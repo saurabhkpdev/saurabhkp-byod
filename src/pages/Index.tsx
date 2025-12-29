@@ -5,30 +5,26 @@ import { useUsageStats } from '@/hooks/useUsageStats';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Upload, BarChart3, Shield, Clock, Activity, FileUp } from 'lucide-react';
-
 const Index = () => {
-  const { totalVisits, totalUploads, getLastVisitFormatted } = useUsageStats();
-
-  const features = [
-    {
-      icon: Upload,
-      title: 'Easy Upload',
-      description: 'Drag and drop your CSV files or choose from sample datasets',
-    },
-    {
-      icon: BarChart3,
-      title: 'Smart Analytics',
-      description: 'Automatic statistics and visualizations for your data',
-    },
-    {
-      icon: Shield,
-      title: 'PII Protection',
-      description: 'Mark and track sensitive personal information columns',
-    },
-  ];
-
-  return (
-    <>
+  const {
+    totalVisits,
+    totalUploads,
+    getLastVisitFormatted
+  } = useUsageStats();
+  const features = [{
+    icon: Upload,
+    title: 'Easy Upload',
+    description: 'Drag and drop your CSV files or choose from sample datasets'
+  }, {
+    icon: BarChart3,
+    title: 'Smart Analytics',
+    description: 'Automatic statistics and visualizations for your data'
+  }, {
+    icon: Shield,
+    title: 'PII Protection',
+    description: 'Mark and track sensitive personal information columns'
+  }];
+  return <>
       <Helmet>
         <title>DataLens - Your Data Analysis Platform</title>
         <meta name="description" content="Upload, analyze, and protect your data with DataLens. View statistics, create visualizations, and manage PII columns." />
@@ -41,7 +37,7 @@ const Index = () => {
           {/* Hero Section */}
           <section className="text-center mb-16 animate-fade-in">
             <h1 className="text-5xl font-bold mb-6">
-              Welcome to <span className="gradient-text">DataLens</span>
+              Welcome to <span className="gradient-text">BYOD</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
               Your powerful platform for uploading, analyzing, and protecting data. 
@@ -100,10 +96,9 @@ const Index = () => {
               What You Can Do
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {features.map((feature) => {
-                const Icon = feature.icon;
-                return (
-                  <Card key={feature.title} className="text-center hover:shadow-lg transition-shadow">
+              {features.map(feature => {
+              const Icon = feature.icon;
+              return <Card key={feature.title} className="text-center hover:shadow-lg transition-shadow">
                     <CardContent className="p-8">
                       <div className="inline-flex p-4 rounded-2xl bg-primary/10 mb-4">
                         <Icon className="w-8 h-8 text-primary" />
@@ -111,9 +106,8 @@ const Index = () => {
                       <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                       <p className="text-muted-foreground">{feature.description}</p>
                     </CardContent>
-                  </Card>
-                );
-              })}
+                  </Card>;
+            })}
             </div>
           </section>
 
@@ -132,8 +126,6 @@ const Index = () => {
           </section>
         </main>
       </div>
-    </>
-  );
+    </>;
 };
-
 export default Index;
