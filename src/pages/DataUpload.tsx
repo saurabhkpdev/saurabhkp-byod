@@ -9,8 +9,10 @@ import { StatsPanel } from '@/components/StatsPanel';
 import { DataVisualization } from '@/components/DataVisualization';
 import { Header } from '@/components/Header';
 import { UploadWizard } from '@/components/UploadWizard';
+import { DatabaseSelector } from '@/components/DatabaseSelector';
+import { MapEditor } from '@/components/MapEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table2, BarChart3, PieChart } from 'lucide-react';
+import { Table2, BarChart3, PieChart, MapPin } from 'lucide-react';
 
 interface WizardData {
   country: string;
@@ -22,6 +24,8 @@ const DataUpload = () => {
   const navigate = useNavigate();
   const [wizardComplete, setWizardComplete] = useState(false);
   const [wizardData, setWizardData] = useState<WizardData | null>(null);
+  const [sourceMode, setSourceMode] = useState<'select' | 'upload' | 'database'>('select');
+  const [hasGeoData, setHasGeoData] = useState(false);
   const { recordUpload } = useUsageStats();
   
   const {
@@ -41,8 +45,9 @@ const DataUpload = () => {
     setWizardComplete(true);
   };
 
-  const handleDataLoaded = (data: Record<string, unknown>[], fileName: string) => {
+  const handleDataLoaded = (data: Record<string, unknown>[], fileName: string, geoData: boolean = false) => {
     loadData(data, fileName);
+    setHasGeoData(geoData);
     recordUpload();
   };
 
@@ -50,11 +55,38 @@ const DataUpload = () => {
     clearData();
     setWizardComplete(false);
     setWizardData(null);
+    setSourceMode('select');
+    setHasGeoData(false);
   };
 
   const handleGoHome = () => {
     handleClear();
     navigate('/');
+  };
+
+  const handleDatabaseSelect = (databaseData: Record<string, unknown>[], fileName: string, geoData: boolean) => {
+    handleDataLoaded(databaseData, fileName, geoData);
+  };
+
+  const handleChooseUpload = () => {
+    setSourceMode('upload');
+  };
+
+  const handleUpdateCoordinates = (rowIndex: number, lat: number, lng: number) => {
+    // Find lat/lng column names
+    const latColumn = data?.columns.find(c => 
+      c.name.toLowerCase().includes('lat') || c.name.toLowerCase() === 'latitude'
+    );
+    const lngColumn = data?.columns.find(c => 
+      c.name.toLowerCase().includes('lng') || 
+      c.name.toLowerCase().includes('lon') || 
+      c.name.toLowerCase() === 'longitude'
+    );
+    
+    if (latColumn && lngColumn) {
+      updateCell(rowIndex, latColumn.name, lat);
+      updateCell(rowIndex, lngColumn.name, lng);
+    }
   };
 
   return (
@@ -80,7 +112,14 @@ const DataUpload = () => {
               </div>
               <UploadWizard onComplete={handleWizardComplete} />
             </div>
-          ) : !data ? (
+          ) : sourceMode === 'select' && !data ? (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
+              <DatabaseSelector 
+                onSelectDataset={handleDatabaseSelect}
+                onChooseUpload={handleChooseUpload}
+              />
+            </div>
+          ) : sourceMode === 'upload' && !data ? (
             <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold mb-4">
@@ -95,24 +134,30 @@ const DataUpload = () => {
                   </p>
                 )}
               </div>
-              <FileUpload onDataLoaded={handleDataLoaded} />
+              <FileUpload onDataLoaded={(d, f) => handleDataLoaded(d, f, false)} />
             </div>
-          ) : (
+          ) : data ? (
             <div className="space-y-8 animate-slide-up">
               <Tabs defaultValue="data" className="w-full">
-                <TabsList className="grid w-full max-w-md grid-cols-3 mx-auto">
+                <TabsList className={`grid w-full max-w-lg mx-auto ${hasGeoData ? 'grid-cols-4' : 'grid-cols-3'}`}>
                   <TabsTrigger value="data" className="flex items-center gap-2">
                     <Table2 className="w-4 h-4" />
                     Data
                   </TabsTrigger>
                   <TabsTrigger value="stats" className="flex items-center gap-2">
                     <BarChart3 className="w-4 h-4" />
-                    Statistics
+                    Stats
                   </TabsTrigger>
                   <TabsTrigger value="visualize" className="flex items-center gap-2">
                     <PieChart className="w-4 h-4" />
-                    Visualize
+                    Charts
                   </TabsTrigger>
+                  {hasGeoData && (
+                    <TabsTrigger value="map" className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Map
+                    </TabsTrigger>
+                  )}
                 </TabsList>
 
                 <TabsContent value="data" className="mt-6">
@@ -126,9 +171,19 @@ const DataUpload = () => {
                 <TabsContent value="visualize" className="mt-6">
                   <DataVisualization columns={data.columns} rows={data.rows} />
                 </TabsContent>
+
+                {hasGeoData && (
+                  <TabsContent value="map" className="mt-6">
+                    <MapEditor 
+                      columns={data.columns} 
+                      rows={data.rows} 
+                      onUpdateCoordinates={handleUpdateCoordinates}
+                    />
+                  </TabsContent>
+                )}
               </Tabs>
             </div>
-          )}
+          ) : null}
         </main>
       </div>
     </>
