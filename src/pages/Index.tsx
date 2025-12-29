@@ -1,120 +1,135 @@
-import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useDataStore } from '@/hooks/useDataStore';
-import { FileUpload } from '@/components/FileUpload';
-import { DataTable } from '@/components/DataTable';
-import { StatsPanel } from '@/components/StatsPanel';
-import { DataVisualization } from '@/components/DataVisualization';
+import { Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
-import { UploadWizard } from '@/components/UploadWizard';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table2, BarChart3, PieChart } from 'lucide-react';
-
-interface WizardData {
-  country: string;
-  region: string;
-  consent: boolean;
-}
+import { useUsageStats } from '@/hooks/useUsageStats';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Upload, BarChart3, Shield, Clock, Activity, FileUp } from 'lucide-react';
 
 const Index = () => {
-  const [wizardComplete, setWizardComplete] = useState(false);
-  const [wizardData, setWizardData] = useState<WizardData | null>(null);
-  
-  const {
-    data,
-    loadData,
-    updateCell,
-    togglePII,
-    getStats,
-    clearData
-  } = useDataStore();
+  const { totalVisits, totalUploads, getLastVisitFormatted } = useUsageStats();
 
-  const stats = data ? getStats() : [];
-  const piiColumns = data?.columns.filter(c => c.isPII).map(c => c.name) || [];
-
-  const handleWizardComplete = (data: WizardData) => {
-    setWizardData(data);
-    setWizardComplete(true);
-  };
-
-  const handleClear = () => {
-    clearData();
-    setWizardComplete(false);
-    setWizardData(null);
-  };
+  const features = [
+    {
+      icon: Upload,
+      title: 'Easy Upload',
+      description: 'Drag and drop your CSV files or choose from sample datasets',
+    },
+    {
+      icon: BarChart3,
+      title: 'Smart Analytics',
+      description: 'Automatic statistics and visualizations for your data',
+    },
+    {
+      icon: Shield,
+      title: 'PII Protection',
+      description: 'Mark and track sensitive personal information columns',
+    },
+  ];
 
   return (
     <>
       <Helmet>
-        <title>DataLens - Upload, Analyze & Protect Your Data</title>
-        <meta name="description" content="Upload CSV data, view statistics, create visualizations, and mark PII columns for privacy protection. A powerful data analysis tool." />
+        <title>DataLens - Your Data Analysis Platform</title>
+        <meta name="description" content="Upload, analyze, and protect your data with DataLens. View statistics, create visualizations, and manage PII columns." />
       </Helmet>
       
       <div className="min-h-screen bg-background">
-        <Header fileName={data?.fileName} onClear={handleClear} />
+        <Header />
         
-        <main className="container mx-auto px-6 py-8">
-          {!wizardComplete ? (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
-              <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4">
-                  <span className="gradient-text">Before You Begin</span>
-                </h2>
-                <p className="text-lg text-muted-foreground max-w-md mx-auto">
-                  Please complete the following questionnaire to proceed with data upload
-                </p>
-              </div>
-              <UploadWizard onComplete={handleWizardComplete} />
-            </div>
-          ) : !data ? (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
-              <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-4">
-                  <span className="gradient-text">Bring Your Own Data</span>
-                </h2>
-                <p className="text-lg text-muted-foreground max-w-md mx-auto">
-                  Upload your CSV file to explore statistics, visualize patterns, and mark sensitive information
-                </p>
-                {wizardData && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Uploading from {wizardData.region}, {wizardData.country}
-                  </p>
-                )}
-              </div>
-              <FileUpload onDataLoaded={loadData} />
-            </div>
-          ) : (
-            <div className="space-y-8 animate-slide-up">
-              <Tabs defaultValue="data" className="w-full">
-                <TabsList className="grid w-full max-w-md grid-cols-3 mx-auto">
-                  <TabsTrigger value="data" className="flex items-center gap-2">
-                    <Table2 className="w-4 h-4" />
-                    Data
-                  </TabsTrigger>
-                  <TabsTrigger value="stats" className="flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4" />
-                    Statistics
-                  </TabsTrigger>
-                  <TabsTrigger value="visualize" className="flex items-center gap-2">
-                    <PieChart className="w-4 h-4" />
-                    Visualize
-                  </TabsTrigger>
-                </TabsList>
+        <main className="container mx-auto px-6 py-12">
+          {/* Hero Section */}
+          <section className="text-center mb-16 animate-fade-in">
+            <h1 className="text-5xl font-bold mb-6">
+              Welcome to <span className="gradient-text">DataLens</span>
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+              Your powerful platform for uploading, analyzing, and protecting data. 
+              Get insights with statistics, visualizations, and PII management.
+            </p>
+            <Link to="/upload">
+              <Button size="lg" className="gap-2 text-lg px-8 py-6">
+                <FileUp className="w-5 h-5" />
+                Start Uploading Data
+              </Button>
+            </Link>
+          </section>
 
-                <TabsContent value="data" className="mt-6">
-                  <DataTable columns={data.columns} rows={data.rows} onCellUpdate={updateCell} onTogglePII={togglePII} />
-                </TabsContent>
+          {/* Stats Cards */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            <Card className="glass border-primary/20">
+              <CardContent className="p-6 flex items-center gap-4">
+                <div className="p-4 rounded-xl bg-primary/10">
+                  <Activity className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-foreground">{totalVisits}</p>
+                  <p className="text-sm text-muted-foreground">Total Visits</p>
+                </div>
+              </CardContent>
+            </Card>
 
-                <TabsContent value="stats" className="mt-6">
-                  <StatsPanel stats={stats} piiColumns={piiColumns} />
-                </TabsContent>
+            <Card className="glass border-success/20">
+              <CardContent className="p-6 flex items-center gap-4">
+                <div className="p-4 rounded-xl bg-success/10">
+                  <Upload className="w-8 h-8 text-success" />
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-foreground">{totalUploads}</p>
+                  <p className="text-sm text-muted-foreground">Files Uploaded</p>
+                </div>
+              </CardContent>
+            </Card>
 
-                <TabsContent value="visualize" className="mt-6">
-                  <DataVisualization columns={data.columns} rows={data.rows} />
-                </TabsContent>
-              </Tabs>
+            <Card className="glass border-warning/20">
+              <CardContent className="p-6 flex items-center gap-4">
+                <div className="p-4 rounded-xl bg-warning/10">
+                  <Clock className="w-8 h-8 text-warning" />
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-foreground">{getLastVisitFormatted()}</p>
+                  <p className="text-sm text-muted-foreground">Last Visit</p>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* Features Section */}
+          <section className="mb-16">
+            <h2 className="text-3xl font-bold text-center mb-10">
+              What You Can Do
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {features.map((feature) => {
+                const Icon = feature.icon;
+                return (
+                  <Card key={feature.title} className="text-center hover:shadow-lg transition-shadow">
+                    <CardContent className="p-8">
+                      <div className="inline-flex p-4 rounded-2xl bg-primary/10 mb-4">
+                        <Icon className="w-8 h-8 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                      <p className="text-muted-foreground">{feature.description}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
-          )}
+          </section>
+
+          {/* CTA Section */}
+          <section className="text-center py-12 px-8 rounded-2xl glass border">
+            <h2 className="text-2xl font-bold mb-4">Ready to analyze your data?</h2>
+            <p className="text-muted-foreground mb-6">
+              Upload your CSV file and get instant insights with statistics and visualizations.
+            </p>
+            <Link to="/upload">
+              <Button variant="outline" size="lg" className="gap-2">
+                <Upload className="w-4 h-4" />
+                Go to Data Upload
+              </Button>
+            </Link>
+          </section>
         </main>
       </div>
     </>
