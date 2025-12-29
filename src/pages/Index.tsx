@@ -7,15 +7,18 @@ import { DataVisualization } from '@/components/DataVisualization';
 import { Header } from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table2, BarChart3, PieChart } from 'lucide-react';
-
 const Index = () => {
-  const { data, loadData, updateCell, togglePII, getStats, clearData } = useDataStore();
-
+  const {
+    data,
+    loadData,
+    updateCell,
+    togglePII,
+    getStats,
+    clearData
+  } = useDataStore();
   const stats = data ? getStats() : [];
   const piiColumns = data?.columns.filter(c => c.isPII).map(c => c.name) || [];
-
-  return (
-    <>
+  return <>
       <Helmet>
         <title>DataLens - Upload, Analyze & Protect Your Data</title>
         <meta name="description" content="Upload CSV data, view statistics, create visualizations, and mark PII columns for privacy protection. A powerful data analysis tool." />
@@ -25,20 +28,17 @@ const Index = () => {
         <Header fileName={data?.fileName} onClear={clearData} />
         
         <main className="container mx-auto px-6 py-8">
-          {!data ? (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
+          {!data ? <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold mb-4">
-                  <span className="gradient-text">Analyze Your Data</span>
+                  <span className="gradient-text">Bring Your Own Data</span>
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-md mx-auto">
                   Upload your CSV file to explore statistics, visualize patterns, and mark sensitive information
                 </p>
               </div>
               <FileUpload onDataLoaded={loadData} />
-            </div>
-          ) : (
-            <div className="space-y-8 animate-slide-up">
+            </div> : <div className="space-y-8 animate-slide-up">
               <Tabs defaultValue="data" className="w-full">
                 <TabsList className="grid w-full max-w-md grid-cols-3 mx-auto">
                   <TabsTrigger value="data" className="flex items-center gap-2">
@@ -56,12 +56,7 @@ const Index = () => {
                 </TabsList>
 
                 <TabsContent value="data" className="mt-6">
-                  <DataTable
-                    columns={data.columns}
-                    rows={data.rows}
-                    onCellUpdate={updateCell}
-                    onTogglePII={togglePII}
-                  />
+                  <DataTable columns={data.columns} rows={data.rows} onCellUpdate={updateCell} onTogglePII={togglePII} />
                 </TabsContent>
 
                 <TabsContent value="stats" className="mt-6">
@@ -72,12 +67,9 @@ const Index = () => {
                   <DataVisualization columns={data.columns} rows={data.rows} />
                 </TabsContent>
               </Tabs>
-            </div>
-          )}
+            </div>}
         </main>
       </div>
-    </>
-  );
+    </>;
 };
-
 export default Index;
