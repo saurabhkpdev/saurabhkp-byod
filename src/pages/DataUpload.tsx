@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { useDataStore } from '@/hooks/useDataStore';
 import { useUsageStats } from '@/hooks/useUsageStats';
+import { useAuditLog } from '@/hooks/useAuditLog';
 import { FileUpload } from '@/components/FileUpload';
 import { DataTable } from '@/components/DataTable';
 import { StatsPanel } from '@/components/StatsPanel';
@@ -29,6 +30,12 @@ const DataUpload = () => {
   const [sourceMode, setSourceMode] = useState<'select' | 'upload' | 'database'>('select');
   const [hasGeoData, setHasGeoData] = useState(false);
   const { recordUpload } = useUsageStats();
+  const { logEvent } = useAuditLog();
+  
+  // Log page view
+  useEffect(() => {
+    logEvent('page_view', 'Visited Data Upload page', 'Data Upload');
+  }, [logEvent]);
   
   const {
     data,
@@ -51,6 +58,7 @@ const DataUpload = () => {
     loadData(data, fileName);
     setHasGeoData(geoData);
     recordUpload();
+    logEvent('data_upload', `Uploaded file: ${fileName} (${data.length} rows)`, 'Data Upload', { fileName, rowCount: data.length, hasGeoData: geoData });
   };
 
   const handleClear = () => {
@@ -67,6 +75,7 @@ const DataUpload = () => {
   };
 
   const handleDatabaseSelect = (databaseData: Record<string, unknown>[], fileName: string, geoData: boolean) => {
+    logEvent('dataset_selected', `Selected dataset: ${fileName}`, 'Data Upload', { fileName, hasGeoData: geoData });
     handleDataLoaded(databaseData, fileName, geoData);
   };
 
@@ -88,6 +97,7 @@ const DataUpload = () => {
     if (latColumn && lngColumn) {
       updateCell(rowIndex, latColumn.name, lat);
       updateCell(rowIndex, lngColumn.name, lng);
+      logEvent('coordinates_updated', `Updated coordinates for row ${rowIndex + 1}`, 'Data Upload', { rowIndex, lat, lng });
     }
   };
 
@@ -193,6 +203,7 @@ const DataUpload = () => {
                     columns={data.columns} 
                     rows={data.rows} 
                     onProcessData={() => {
+                      logEvent('data_processed', `Processed ${data.rows.length} rows from "${data.fileName}"`, 'Data Upload', { fileName: data.fileName, rowCount: data.rows.length });
                       toast.success('Data successfully processed to platform!', {
                         description: `${data.rows.length} rows from "${data.fileName}" have been submitted.`
                       });

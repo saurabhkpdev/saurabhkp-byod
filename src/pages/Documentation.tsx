@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
+import { useAuditLog } from "@/hooks/useAuditLog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +29,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const Documentation = () => {
+  const { logEvent } = useAuditLog();
+
+  useEffect(() => {
+    logEvent('page_view', 'Visited Documentation page', 'Docs');
+  }, [logEvent]);
   const quickStartSteps = [
     {
       step: 1,

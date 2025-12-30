@@ -1,16 +1,20 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { useUsageStats } from '@/hooks/useUsageStats';
+import { useAuditLog } from '@/hooks/useAuditLog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Upload, BarChart3, Shield, Clock, Activity, FileUp } from 'lucide-react';
+
 const Index = () => {
-  const {
-    totalVisits,
-    totalUploads,
-    getLastVisitFormatted
-  } = useUsageStats();
+  const { totalVisits, totalUploads, getLastVisitFormatted } = useUsageStats();
+  const { logEvent } = useAuditLog();
+
+  useEffect(() => {
+    logEvent('page_view', 'Visited Home page', 'Home');
+  }, [logEvent]);
   const features = [{
     icon: Upload,
     title: 'Easy Upload',

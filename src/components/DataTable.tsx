@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { Shield, ShieldOff, Edit2, Check, X } from 'lucide-react';
 import { DataColumn, DataRow } from '@/types/data';
 import { cn } from '@/lib/utils';
+import { useAuditLog } from '@/hooks/useAuditLog';
 import {
   Table,
   TableBody,
@@ -37,6 +38,7 @@ export const DataTable = ({ columns, rows, onCellUpdate, onTogglePII }: DataTabl
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [page, setPage] = useState(0);
   const pageSize = 50;
+  const { logEvent } = useAuditLog();
 
   const paginatedRows = rows.slice(page * pageSize, (page + 1) * pageSize);
   const totalPages = Math.ceil(rows.length / pageSize);
@@ -65,12 +67,20 @@ export const DataTable = ({ columns, rows, onCellUpdate, onTogglePII }: DataTabl
     }
     
     onCellUpdate(editingCell.rowIndex, editingCell.columnName, parsedValue);
+    logEvent('data_edit', `Edited cell [${editingCell.rowIndex + 1}, ${editingCell.columnName}]`, 'Data Upload', { rowIndex: editingCell.rowIndex, column: editingCell.columnName, newValue: parsedValue });
     setEditingCell(null);
-  }, [editingCell, columns, onCellUpdate]);
+  }, [editingCell, columns, onCellUpdate, logEvent]);
 
   const handleCancelEdit = useCallback(() => {
     setEditingCell(null);
   }, []);
+
+  const handleTogglePII = useCallback((columnName: string) => {
+    const column = columns.find(c => c.name === columnName);
+    const isCurrentlyPII = column?.isPII ?? false;
+    onTogglePII(columnName);
+    logEvent(isCurrentlyPII ? 'pii_untagged' : 'pii_tagged', `${isCurrentlyPII ? 'Untagged' : 'Tagged'} column "${columnName}" as PII`, 'Data Upload', { column: columnName });
+  }, [columns, onTogglePII, logEvent]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -120,7 +130,7 @@ export const DataTable = ({ columns, rows, onCellUpdate, onTogglePII }: DataTabl
                               "h-6 w-6 ml-auto",
                               column.isPII && "text-pii hover:text-pii"
                             )}
-                            onClick={() => onTogglePII(column.name)}
+                            onClick={() => handleTogglePII(column.name)}
                           >
                             {column.isPII ? (
                               <Shield className="w-3.5 h-3.5" />
