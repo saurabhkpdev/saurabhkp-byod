@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw';
+import 'leaflet-draw/dist/leaflet.draw.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, MapPin, Move } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { AlertCircle, MapPin, Move, Pencil, Square, Minus, Circle, Trash2, Layers } from 'lucide-react';
 import { DataColumn, DataRow } from '@/types/data';
 import { toast } from 'sonner';
 import { useAuditLog } from '@/hooks/useAuditLog';
@@ -51,12 +54,17 @@ const createNumberedIcon = (number: number, isSelected: boolean = false) => {
   });
 };
 
+type DrawMode = 'select' | 'marker' | 'polygon' | 'polyline' | 'rectangle' | 'circle';
+
 export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: LeafletMapEditorProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
+  const drawnItemsRef = useRef<L.FeatureGroup | null>(null);
   const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
   const [isMapInitialized, setIsMapInitialized] = useState(false);
+  const [drawMode, setDrawMode] = useState<DrawMode>('select');
+  const [drawnShapesCount, setDrawnShapesCount] = useState(0);
   const { logEvent } = useAuditLog();
 
   // Find latitude and longitude columns
@@ -110,6 +118,25 @@ export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: Leaflet
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mapRef.current);
 
+    // Initialize FeatureGroup for drawn items
+    drawnItemsRef.current = new L.FeatureGroup();
+    mapRef.current.addLayer(drawnItemsRef.current);
+
+    // Handle draw created event
+    mapRef.current.on(L.Draw.Event.CREATED, (e: L.LeafletEvent) => {
+      const event = e as L.DrawEvents.Created;
+      const layer = event.layer;
+      drawnItemsRef.current?.addLayer(layer);
+      setDrawnShapesCount(prev => prev + 1);
+      
+      const shapeType = event.layerType;
+      logEvent('map_feature_created', `Created ${shapeType} on map`, 'Data Upload', { shapeType });
+      toast.success(`Created ${shapeType}`);
+      
+      // Reset to select mode
+      setDrawMode('select');
+    });
+
     setIsMapInitialized(true);
 
     return () => {
@@ -118,13 +145,13 @@ export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: Leaflet
         mapRef.current = null;
       }
     };
-  }, [hasGeoData, getPoints]);
+  }, [hasGeoData, getPoints, logEvent]);
 
-  // Add/update markers
+  // Add/update data markers
   useEffect(() => {
     if (!mapRef.current || !isMapInitialized) return;
 
-    // Clear existing markers
+    // Clear existing data markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
@@ -184,6 +211,78 @@ export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: Leaflet
     });
   }, [selectedMarker, getPoints, isMapInitialized]);
 
+  // Handle draw mode changes
+  const activateDrawMode = useCallback((mode: DrawMode) => {
+    if (!mapRef.current) return;
+    
+    setDrawMode(mode);
+
+    if (mode === 'select') return;
+
+    // Create and enable draw handler using type assertions
+    const map = mapRef.current as L.Map & L.DrawMap;
+    let handler: L.Handler | null = null;
+    
+    switch (mode) {
+      case 'marker':
+        handler = new L.Draw.Marker(map, {
+          icon: new L.Icon.Default()
+        });
+        break;
+      case 'polygon':
+        handler = new L.Draw.Polygon(map, {
+          shapeOptions: {
+            color: '#6366f1',
+            fillColor: '#6366f1',
+            fillOpacity: 0.2
+          }
+        });
+        break;
+      case 'polyline':
+        handler = new L.Draw.Polyline(map, {
+          shapeOptions: {
+            color: '#6366f1',
+            weight: 3
+          }
+        });
+        break;
+      case 'rectangle':
+        handler = new L.Draw.Rectangle(map, {
+          shapeOptions: {
+            color: '#6366f1',
+            fillColor: '#6366f1',
+            fillOpacity: 0.2
+          }
+        });
+        break;
+      case 'circle':
+        handler = new L.Draw.Circle(map, {
+          shapeOptions: {
+            color: '#6366f1',
+            fillColor: '#6366f1',
+            fillOpacity: 0.2
+          }
+        });
+        break;
+    }
+
+    if (handler) {
+      handler.enable();
+    }
+  }, []);
+
+  const clearAllDrawnShapes = useCallback(() => {
+    if (drawnItemsRef.current) {
+      const count = drawnItemsRef.current.getLayers().length;
+      drawnItemsRef.current.clearLayers();
+      setDrawnShapesCount(0);
+      if (count > 0) {
+        logEvent('map_feature_deleted', `Cleared all ${count} drawn shapes`, 'Data Upload', { count });
+        toast.success(`Cleared ${count} drawn shape(s)`);
+      }
+    }
+  }, [logEvent]);
+
   if (!hasGeoData) {
     return (
       <Card>
@@ -204,28 +303,88 @@ export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: Leaflet
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="flex items-center gap-2">
             <MapPin className="w-5 h-5" />
             Map Editor
-            <span className="text-xs font-normal text-muted-foreground ml-2">(OpenStreetMap - No API key required)</span>
+            <span className="text-xs font-normal text-muted-foreground ml-2">(OpenStreetMap)</span>
           </CardTitle>
-          <div className="flex items-center gap-2">
+          
+          {/* Drawing Tools */}
+          <div className="flex items-center gap-1 flex-wrap">
+            <Button
+              variant={drawMode === 'select' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => activateDrawMode('select')}
+              title="Select Mode"
+            >
+              <Move className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={drawMode === 'marker' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => activateDrawMode('marker')}
+              title="Add Marker"
+            >
+              <MapPin className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={drawMode === 'polyline' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => activateDrawMode('polyline')}
+              title="Draw Line"
+            >
+              <Minus className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={drawMode === 'polygon' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => activateDrawMode('polygon')}
+              title="Draw Polygon"
+            >
+              <Pencil className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={drawMode === 'rectangle' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => activateDrawMode('rectangle')}
+              title="Draw Rectangle"
+            >
+              <Square className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={drawMode === 'circle' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => activateDrawMode('circle')}
+              title="Draw Circle"
+            >
+              <Circle className="w-4 h-4" />
+            </Button>
+            <div className="w-px h-6 bg-border mx-1" />
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setSelectedMarker(null)}
-              title="Clear Selection"
-              disabled={selectedMarker === null}
+              onClick={clearAllDrawnShapes}
+              title="Clear All Shapes"
+              disabled={drawnShapesCount === 0}
+              className="text-destructive hover:text-destructive"
             >
-              <Move className="w-4 h-4 mr-1" />
-              Clear
+              <Trash2 className="w-4 h-4" />
             </Button>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Drag markers to update coordinates. Click a marker to select it. {points.length} locations shown.
-        </p>
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <span>Drag data markers to update coordinates. Click drawing tools to add shapes.</span>
+          <span className="flex items-center gap-1">
+            <Layers className="w-4 h-4" />
+            {points.length} data points
+          </span>
+          {drawnShapesCount > 0 && (
+            <Badge variant="secondary">
+              {drawnShapesCount} drawn shape{drawnShapesCount !== 1 ? 's' : ''}
+            </Badge>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         <div ref={mapContainer} className="h-[500px] w-full" />
