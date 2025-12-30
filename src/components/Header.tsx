@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Database, FileSpreadsheet, Trash2, Home } from 'lucide-react';
+import { Database, FileSpreadsheet, Trash2, Home, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NavLink } from '@/components/NavLink';
+
 interface HeaderProps {
   fileName?: string;
   onClear?: () => void;
@@ -31,6 +33,15 @@ export const Header = ({
                 <Home className="w-4 h-4" />
                 Home
               </Button>}
+            
+            <NavLink 
+              to="/docs" 
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+              activeClassName="text-primary bg-primary/10"
+            >
+              <BookOpen className="w-4 h-4" />
+              Docs
+            </NavLink>
           </div>
           
           {fileName && <div className="flex items-center gap-4">
