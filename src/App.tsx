@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/Index";
 import DataUpload from "./pages/DataUpload";
 import Documentation from "./pages/Documentation";
@@ -19,13 +20,15 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/upload" element={<DataUpload />} />
-            <Route path="/docs" element={<Documentation />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppSidebar>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/upload" element={<DataUpload />} />
+              <Route path="/docs" element={<Documentation />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AppSidebar>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

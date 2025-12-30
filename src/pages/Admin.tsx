@@ -1,5 +1,4 @@
 import { Helmet } from "react-helmet-async";
-import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -84,8 +83,6 @@ const Admin = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <Header />
-
         <main className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
