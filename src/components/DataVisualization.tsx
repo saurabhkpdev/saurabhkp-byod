@@ -261,16 +261,6 @@ export const DataVisualization = ({ columns, rows }: DataVisualizationProps) => 
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm text-muted-foreground">Available visualizations:</span>
-        {availableCharts.map(chart => (
-          <Badge key={chart} variant="secondary" className="flex items-center gap-1">
-            {chartIcons[chart]}
-            {chartLabels[chart]}
-          </Badge>
-        ))}
-      </div>
-
       <Tabs defaultValue={availableCharts[0]} className="w-full">
         <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/50 p-1">
           {availableCharts.map(chart => (

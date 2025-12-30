@@ -11,11 +11,9 @@ import { DataQualityPanel } from '@/components/DataQualityPanel';
 import { TopBar } from '@/components/TopBar';
 import { UploadWizard } from '@/components/UploadWizard';
 import { DatabaseSelector } from '@/components/DatabaseSelector';
-import { MapEditor } from '@/components/MapEditor';
+
 import { LeafletMapEditor } from '@/components/LeafletMapEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { Table2, BarChart3, PieChart, MapPin, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -30,7 +28,6 @@ const DataUpload = () => {
   const [wizardData, setWizardData] = useState<WizardData | null>(null);
   const [sourceMode, setSourceMode] = useState<'select' | 'upload' | 'database'>('select');
   const [hasGeoData, setHasGeoData] = useState(false);
-  const [mapProvider, setMapProvider] = useState<'openstreetmap' | 'mapbox'>('openstreetmap');
   const { recordUpload } = useUsageStats();
   const { logEvent } = useAuditLog();
   
@@ -181,42 +178,12 @@ const DataUpload = () => {
                 </TabsContent>
 
                 {hasGeoData && (
-                  <TabsContent value="map" className="mt-6 space-y-4">
-                    <div className="flex items-center gap-4 p-3 rounded-lg border bg-muted/30">
-                      <span className="text-sm font-medium">Map Provider:</span>
-                      <RadioGroup 
-                        value={mapProvider} 
-                        onValueChange={(v) => setMapProvider(v as 'openstreetmap' | 'mapbox')}
-                        className="flex gap-4"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="openstreetmap" id="osm" />
-                          <Label htmlFor="osm" className="text-sm cursor-pointer">
-                            OpenStreetMap (Free, no API key)
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="mapbox" id="mapbox" />
-                          <Label htmlFor="mapbox" className="text-sm cursor-pointer">
-                            Mapbox (Requires API key)
-                          </Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                    
-                    {mapProvider === 'openstreetmap' ? (
-                      <LeafletMapEditor 
-                        columns={data.columns} 
-                        rows={data.rows} 
-                        onUpdateCoordinates={handleUpdateCoordinates}
-                      />
-                    ) : (
-                      <MapEditor 
-                        columns={data.columns} 
-                        rows={data.rows} 
-                        onUpdateCoordinates={handleUpdateCoordinates}
-                      />
-                    )}
+                  <TabsContent value="map" className="mt-6">
+                    <LeafletMapEditor 
+                      columns={data.columns} 
+                      rows={data.rows} 
+                      onUpdateCoordinates={handleUpdateCoordinates}
+                    />
                   </TabsContent>
                 )}
 
