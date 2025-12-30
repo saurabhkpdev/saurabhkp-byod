@@ -78,6 +78,85 @@ const customerLocationsData = [
   { customer_id: 'CUST-012', name: 'Copenhagen Green', type: 'Startup', country: 'Denmark', city: 'Copenhagen', address: 'Strøget 15', latitude: 55.6779, longitude: 12.5710, revenue: 41000, orders: 17, status: 'New' },
 ];
 
+// Non-geographical datasets
+const employeesData = [
+  { employee_id: 'EMP-001', first_name: 'John', last_name: 'Smith', email: 'john.smith@company.com', department: 'Engineering', position: 'Senior Developer', hire_date: '2020-03-15', salary: 95000, performance_score: 4.5, is_remote: true },
+  { employee_id: 'EMP-002', first_name: 'Sarah', last_name: 'Johnson', email: 'sarah.johnson@company.com', department: 'Marketing', position: 'Marketing Manager', hire_date: '2019-07-22', salary: 85000, performance_score: 4.8, is_remote: false },
+  { employee_id: 'EMP-003', first_name: 'Michael', last_name: 'Williams', email: 'michael.williams@company.com', department: 'Sales', position: 'Sales Rep', hire_date: '2021-01-10', salary: 65000, performance_score: 3.9, is_remote: true },
+  { employee_id: 'EMP-004', first_name: 'Emily', last_name: 'Brown', email: 'emily.brown@company.com', department: 'HR', position: 'HR Specialist', hire_date: '2018-11-05', salary: 72000, performance_score: 4.2, is_remote: false },
+  { employee_id: 'EMP-005', first_name: 'David', last_name: 'Jones', email: 'david.jones@company.com', department: 'Engineering', position: 'Tech Lead', hire_date: '2017-06-18', salary: 125000, performance_score: 4.7, is_remote: true },
+  { employee_id: 'EMP-006', first_name: 'Jessica', last_name: 'Garcia', email: 'jessica.garcia@company.com', department: 'Finance', position: 'Financial Analyst', hire_date: '2020-09-01', salary: 78000, performance_score: 4.1, is_remote: false },
+  { employee_id: 'EMP-007', first_name: 'Robert', last_name: 'Martinez', email: 'robert.martinez@company.com', department: 'Engineering', position: 'Junior Developer', hire_date: '2022-04-12', salary: 62000, performance_score: 3.6, is_remote: true },
+  { employee_id: 'EMP-008', first_name: 'Amanda', last_name: 'Anderson', email: 'amanda.anderson@company.com', department: 'Sales', position: 'Sales Manager', hire_date: '2016-02-28', salary: 98000, performance_score: 4.9, is_remote: false },
+  { employee_id: 'EMP-009', first_name: 'Christopher', last_name: 'Taylor', email: 'christopher.taylor@company.com', department: 'Operations', position: 'Operations Lead', hire_date: '2019-08-14', salary: 82000, performance_score: 4.0, is_remote: true },
+  { employee_id: 'EMP-010', first_name: 'Michelle', last_name: 'Thomas', email: 'michelle.thomas@company.com', department: 'Marketing', position: 'Content Specialist', hire_date: '2021-05-20', salary: 58000, performance_score: 4.3, is_remote: false },
+  { employee_id: 'EMP-011', first_name: 'Daniel', last_name: 'Jackson', email: '', department: 'Engineering', position: 'DevOps Engineer', hire_date: '2020-11-30', salary: 105000, performance_score: 4.6, is_remote: true },
+  { employee_id: 'EMP-012', first_name: '', last_name: 'White', email: 'unknown.white@company.com', department: 'Finance', position: 'Accountant', hire_date: '2018-03-22', salary: 68000, performance_score: 3.8, is_remote: false },
+];
+
+const productsData = [
+  { product_id: 'PROD-001', name: 'Wireless Headphones', category: 'Electronics', brand: 'TechSound', price: 149.99, cost: 65.00, stock_quantity: 234, rating: 4.5, reviews: 1892, is_active: true, launch_date: '2023-01-15' },
+  { product_id: 'PROD-002', name: 'Smart Watch Pro', category: 'Electronics', brand: 'WristTech', price: 299.99, cost: 120.00, stock_quantity: 156, rating: 4.7, reviews: 3421, is_active: true, launch_date: '2022-09-20' },
+  { product_id: 'PROD-003', name: 'Organic Coffee Beans', category: 'Food & Beverage', brand: 'BeanMaster', price: 24.99, cost: 8.50, stock_quantity: 892, rating: 4.8, reviews: 567, is_active: true, launch_date: '2021-06-10' },
+  { product_id: 'PROD-004', name: 'Yoga Mat Premium', category: 'Sports', brand: 'FlexFit', price: 79.99, cost: 22.00, stock_quantity: 445, rating: 4.3, reviews: 234, is_active: true, launch_date: '2022-03-05' },
+  { product_id: 'PROD-005', name: 'LED Desk Lamp', category: 'Home & Office', brand: 'BrightLife', price: 59.99, cost: 18.00, stock_quantity: 0, rating: 4.1, reviews: 789, is_active: false, launch_date: '2020-11-28' },
+  { product_id: 'PROD-006', name: 'Running Shoes X1', category: 'Sports', brand: 'SpeedRun', price: 189.99, cost: 75.00, stock_quantity: 312, rating: 4.6, reviews: 2156, is_active: true, launch_date: '2023-04-12' },
+  { product_id: 'PROD-007', name: 'Portable Charger 20K', category: 'Electronics', brand: 'PowerPlus', price: 49.99, cost: 15.00, stock_quantity: 678, rating: 4.4, reviews: 945, is_active: true, launch_date: '2022-07-18' },
+  { product_id: 'PROD-008', name: 'Stainless Steel Bottle', category: 'Home & Office', brand: 'EcoSip', price: 34.99, cost: 9.00, stock_quantity: 523, rating: 4.2, reviews: 412, is_active: true, launch_date: '2021-09-03' },
+  { product_id: 'PROD-009', name: 'Noise Cancelling Earbuds', category: 'Electronics', brand: 'TechSound', price: 199.99, cost: 85.00, stock_quantity: 189, rating: 4.8, reviews: 3876, is_active: true, launch_date: '2023-02-28' },
+  { product_id: 'PROD-010', name: 'Bamboo Cutting Board', category: 'Home & Office', brand: 'NatureHome', price: 29.99, cost: 7.50, stock_quantity: -5, rating: 4.0, reviews: 178, is_active: true, launch_date: '2020-05-15' },
+  { product_id: 'PROD-011', name: 'Fitness Tracker Band', category: 'Electronics', brand: 'WristTech', price: 89.99, cost: 32.00, stock_quantity: 267, rating: 4.3, reviews: 1234, is_active: true, launch_date: '2022-12-01' },
+  { product_id: 'PROD-012', name: 'Premium Notebook Set', category: 'Home & Office', brand: 'WriteWell', price: 19.99, cost: 4.00, stock_quantity: 1245, rating: 4.6, reviews: 567, is_active: true, launch_date: '2021-08-20' },
+];
+
+const transactionsData = [
+  { transaction_id: 'TXN-001', customer_name: 'Alice Cooper', product: 'Wireless Headphones', quantity: 2, unit_price: 149.99, total_amount: 299.98, payment_method: 'Credit Card', status: 'Completed', transaction_date: '2024-01-15 10:23:45' },
+  { transaction_id: 'TXN-002', customer_name: 'Bob Martin', product: 'Smart Watch Pro', quantity: 1, unit_price: 299.99, total_amount: 299.99, payment_method: 'PayPal', status: 'Completed', transaction_date: '2024-01-15 11:45:12' },
+  { transaction_id: 'TXN-003', customer_name: 'Carol White', product: 'Yoga Mat Premium', quantity: 3, unit_price: 79.99, total_amount: 239.97, payment_method: 'Debit Card', status: 'Pending', transaction_date: '2024-01-15 14:02:33' },
+  { transaction_id: 'TXN-004', customer_name: 'Dave Wilson', product: 'LED Desk Lamp', quantity: 1, unit_price: 59.99, total_amount: 59.99, payment_method: 'Credit Card', status: 'Failed', transaction_date: '2024-01-15 15:18:56' },
+  { transaction_id: 'TXN-005', customer_name: 'Eve Johnson', product: 'Running Shoes X1', quantity: 1, unit_price: 189.99, total_amount: 189.99, payment_method: 'Apple Pay', status: 'Completed', transaction_date: '2024-01-15 16:30:22' },
+  { transaction_id: 'TXN-006', customer_name: 'Frank Brown', product: 'Portable Charger 20K', quantity: 4, unit_price: 49.99, total_amount: 199.96, payment_method: 'Credit Card', status: 'Completed', transaction_date: '2024-01-16 09:12:45' },
+  { transaction_id: 'TXN-007', customer_name: 'Grace Lee', product: 'Noise Cancelling Earbuds', quantity: 1, unit_price: 199.99, total_amount: 199.99, payment_method: 'PayPal', status: 'Refunded', transaction_date: '2024-01-16 10:45:33' },
+  { transaction_id: 'TXN-008', customer_name: 'Henry Davis', product: 'Organic Coffee Beans', quantity: 5, unit_price: 24.99, total_amount: 124.95, payment_method: 'Debit Card', status: 'Completed', transaction_date: '2024-01-16 12:22:18' },
+  { transaction_id: 'TXN-009', customer_name: 'Ivy Chen', product: 'Stainless Steel Bottle', quantity: 2, unit_price: 34.99, total_amount: 69.98, payment_method: 'Credit Card', status: 'Completed', transaction_date: '2024-01-16 14:55:41' },
+  { transaction_id: 'TXN-010', customer_name: 'Jack Miller', product: 'Fitness Tracker Band', quantity: 1, unit_price: 89.99, total_amount: 89.99, payment_method: 'Google Pay', status: 'Pending', transaction_date: '2024-01-16 16:08:29' },
+  { transaction_id: 'TXN-011', customer_name: 'Kate Robinson', product: 'Premium Notebook Set', quantity: 10, unit_price: 19.99, total_amount: 199.90, payment_method: 'Credit Card', status: 'Completed', transaction_date: '2024-01-17 08:34:12' },
+  { transaction_id: 'TXN-012', customer_name: '', product: 'Smart Watch Pro', quantity: 1, unit_price: 299.99, total_amount: 299.99, payment_method: 'Credit Card', status: 'Completed', transaction_date: '2024-01-17 09:22:45' },
+  { transaction_id: 'TXN-013', customer_name: 'Lucy Adams', product: 'Wireless Headphones', quantity: 1, unit_price: 149.99, total_amount: 149.99, payment_method: 'PayPal', status: 'Completed', transaction_date: '2024-01-17 11:15:33' },
+  { transaction_id: 'TXN-014', customer_name: 'Mike Turner', product: 'Running Shoes X1', quantity: 2, unit_price: 189.99, total_amount: 379.98, payment_method: 'Credit Card', status: 'Completed', transaction_date: '2024-01-17 13:42:18' },
+  { transaction_id: 'TXN-015', customer_name: 'Nancy Clark', product: 'Yoga Mat Premium', quantity: 1, unit_price: 79.99, total_amount: 79.99, payment_method: 'Debit Card', status: 'Completed', transaction_date: '2024-01-17 15:28:56' },
+];
+
+const surveyResponsesData = [
+  { response_id: 1, respondent_age: 25, gender: 'Female', education: 'Bachelor', income_bracket: '$50K-$75K', satisfaction_score: 8, likelihood_to_recommend: 9, product_quality: 'Excellent', customer_service: 'Good', survey_date: '2024-01-10' },
+  { response_id: 2, respondent_age: 34, gender: 'Male', education: 'Master', income_bracket: '$75K-$100K', satisfaction_score: 7, likelihood_to_recommend: 7, product_quality: 'Good', customer_service: 'Excellent', survey_date: '2024-01-10' },
+  { response_id: 3, respondent_age: 45, gender: 'Female', education: 'PhD', income_bracket: '$100K+', satisfaction_score: 9, likelihood_to_recommend: 10, product_quality: 'Excellent', customer_service: 'Excellent', survey_date: '2024-01-11' },
+  { response_id: 4, respondent_age: 28, gender: 'Male', education: 'Bachelor', income_bracket: '$25K-$50K', satisfaction_score: 5, likelihood_to_recommend: 4, product_quality: 'Average', customer_service: 'Poor', survey_date: '2024-01-11' },
+  { response_id: 5, respondent_age: 52, gender: 'Female', education: 'High School', income_bracket: '$25K-$50K', satisfaction_score: 6, likelihood_to_recommend: 6, product_quality: 'Good', customer_service: 'Average', survey_date: '2024-01-12' },
+  { response_id: 6, respondent_age: 31, gender: 'Non-binary', education: 'Master', income_bracket: '$75K-$100K', satisfaction_score: 8, likelihood_to_recommend: 8, product_quality: 'Good', customer_service: 'Good', survey_date: '2024-01-12' },
+  { response_id: 7, respondent_age: 19, gender: 'Male', education: 'Some College', income_bracket: '<$25K', satisfaction_score: 7, likelihood_to_recommend: 7, product_quality: 'Good', customer_service: 'Good', survey_date: '2024-01-13' },
+  { response_id: 8, respondent_age: 41, gender: 'Female', education: 'Bachelor', income_bracket: '$50K-$75K', satisfaction_score: 4, likelihood_to_recommend: 3, product_quality: 'Poor', customer_service: 'Average', survey_date: '2024-01-13' },
+  { response_id: 9, respondent_age: 37, gender: 'Male', education: 'Master', income_bracket: '$100K+', satisfaction_score: 9, likelihood_to_recommend: 9, product_quality: 'Excellent', customer_service: 'Good', survey_date: '2024-01-14' },
+  { response_id: 10, respondent_age: 23, gender: 'Female', education: 'Bachelor', income_bracket: '$25K-$50K', satisfaction_score: 6, likelihood_to_recommend: 5, product_quality: 'Average', customer_service: 'Average', survey_date: '2024-01-14' },
+  { response_id: 11, respondent_age: null, gender: 'Male', education: 'PhD', income_bracket: '$100K+', satisfaction_score: 10, likelihood_to_recommend: 10, product_quality: 'Excellent', customer_service: 'Excellent', survey_date: '2024-01-15' },
+  { response_id: 12, respondent_age: 29, gender: '', education: 'Bachelor', income_bracket: '$50K-$75K', satisfaction_score: 7, likelihood_to_recommend: 8, product_quality: 'Good', customer_service: 'Good', survey_date: '2024-01-15' },
+];
+
+const websiteAnalyticsData = [
+  { date: '2024-01-01', page_views: 12543, unique_visitors: 4521, bounce_rate: 42.5, avg_session_duration: 245, conversions: 156, revenue: 15678.45, top_source: 'Organic Search', device_type: 'Desktop' },
+  { date: '2024-01-02', page_views: 11234, unique_visitors: 4123, bounce_rate: 44.2, avg_session_duration: 232, conversions: 142, revenue: 14234.67, top_source: 'Direct', device_type: 'Mobile' },
+  { date: '2024-01-03', page_views: 13456, unique_visitors: 4876, bounce_rate: 39.8, avg_session_duration: 267, conversions: 178, revenue: 17845.23, top_source: 'Social Media', device_type: 'Desktop' },
+  { date: '2024-01-04', page_views: 14567, unique_visitors: 5234, bounce_rate: 38.5, avg_session_duration: 278, conversions: 192, revenue: 19234.56, top_source: 'Organic Search', device_type: 'Desktop' },
+  { date: '2024-01-05', page_views: 15678, unique_visitors: 5678, bounce_rate: 36.2, avg_session_duration: 289, conversions: 215, revenue: 21567.89, top_source: 'Email Campaign', device_type: 'Desktop' },
+  { date: '2024-01-06', page_views: 10234, unique_visitors: 3876, bounce_rate: 48.7, avg_session_duration: 198, conversions: 98, revenue: 9876.34, top_source: 'Organic Search', device_type: 'Mobile' },
+  { date: '2024-01-07', page_views: 9876, unique_visitors: 3654, bounce_rate: 51.2, avg_session_duration: 187, conversions: 87, revenue: 8765.23, top_source: 'Direct', device_type: 'Mobile' },
+  { date: '2024-01-08', page_views: 13789, unique_visitors: 4987, bounce_rate: 40.1, avg_session_duration: 256, conversions: 167, revenue: 16789.45, top_source: 'Paid Search', device_type: 'Desktop' },
+  { date: '2024-01-09', page_views: 14234, unique_visitors: 5123, bounce_rate: 38.9, avg_session_duration: 271, conversions: 185, revenue: 18567.89, top_source: 'Organic Search', device_type: 'Desktop' },
+  { date: '2024-01-10', page_views: 15123, unique_visitors: 5456, bounce_rate: 37.4, avg_session_duration: 283, conversions: 201, revenue: 20134.56, top_source: 'Referral', device_type: 'Desktop' },
+  { date: '2024-01-11', page_views: 14567, unique_visitors: 5234, bounce_rate: 39.2, avg_session_duration: 268, conversions: 189, revenue: 18945.67, top_source: 'Social Media', device_type: 'Tablet' },
+  { date: '2024-01-12', page_views: 13890, unique_visitors: 5012, bounce_rate: 41.5, avg_session_duration: 251, conversions: 172, revenue: 17234.89, top_source: 'Organic Search', device_type: 'Desktop' },
+];
+
 export const mockDatasets: MockDataset[] = [
   {
     id: 'europe-landmarks',
@@ -118,6 +197,46 @@ export const mockDatasets: MockDataset[] = [
     category: 'geographical',
     hasGeoData: true,
     data: customerLocationsData,
+  },
+  {
+    id: 'employees',
+    name: 'Employee Directory',
+    description: 'Company employee records with HR data',
+    category: 'general',
+    hasGeoData: false,
+    data: employeesData,
+  },
+  {
+    id: 'products',
+    name: 'Product Catalog',
+    description: 'E-commerce product inventory with pricing and ratings',
+    category: 'general',
+    hasGeoData: false,
+    data: productsData,
+  },
+  {
+    id: 'transactions',
+    name: 'Sales Transactions',
+    description: 'Recent transaction records with payment details',
+    category: 'general',
+    hasGeoData: false,
+    data: transactionsData,
+  },
+  {
+    id: 'survey-responses',
+    name: 'Customer Survey',
+    description: 'Customer satisfaction survey responses',
+    category: 'general',
+    hasGeoData: false,
+    data: surveyResponsesData,
+  },
+  {
+    id: 'website-analytics',
+    name: 'Website Analytics',
+    description: 'Daily website traffic and conversion metrics',
+    category: 'general',
+    hasGeoData: false,
+    data: websiteAnalyticsData,
   },
 ];
 

@@ -7,12 +7,14 @@ import { FileUpload } from '@/components/FileUpload';
 import { DataTable } from '@/components/DataTable';
 import { StatsPanel } from '@/components/StatsPanel';
 import { DataVisualization } from '@/components/DataVisualization';
+import { DataQualityPanel } from '@/components/DataQualityPanel';
 import { Header } from '@/components/Header';
 import { UploadWizard } from '@/components/UploadWizard';
 import { DatabaseSelector } from '@/components/DatabaseSelector';
 import { MapEditor } from '@/components/MapEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table2, BarChart3, PieChart, MapPin } from 'lucide-react';
+import { Table2, BarChart3, PieChart, MapPin, ShieldCheck } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface WizardData {
   country: string;
@@ -139,7 +141,7 @@ const DataUpload = () => {
           ) : data ? (
             <div className="space-y-8 animate-slide-up">
               <Tabs defaultValue="data" className="w-full">
-                <TabsList className={`grid w-full max-w-lg mx-auto ${hasGeoData ? 'grid-cols-4' : 'grid-cols-3'}`}>
+                <TabsList className={`grid w-full max-w-2xl mx-auto ${hasGeoData ? 'grid-cols-5' : 'grid-cols-4'}`}>
                   <TabsTrigger value="data" className="flex items-center gap-2">
                     <Table2 className="w-4 h-4" />
                     Data
@@ -158,6 +160,10 @@ const DataUpload = () => {
                       Map
                     </TabsTrigger>
                   )}
+                  <TabsTrigger value="quality" className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4" />
+                    Validate
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="data" className="mt-6">
@@ -181,6 +187,18 @@ const DataUpload = () => {
                     />
                   </TabsContent>
                 )}
+
+                <TabsContent value="quality" className="mt-6">
+                  <DataQualityPanel 
+                    columns={data.columns} 
+                    rows={data.rows} 
+                    onProcessData={() => {
+                      toast.success('Data successfully processed to platform!', {
+                        description: `${data.rows.length} rows from "${data.fileName}" have been submitted.`
+                      });
+                    }}
+                  />
+                </TabsContent>
               </Tabs>
             </div>
           ) : null}
