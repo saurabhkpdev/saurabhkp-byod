@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, MapPin, Move, Trash2 } from 'lucide-react';
+import { AlertCircle, MapPin, Move } from 'lucide-react';
 import { DataColumn, DataRow } from '@/types/data';
 import { toast } from 'sonner';
 import { useAuditLog } from '@/hooks/useAuditLog';
@@ -31,7 +30,7 @@ const createNumberedIcon = (number: number, isSelected: boolean = false) => {
       <div style="
         width: 32px;
         height: 32px;
-        background: ${isSelected ? 'hsl(var(--destructive))' : 'hsl(var(--primary))'};
+        background: ${isSelected ? '#dc2626' : '#6366f1'};
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -52,76 +51,12 @@ const createNumberedIcon = (number: number, isSelected: boolean = false) => {
   });
 };
 
-// Component to fit bounds
-const FitBounds = ({ points }: { points: [number, number][] }) => {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (points.length > 0) {
-      const bounds = L.latLngBounds(points);
-      map.fitBounds(bounds, { padding: [50, 50] });
-    }
-  }, [map, points]);
-  
-  return null;
-};
-
-// Draggable marker component
-interface DraggableMarkerProps {
-  position: [number, number];
-  index: number;
-  name?: string;
-  onDragEnd: (index: number, lat: number, lng: number) => void;
-  isSelected: boolean;
-  onSelect: (index: number) => void;
-}
-
-const DraggableMarker = ({ 
-  position, 
-  index, 
-  name, 
-  onDragEnd, 
-  isSelected,
-  onSelect 
-}: DraggableMarkerProps) => {
-  const markerRef = useRef<L.Marker>(null);
-
-  const eventHandlers = {
-    dragend() {
-      const marker = markerRef.current;
-      if (marker) {
-        const latlng = marker.getLatLng();
-        onDragEnd(index, latlng.lat, latlng.lng);
-      }
-    },
-    click() {
-      onSelect(index);
-    },
-  };
-
-  return (
-    <Marker
-      position={position}
-      draggable
-      ref={markerRef}
-      eventHandlers={eventHandlers}
-      icon={createNumberedIcon(index + 1, isSelected)}
-    >
-      <Popup>
-        <div className="text-sm">
-          {name ? <strong>{name}</strong> : <span>Row {index + 1}</span>}
-          <br />
-          <span className="text-muted-foreground">
-            Lat: {position[0].toFixed(4)}, Lng: {position[1].toFixed(4)}
-          </span>
-        </div>
-      </Popup>
-    </Marker>
-  );
-};
-
 export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: LeafletMapEditorProps) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
+  const [isMapInitialized, setIsMapInitialized] = useState(false);
   const { logEvent } = useAuditLog();
 
   // Find latitude and longitude columns
@@ -139,37 +74,115 @@ export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: Leaflet
   const hasGeoData = latColumn && lngColumn;
 
   // Get valid points
-  const points: { lat: number; lng: number; name?: string; index: number }[] = [];
-  rows.forEach((row, index) => {
-    const lat = row[latColumn?.name || ''] as number;
-    const lng = row[lngColumn?.name || ''] as number;
-    
-    if (typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
-      points.push({
-        lat,
-        lng,
-        name: nameColumn ? String(row[nameColumn.name] || '') : undefined,
-        index,
+  const getPoints = useCallback(() => {
+    const points: { lat: number; lng: number; name?: string; index: number }[] = [];
+    rows.forEach((row, index) => {
+      const lat = row[latColumn?.name || ''] as number;
+      const lng = row[lngColumn?.name || ''] as number;
+      
+      if (typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
+        points.push({
+          lat,
+          lng,
+          name: nameColumn ? String(row[nameColumn.name] || '') : undefined,
+          index,
+        });
+      }
+    });
+    return points;
+  }, [rows, latColumn, lngColumn, nameColumn]);
+
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainer.current || !hasGeoData || mapRef.current) return;
+
+    const points = getPoints();
+    const centerLat = points.length > 0 
+      ? points.reduce((sum, p) => sum + p.lat, 0) / points.length 
+      : 50.0;
+    const centerLng = points.length > 0 
+      ? points.reduce((sum, p) => sum + p.lng, 0) / points.length 
+      : 10.0;
+
+    mapRef.current = L.map(mapContainer.current).setView([centerLat, centerLng], 4);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mapRef.current);
+
+    setIsMapInitialized(true);
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [hasGeoData, getPoints]);
+
+  // Add/update markers
+  useEffect(() => {
+    if (!mapRef.current || !isMapInitialized) return;
+
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    const points = getPoints();
+
+    // Add markers
+    points.forEach((point) => {
+      const marker = L.marker([point.lat, point.lng], {
+        icon: createNumberedIcon(point.index + 1, selectedMarker === point.index),
+        draggable: true,
       });
+
+      // Popup content
+      const popupContent = point.name 
+        ? `<strong>${point.name}</strong><br/>Lat: ${point.lat.toFixed(4)}, Lng: ${point.lng.toFixed(4)}`
+        : `Row ${point.index + 1}<br/>Lat: ${point.lat.toFixed(4)}, Lng: ${point.lng.toFixed(4)}`;
+      
+      marker.bindPopup(popupContent);
+
+      // Click handler
+      marker.on('click', () => {
+        setSelectedMarker(prev => prev === point.index ? null : point.index);
+      });
+
+      // Drag end handler
+      marker.on('dragend', () => {
+        const latlng = marker.getLatLng();
+        onUpdateCoordinates(point.index, latlng.lat, latlng.lng);
+        logEvent('coordinates_updated', `Updated coordinates for row ${point.index + 1} via map`, 'Data Upload', { 
+          rowIndex: point.index, 
+          lat: latlng.lat, 
+          lng: latlng.lng 
+        });
+        toast.success(`Updated coordinates for row ${point.index + 1}`);
+      });
+
+      marker.addTo(mapRef.current!);
+      markersRef.current.push(marker);
+    });
+
+    // Fit bounds if we have points
+    if (points.length > 0) {
+      const bounds = L.latLngBounds(points.map(p => [p.lat, p.lng]));
+      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
     }
-  });
+  }, [isMapInitialized, rows, selectedMarker, getPoints, onUpdateCoordinates, logEvent]);
 
-  const handleDragEnd = useCallback((index: number, lat: number, lng: number) => {
-    onUpdateCoordinates(index, lat, lng);
-    logEvent('coordinates_updated', `Updated coordinates for row ${index + 1} via map`, 'Data Upload', { rowIndex: index, lat, lng });
-    toast.success(`Updated coordinates for row ${index + 1}`);
-  }, [onUpdateCoordinates, logEvent]);
-
-  const handleSelect = useCallback((index: number) => {
-    setSelectedMarker(prev => prev === index ? null : index);
-  }, []);
-
-  const centerPoint: [number, number] = points.length > 0
-    ? [
-        points.reduce((sum, p) => sum + p.lat, 0) / points.length,
-        points.reduce((sum, p) => sum + p.lng, 0) / points.length,
-      ]
-    : [50.0, 10.0]; // Default to Europe center
+  // Update marker icons when selection changes
+  useEffect(() => {
+    if (!isMapInitialized) return;
+    
+    const points = getPoints();
+    markersRef.current.forEach((marker, idx) => {
+      if (points[idx]) {
+        marker.setIcon(createNumberedIcon(points[idx].index + 1, selectedMarker === points[idx].index));
+      }
+    });
+  }, [selectedMarker, getPoints, isMapInitialized]);
 
   if (!hasGeoData) {
     return (
@@ -185,6 +198,8 @@ export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: Leaflet
       </Card>
     );
   }
+
+  const points = getPoints();
 
   return (
     <Card className="overflow-hidden">
@@ -209,40 +224,16 @@ export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: Leaflet
           </div>
         </div>
         <p className="text-sm text-muted-foreground">
-          Drag markers to update coordinates. Click a marker to select it.
+          Drag markers to update coordinates. Click a marker to select it. {points.length} locations shown.
         </p>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="h-[500px] w-full">
-          <MapContainer
-            center={centerPoint}
-            zoom={4}
-            style={{ height: '100%', width: '100%' }}
-            scrollWheelZoom={true}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {points.length > 0 && <FitBounds points={points.map(p => [p.lat, p.lng])} />}
-            {points.map((point) => (
-              <DraggableMarker
-                key={point.index}
-                position={[point.lat, point.lng]}
-                index={point.index}
-                name={point.name}
-                onDragEnd={handleDragEnd}
-                isSelected={selectedMarker === point.index}
-                onSelect={handleSelect}
-              />
-            ))}
-          </MapContainer>
-        </div>
-        {selectedMarker !== null && (
+        <div ref={mapContainer} className="h-[500px] w-full" />
+        {selectedMarker !== null && rows[selectedMarker] && (
           <div className="p-4 border-t bg-muted/50">
             <p className="text-sm">
               <strong>Selected:</strong> Row {selectedMarker + 1}
-              {nameColumn && rows[selectedMarker] && (
+              {nameColumn && (
                 <span className="ml-2">
                   ({rows[selectedMarker][nameColumn.name]})
                 </span>
