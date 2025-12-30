@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { 
   Home, 
-  Upload, 
+  Sparkles, 
   BookOpen, 
   Shield, 
   ChevronLeft,
@@ -15,7 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 const navItems = [
   { title: "Home", url: "/", icon: Home },
-  { title: "Data Upload", url: "/upload", icon: Upload },
+  { title: "Data Studio", url: "/upload", icon: Sparkles },
   { title: "Documentation", url: "/docs", icon: BookOpen },
   { title: "Admin", url: "/admin", icon: Shield },
 ];

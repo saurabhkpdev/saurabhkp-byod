@@ -36,7 +36,7 @@ const DataUpload = () => {
   
   // Log page view
   useEffect(() => {
-    logEvent('page_view', 'Visited Data Upload page', 'Data Upload');
+    logEvent('page_view', 'Visited Data Studio page', 'Data Studio');
   }, [logEvent]);
   
   const {
