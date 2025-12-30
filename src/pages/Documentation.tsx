@@ -19,10 +19,10 @@ import {
   ArrowRight,
   FileSpreadsheet,
   Edit3,
-  Eye,
   Lock,
   AlertTriangle,
-  Send
+  Send,
+  Sparkles
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -33,48 +33,56 @@ const Documentation = () => {
   useEffect(() => {
     logEvent('page_view', 'Visited Documentation page', 'Docs');
   }, [logEvent]);
+
   const quickStartSteps = [
     {
       step: 1,
-      title: "Upload or Select Data",
-      description: "Start by uploading a CSV file or selecting from our sample datasets. We support both geographical and non-geographical data.",
-      icon: Upload,
-      tips: ["Drag & drop or click to browse", "CSV format supported", "Sample datasets available for testing"]
+      title: "Complete the Wizard",
+      description: "Answer a quick questionnaire about your data region and consent before proceeding with data upload.",
+      icon: CheckCircle2,
+      tips: ["Select your country & region", "Confirm data consent", "Enables compliant data handling"]
     },
     {
       step: 2,
+      title: "Upload or Select Data",
+      description: "Choose from 10+ sample datasets or upload your own CSV file. Geographical data enables the interactive map feature.",
+      icon: Upload,
+      tips: ["Drag & drop or browse files", "10 sample datasets available", "Geo data unlocks Map tab"]
+    },
+    {
+      step: 3,
       title: "Review & Edit Data",
       description: "View your data in an interactive table. Click any cell to edit values directly, just like a spreadsheet.",
       icon: Edit3,
       tips: ["Click cells to edit inline", "Changes save automatically", "Scroll horizontally for wide datasets"]
     },
     {
-      step: 3,
+      step: 4,
       title: "Mark PII Fields",
       description: "Identify sensitive data by marking columns as PII (Personally Identifiable Information) using the lock icon.",
       icon: Lock,
       tips: ["Click the lock icon on column headers", "PII columns are highlighted", "Track sensitive data easily"]
     },
     {
-      step: 4,
-      title: "Explore Visualizations",
-      description: "Switch to the Charts tab to see automatic visualizations based on your data types.",
-      icon: BarChart3,
-      tips: ["Charts adapt to data types", "Interactive tooltips", "Multiple chart types available"]
-    },
-    {
       step: 5,
-      title: "Validate Data Quality",
-      description: "Run validation checks to identify issues like missing values, duplicates, and format errors.",
-      icon: ShieldCheck,
-      tips: ["Click 'Run Validation'", "Review issue details", "Fix issues before processing"]
+      title: "Explore Charts & Stats",
+      description: "Switch to Stats for summary metrics or Charts for dynamic visualizations—histograms, pie charts, scatter plots, and more.",
+      icon: BarChart3,
+      tips: ["7 chart types available", "Auto-adapts to data types", "Interactive tooltips & legends"]
     },
     {
       step: 6,
-      title: "Process & Export",
-      description: "Once validation passes, process your data to send it to your data platform.",
-      icon: Send,
-      tips: ["Green checkmark means ready", "Process with one click", "Data sent to platform"]
+      title: "Edit on Map (Geo Data)",
+      description: "For geographical datasets, drag markers to update coordinates or use drawing tools to create points, lines, and polygons.",
+      icon: Map,
+      tips: ["OpenStreetMap integration", "Drag markers to move", "Draw new geometries"]
+    },
+    {
+      step: 7,
+      title: "Validate & Process",
+      description: "Run validation checks for data quality issues, then process your data to send it to your platform.",
+      icon: ShieldCheck,
+      tips: ["Quality scores displayed", "Fix issues before processing", "One-click submission"]
     }
   ];
 
@@ -91,6 +99,11 @@ const Documentation = () => {
           title: "Sample Databases",
           description: "Choose from 10 pre-built datasets including geographical data (landmarks, territories) and business data (employees, products, sales).",
           icon: Database
+        },
+        {
+          title: "Upload Wizard",
+          description: "Complete a pre-upload questionnaire to capture region and consent information for compliant data handling.",
+          icon: Sparkles
         }
       ]
     },
@@ -109,13 +122,13 @@ const Documentation = () => {
         },
         {
           title: "Map-Based Editing",
-          description: "For geographical data, drag markers on the map to update coordinates. Draw new points, polygons, and lines.",
+          description: "For geographical data, drag markers on the OpenStreetMap to update coordinates. Draw new points, polygons, and lines.",
           icon: Map
         }
       ]
     },
     {
-      category: "Analytics",
+      category: "Analytics & Visualization",
       items: [
         {
           title: "Statistics Panel",
@@ -123,8 +136,8 @@ const Documentation = () => {
           icon: Table
         },
         {
-          title: "Dynamic Visualizations",
-          description: "Charts automatically adapt to your data: histograms for numbers, pie charts for categories, time series for dates.",
+          title: "Dynamic Charts",
+          description: "7 chart types that adapt to your data: Distribution, Categories (Pie), Correlation (Scatter), Trend, Grouped, Radar, and Boolean.",
           icon: BarChart3
         }
       ]
@@ -149,11 +162,11 @@ const Documentation = () => {
   const faqs = [
     {
       question: "What file formats are supported?",
-      answer: "Currently, DataLens supports CSV (Comma-Separated Values) files. The system automatically detects delimiters and header rows."
+      answer: "Currently, BYOD supports CSV (Comma-Separated Values) files. The system automatically detects delimiters and header rows."
     },
     {
       question: "How do I edit geographical data?",
-      answer: "If your dataset contains latitude and longitude columns, a Map tab will appear. You can drag markers to update coordinates, or use the drawing tools to create new points and polygons."
+      answer: "If your dataset contains latitude and longitude columns, a Map tab will appear. You can drag markers to update coordinates, or use the drawing tools to create new points and polygons. BYOD uses OpenStreetMap, so no API key is required."
     },
     {
       question: "What is PII tagging?",
@@ -168,16 +181,20 @@ const Documentation = () => {
       answer: "The overall quality score is calculated from four components: Completeness (no missing values), Consistency (uniform formatting), Validity (correct data formats), and Uniqueness (no duplicates). A score above 80% is considered good."
     },
     {
-      question: "Can I use my own Mapbox token?",
-      answer: "Yes! When you first access the Map tab, you'll be prompted to enter your Mapbox public access token. This enables the interactive map features."
+      question: "What sample datasets are available?",
+      answer: "BYOD includes 10 sample datasets: World Landmarks, Country Territories, Global Cities, Sales Data, Product Inventory, Employee Directory, Customer Feedback, Weather Stations, Financial Transactions, and Healthcare Records."
+    },
+    {
+      question: "What chart types are available?",
+      answer: "Based on your data, BYOD offers: Distribution (histogram), Categories (pie chart), Correlation (scatter plot), Trend (area chart), Grouped (bar chart by category), Radar (multi-metric comparison), and Boolean (true/false distribution)."
     }
   ];
 
   return (
     <>
       <Helmet>
-        <title>Documentation - DataLens</title>
-        <meta name="description" content="Learn how to use DataLens for data upload, editing, visualization, and quality validation." />
+        <title>Documentation - BYOD</title>
+        <meta name="description" content="Learn how to use BYOD for data upload, editing, visualization, and quality validation." />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -188,9 +205,9 @@ const Documentation = () => {
               <BookOpen className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium text-primary">Documentation</span>
             </div>
-            <h1 className="text-4xl font-bold mb-4">Learn DataLens</h1>
+            <h1 className="text-4xl font-bold mb-4">Learn BYOD</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to know about uploading, editing, visualizing, and validating your data.
+              Everything you need to know about uploading, editing, visualizing, and validating your data with Bring Your Own Data.
             </p>
           </div>
 
@@ -219,7 +236,7 @@ const Documentation = () => {
                     Quick Start Guide
                   </CardTitle>
                   <CardDescription>
-                    Get up and running with DataLens in just a few steps
+                    Get up and running with BYOD in just a few steps
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -269,7 +286,7 @@ const Documentation = () => {
                     <Link to="/upload">
                       <Button size="lg" className="gap-2">
                         <Rocket className="h-4 w-4" />
-                        Start Now
+                        Go to Data Studio
                       </Button>
                     </Link>
                   </div>
@@ -285,7 +302,7 @@ const Documentation = () => {
                     <CardTitle>{category.category}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {category.items.map((item) => (
                         <div 
                           key={item.title}
@@ -316,7 +333,7 @@ const Documentation = () => {
                 <CardHeader>
                   <CardTitle>Frequently Asked Questions</CardTitle>
                   <CardDescription>
-                    Common questions about using DataLens
+                    Common questions about using BYOD
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -341,12 +358,12 @@ const Documentation = () => {
           <div className="mt-12 text-center p-8 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border">
             <h2 className="text-2xl font-bold mb-2">Ready to get started?</h2>
             <p className="text-muted-foreground mb-6">
-              Upload your data and experience the power of DataLens
+              Bring your own data and experience the power of BYOD
             </p>
             <Link to="/upload">
               <Button size="lg" className="gap-2">
-                <Upload className="h-4 w-4" />
-                Upload Data
+                <Sparkles className="h-4 w-4" />
+                Open Data Studio
               </Button>
             </Link>
           </div>
