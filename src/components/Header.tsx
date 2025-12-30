@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Database, FileSpreadsheet, Trash2, Home, BookOpen } from 'lucide-react';
+import { Database, FileSpreadsheet, Trash2, BookOpen, Upload, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NavLink } from '@/components/NavLink';
 
@@ -9,16 +9,20 @@ interface HeaderProps {
   showHomeLink?: boolean;
   onGoHome?: () => void;
 }
+
 export const Header = ({
   fileName,
-  onClear,
-  showHomeLink,
-  onGoHome
+  onClear
 }: HeaderProps) => {
-  return <header className="sticky top-0 z-50 glass border-b">
+  const navLinkClasses = "flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted";
+  const activeClasses = "text-primary bg-primary/10";
+
+  return (
+    <header className="sticky top-0 z-50 glass border-b">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          {/* Logo and Navigation */}
+          <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="p-2 rounded-xl gradient-primary">
                 <Database className="w-6 h-6 text-primary-foreground" />
@@ -28,33 +32,99 @@ export const Header = ({
                 <p className="text-xs text-muted-foreground">Upload • Manipulate • Process</p>
               </div>
             </Link>
-            
-            {showHomeLink && <Button variant="ghost" size="sm" onClick={onGoHome} className="gap-2">
-                <Home className="w-4 h-4" />
+
+            {/* Main Navigation */}
+            <nav className="hidden md:flex items-center gap-1 ml-4 pl-4 border-l">
+              <NavLink 
+                to="/" 
+                end
+                className={navLinkClasses}
+                activeClassName={activeClasses}
+              >
                 Home
-              </Button>}
-            
-            <NavLink 
-              to="/docs" 
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
-              activeClassName="text-primary bg-primary/10"
-            >
-              <BookOpen className="w-4 h-4" />
-              Docs
-            </NavLink>
+              </NavLink>
+              <NavLink 
+                to="/upload" 
+                className={navLinkClasses}
+                activeClassName={activeClasses}
+              >
+                <Upload className="w-4 h-4" />
+                Data Upload
+              </NavLink>
+              <NavLink 
+                to="/docs" 
+                className={navLinkClasses}
+                activeClassName={activeClasses}
+              >
+                <BookOpen className="w-4 h-4" />
+                Docs
+              </NavLink>
+              <NavLink 
+                to="/admin" 
+                className={navLinkClasses}
+                activeClassName={activeClasses}
+              >
+                <Shield className="w-4 h-4" />
+                Admin
+              </NavLink>
+            </nav>
           </div>
           
-          {fileName && <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-4 py-2 bg-muted rounded-lg">
-                <FileSpreadsheet className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">{fileName}</span>
-              </div>
-              <Button variant="outline" size="sm" onClick={onClear} className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Clear Data
-              </Button>
-            </div>}
+          {/* File info and actions */}
+          <div className="flex items-center gap-4">
+            {/* Mobile Navigation */}
+            <nav className="flex md:hidden items-center gap-1">
+              <NavLink 
+                to="/" 
+                end
+                className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+                activeClassName="text-primary bg-primary/10"
+              >
+                Home
+              </NavLink>
+              <NavLink 
+                to="/upload" 
+                className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+                activeClassName="text-primary bg-primary/10"
+              >
+                <Upload className="w-4 h-4" />
+              </NavLink>
+              <NavLink 
+                to="/docs" 
+                className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+                activeClassName="text-primary bg-primary/10"
+              >
+                <BookOpen className="w-4 h-4" />
+              </NavLink>
+              <NavLink 
+                to="/admin" 
+                className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+                activeClassName="text-primary bg-primary/10"
+              >
+                <Shield className="w-4 h-4" />
+              </NavLink>
+            </nav>
+
+            {fileName && (
+              <>
+                <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-muted rounded-lg">
+                  <FileSpreadsheet className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium">{fileName}</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={onClear} 
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Clear Data</span>
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </header>;
+    </header>
+  );
 };

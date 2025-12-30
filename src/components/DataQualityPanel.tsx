@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { DataColumn, DataRow } from '@/types/data';
+import { useAuditLog } from '@/hooks/useAuditLog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +42,7 @@ interface QualityMetrics {
 export const DataQualityPanel = ({ columns, rows, onProcessData }: DataQualityPanelProps) => {
   const [isValidating, setIsValidating] = useState(false);
   const [hasValidated, setHasValidated] = useState(false);
+  const { logEvent } = useAuditLog();
 
   const qualityMetrics = useMemo((): QualityMetrics => {
     const issues: QualityIssue[] = [];
@@ -272,6 +274,10 @@ export const DataQualityPanel = ({ columns, rows, onProcessData }: DataQualityPa
     setTimeout(() => {
       setIsValidating(false);
       setHasValidated(true);
+      logEvent('validation_run', `Validation complete: Score ${qualityMetrics.overallScore}%, ${qualityMetrics.issues.length} issues found`, 'Data Upload', { 
+        overallScore: qualityMetrics.overallScore, 
+        issueCount: qualityMetrics.issues.length 
+      });
       toast.success('Data quality validation complete');
     }, 1500);
   };
