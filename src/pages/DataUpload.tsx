@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useDataStore } from '@/hooks/useDataStore';
 import { useUsageStats } from '@/hooks/useUsageStats';
@@ -24,6 +25,7 @@ interface WizardData {
 }
 
 const DataUpload = () => {
+  const navigate = useNavigate();
   const [wizardComplete, setWizardComplete] = useState(false);
   const [wizardData, setWizardData] = useState<WizardData | null>(null);
   const [sourceMode, setSourceMode] = useState<'select' | 'upload' | 'database'>('select');
@@ -193,9 +195,12 @@ const DataUpload = () => {
                     rows={data.rows} 
                     onProcessData={() => {
                       logEvent('data_processed', `Processed ${data.rows.length} rows from "${data.fileName}"`, 'Data Upload', { fileName: data.fileName, rowCount: data.rows.length });
-                      toast.success('Data successfully processed to platform!', {
-                        description: `${data.rows.length} rows from "${data.fileName}" have been submitted.`
+                      toast.success('🎉 Congratulations! Data successfully processed!', {
+                        description: `${data.rows.length} rows from "${data.fileName}" have been submitted to the platform. Redirecting to home...`
                       });
+                      setTimeout(() => {
+                        navigate('/');
+                      }, 2000);
                     }}
                   />
                 </TabsContent>
