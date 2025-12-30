@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { Header } from '@/components/Header';
 import { useUsageStats } from '@/hooks/useUsageStats';
 import { useAuditLog } from '@/hooks/useAuditLog';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,6 +14,7 @@ const Index = () => {
   useEffect(() => {
     logEvent('page_view', 'Visited Home page', 'Home');
   }, [logEvent]);
+
   const features = [{
     icon: Upload,
     title: 'Easy Upload',
@@ -28,15 +28,15 @@ const Index = () => {
     title: 'PII Protection',
     description: 'Mark and track sensitive personal information columns'
   }];
-  return <>
+
+  return (
+    <>
       <Helmet>
         <title>DataLens - Your Data Analysis Platform</title>
         <meta name="description" content="Upload, analyze, and protect your data with DataLens. View statistics, create visualizations, and manage PII columns." />
       </Helmet>
       
       <div className="min-h-screen bg-background">
-        <Header />
-        
         <main className="container mx-auto px-6 py-12">
           {/* Hero Section */}
           <section className="text-center mb-16 animate-fade-in">
@@ -130,6 +130,8 @@ const Index = () => {
           </section>
         </main>
       </div>
-    </>;
+    </>
+  );
 };
+
 export default Index;

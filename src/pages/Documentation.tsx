@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { Header } from "@/components/Header";
 import { useAuditLog } from "@/hooks/useAuditLog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -182,8 +181,6 @@ const Documentation = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        <Header />
-
         <main className="container mx-auto px-4 py-8 max-w-6xl">
           {/* Hero Section */}
           <div className="text-center mb-12">

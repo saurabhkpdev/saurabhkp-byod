@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
 import { useDataStore } from '@/hooks/useDataStore';
 import { useUsageStats } from '@/hooks/useUsageStats';
 import { useAuditLog } from '@/hooks/useAuditLog';
@@ -9,7 +8,7 @@ import { DataTable } from '@/components/DataTable';
 import { StatsPanel } from '@/components/StatsPanel';
 import { DataVisualization } from '@/components/DataVisualization';
 import { DataQualityPanel } from '@/components/DataQualityPanel';
-import { Header } from '@/components/Header';
+import { TopBar } from '@/components/TopBar';
 import { UploadWizard } from '@/components/UploadWizard';
 import { DatabaseSelector } from '@/components/DatabaseSelector';
 import { MapEditor } from '@/components/MapEditor';
@@ -27,7 +26,6 @@ interface WizardData {
 }
 
 const DataUpload = () => {
-  const navigate = useNavigate();
   const [wizardComplete, setWizardComplete] = useState(false);
   const [wizardData, setWizardData] = useState<WizardData | null>(null);
   const [sourceMode, setSourceMode] = useState<'select' | 'upload' | 'database'>('select');
@@ -73,11 +71,6 @@ const DataUpload = () => {
     setHasGeoData(false);
   };
 
-  const handleGoHome = () => {
-    handleClear();
-    navigate('/');
-  };
-
   const handleDatabaseSelect = (databaseData: Record<string, unknown>[], fileName: string, geoData: boolean) => {
     logEvent('dataset_selected', `Selected dataset: ${fileName}`, 'Data Upload', { fileName, hasGeoData: geoData });
     handleDataLoaded(databaseData, fileName, geoData);
@@ -107,15 +100,10 @@ const DataUpload = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Upload Data - DataLens</title>
-        <meta name="description" content="Upload your CSV data to analyze, visualize, and protect sensitive information." />
-      </Helmet>
-      
-      <div className="min-h-screen bg-background">
-        <Header fileName={data?.fileName} onClear={handleClear} showHomeLink onGoHome={handleGoHome} />
+      <div className="min-h-screen bg-background flex flex-col">
+        <TopBar fileName={data?.fileName} onClear={handleClear} />
         
-        <main className="container mx-auto px-6 py-8">
+        <main className="flex-1 container mx-auto px-6 py-8">
           {!wizardComplete ? (
             <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
               <div className="text-center mb-12">
