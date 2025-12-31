@@ -4,44 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Activity, 
-  BarChart3, 
-  Calendar,
-  Clock,
-  FileUp,
-  Eye,
-  Trash2,
-  Shield,
-  RefreshCw
-} from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, Shield, RefreshCw } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-
 const Admin = () => {
-  const { events, clearLogs, getStats } = useAuditLog();
+  const {
+    events,
+    clearLogs,
+    getStats
+  } = useAuditLog();
   const stats = getStats();
-
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     if (isToday(date)) {
@@ -52,12 +27,10 @@ const Admin = () => {
     }
     return format(date, 'MMM d, yyyy HH:mm:ss');
   };
-
   const handleClearLogs = () => {
     clearLogs();
     toast.success("Audit logs cleared successfully");
   };
-
   const handleRefresh = () => {
     window.location.reload();
   };
@@ -66,17 +39,11 @@ const Admin = () => {
   const sortedEvents = [...events].reverse();
 
   // Get top actions
-  const topActions = Object.entries(stats.actionCounts)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5);
+  const topActions = Object.entries(stats.actionCounts).sort(([, a], [, b]) => b - a).slice(0, 5);
 
   // Get top pages
-  const topPages = Object.entries(stats.pageCounts)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5);
-
-  return (
-    <>
+  const topPages = Object.entries(stats.pageCounts).sort(([, a], [, b]) => b - a).slice(0, 5);
+  return <>
       <Helmet>
         <title>Admin Dashboard - DataLens</title>
         <meta name="description" content="Admin dashboard for auditing user activity on the DataLens platform." />
@@ -87,10 +54,7 @@ const Admin = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-2">
-                <Shield className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Admin Dashboard</span>
-              </div>
+              
               <h1 className="text-3xl font-bold">Platform Activity</h1>
               <p className="text-muted-foreground">Monitor and audit all user actions on the platform</p>
             </div>
@@ -197,14 +161,11 @@ const Admin = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {sortedEvents.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">
+                  {sortedEvents.length === 0 ? <div className="text-center py-12 text-muted-foreground">
                       <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
                       <p className="text-lg font-medium">No events recorded yet</p>
                       <p className="text-sm">Activity will appear here as users interact with the platform</p>
-                    </div>
-                  ) : (
-                    <ScrollArea className="h-[500px]">
+                    </div> : <ScrollArea className="h-[500px]">
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -215,38 +176,32 @@ const Admin = () => {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {sortedEvents.map((event) => (
-                            <TableRow key={event.id}>
+                          {sortedEvents.map(event => <TableRow key={event.id}>
                               <TableCell className="font-mono text-xs">
                                 <div className="flex flex-col">
                                   <span>{formatTimestamp(event.timestamp)}</span>
                                   <span className="text-muted-foreground">
-                                    {formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}
+                                    {formatDistanceToNow(new Date(event.timestamp), {
+                                addSuffix: true
+                              })}
                                   </span>
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <Badge 
-                                  variant="secondary" 
-                                  className={actionColors[event.action as AuditAction]}
-                                >
+                                <Badge variant="secondary" className={actionColors[event.action as AuditAction]}>
                                   {actionLabels[event.action as AuditAction] || event.action}
                                 </Badge>
                               </TableCell>
                               <TableCell>
-                                {event.page && (
-                                  <span className="text-sm text-muted-foreground">{event.page}</span>
-                                )}
+                                {event.page && <span className="text-sm text-muted-foreground">{event.page}</span>}
                               </TableCell>
                               <TableCell className="max-w-[300px] truncate">
                                 {event.details}
                               </TableCell>
-                            </TableRow>
-                          ))}
+                            </TableRow>)}
                         </TableBody>
                       </Table>
-                    </ScrollArea>
-                  )}
+                    </ScrollArea>}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -260,35 +215,23 @@ const Admin = () => {
                     <CardDescription>Most frequent user actions</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {topActions.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">No data available</p>
-                    ) : (
-                      <div className="space-y-4">
-                        {topActions.map(([action, count]) => (
-                          <div key={action} className="flex items-center justify-between">
+                    {topActions.length === 0 ? <p className="text-muted-foreground text-center py-8">No data available</p> : <div className="space-y-4">
+                        {topActions.map(([action, count]) => <div key={action} className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <Badge 
-                                variant="secondary" 
-                                className={actionColors[action as AuditAction]}
-                              >
+                              <Badge variant="secondary" className={actionColors[action as AuditAction]}>
                                 {actionLabels[action as AuditAction] || action}
                               </Badge>
                             </div>
                             <div className="flex items-center gap-3">
                               <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-primary rounded-full"
-                                  style={{ 
-                                    width: `${(count / stats.totalEvents) * 100}%` 
-                                  }}
-                                />
+                                <div className="h-full bg-primary rounded-full" style={{
+                            width: `${count / stats.totalEvents * 100}%`
+                          }} />
                               </div>
                               <span className="text-sm font-medium w-12 text-right">{count}</span>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          </div>)}
+                      </div>}
                   </CardContent>
                 </Card>
 
@@ -298,28 +241,19 @@ const Admin = () => {
                     <CardDescription>Views by page</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {topPages.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">No data available</p>
-                    ) : (
-                      <div className="space-y-4">
-                        {topPages.map(([page, count]) => (
-                          <div key={page} className="flex items-center justify-between">
+                    {topPages.length === 0 ? <p className="text-muted-foreground text-center py-8">No data available</p> : <div className="space-y-4">
+                        {topPages.map(([page, count]) => <div key={page} className="flex items-center justify-between">
                             <span className="text-sm font-medium">{page}</span>
                             <div className="flex items-center gap-3">
                               <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-green-500 rounded-full"
-                                  style={{ 
-                                    width: `${(count / stats.totalEvents) * 100}%` 
-                                  }}
-                                />
+                                <div className="h-full bg-green-500 rounded-full" style={{
+                            width: `${count / stats.totalEvents * 100}%`
+                          }} />
                               </div>
                               <span className="text-sm font-medium w-12 text-right">{count}</span>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          </div>)}
+                      </div>}
                   </CardContent>
                 </Card>
 
@@ -330,20 +264,12 @@ const Admin = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {Object.entries(actionLabels).map(([action, label]) => (
-                        <div 
-                          key={action}
-                          className="p-4 rounded-lg border bg-card text-center"
-                        >
+                      {Object.entries(actionLabels).map(([action, label]) => <div key={action} className="p-4 rounded-lg border bg-card text-center">
                           <p className="text-2xl font-bold">{stats.actionCounts[action] || 0}</p>
-                          <Badge 
-                            variant="secondary" 
-                            className={`${actionColors[action as AuditAction]} mt-2`}
-                          >
+                          <Badge variant="secondary" className={`${actionColors[action as AuditAction]} mt-2`}>
                             {label}
                           </Badge>
-                        </div>
-                      ))}
+                        </div>)}
                     </div>
                   </CardContent>
                 </Card>
@@ -352,8 +278,6 @@ const Admin = () => {
           </Tabs>
         </main>
       </div>
-    </>
-  );
+    </>;
 };
-
 export default Admin;
