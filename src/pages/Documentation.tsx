@@ -143,10 +143,7 @@ const Documentation = () => {
         <main className="container mx-auto px-4 py-8 max-w-6xl">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4">
-              <BookOpen className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Documentation</span>
-            </div>
+            
             <h1 className="text-4xl font-bold mb-4">Learn BYOD</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Everything you need to know about uploading, editing, visualizing, and validating your data with Bring Your Own Data.
