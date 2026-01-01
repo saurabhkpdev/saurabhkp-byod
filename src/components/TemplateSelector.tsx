@@ -1,0 +1,281 @@
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  FileSpreadsheet, 
+  Users, 
+  ShoppingCart, 
+  Database, 
+  MapPin, 
+  Building2,
+  Download,
+  Check,
+  ArrowRight
+} from 'lucide-react';
+
+export interface Template {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  requiredColumns: string[];
+  optionalColumns?: string[];
+  sampleData: Record<string, unknown>[];
+  category: 'general' | 'geographical';
+}
+
+interface TemplateSelectorProps {
+  onSelectTemplate: (template: Template) => void;
+  onDownloadSample: (template: Template) => void;
+}
+
+export const templates: Template[] = [
+  {
+    id: 'employee-directory',
+    name: 'Employee Directory',
+    description: 'Standard employee records with personal and organizational data',
+    icon: Users,
+    category: 'general',
+    requiredColumns: ['id', 'name', 'email', 'department'],
+    optionalColumns: ['salary', 'hire_date', 'location', 'phone', 'manager'],
+    sampleData: [
+      { id: 1, name: 'John Smith', email: 'john.smith@company.com', department: 'Engineering', salary: 75000, hire_date: '2022-03-15', location: 'New York' },
+      { id: 2, name: 'Sarah Johnson', email: 'sarah.j@company.com', department: 'Marketing', salary: 65000, hire_date: '2021-07-22', location: 'Los Angeles' },
+      { id: 3, name: 'Michael Chen', email: 'mchen@company.com', department: 'Engineering', salary: 85000, hire_date: '2020-01-10', location: 'San Francisco' },
+      { id: 4, name: 'Emily Davis', email: 'emily.d@company.com', department: 'HR', salary: 55000, hire_date: '2023-02-28', location: 'Chicago' },
+      { id: 5, name: 'James Wilson', email: 'jwilson@company.com', department: 'Sales', salary: 70000, hire_date: '2022-11-05', location: 'Boston' },
+    ],
+  },
+  {
+    id: 'sales-transactions',
+    name: 'Sales Transactions',
+    description: 'Transaction records with products, amounts, and dates',
+    icon: ShoppingCart,
+    category: 'general',
+    requiredColumns: ['order_id', 'product', 'quantity', 'total', 'date'],
+    optionalColumns: ['category', 'unit_price', 'region', 'customer_id', 'discount'],
+    sampleData: [
+      { order_id: 'ORD-001', product: 'Laptop Pro', category: 'Electronics', quantity: 2, unit_price: 1299.99, total: 2599.98, date: '2024-01-15', region: 'North' },
+      { order_id: 'ORD-002', product: 'Wireless Mouse', category: 'Electronics', quantity: 5, unit_price: 29.99, total: 149.95, date: '2024-01-16', region: 'South' },
+      { order_id: 'ORD-003', product: 'Office Chair', category: 'Furniture', quantity: 3, unit_price: 349.00, total: 1047.00, date: '2024-01-17', region: 'East' },
+      { order_id: 'ORD-004', product: 'Monitor 27"', category: 'Electronics', quantity: 4, unit_price: 449.99, total: 1799.96, date: '2024-01-18', region: 'West' },
+      { order_id: 'ORD-005', product: 'Keyboard Mechanical', category: 'Electronics', quantity: 8, unit_price: 89.99, total: 719.92, date: '2024-01-19', region: 'North' },
+    ],
+  },
+  {
+    id: 'product-inventory',
+    name: 'Product Inventory',
+    description: 'Inventory tracking with stock levels and supplier info',
+    icon: Database,
+    category: 'general',
+    requiredColumns: ['sku', 'product_name', 'stock_quantity', 'unit_cost'],
+    optionalColumns: ['category', 'reorder_level', 'supplier', 'last_restocked', 'warehouse'],
+    sampleData: [
+      { sku: 'SKU-001', product_name: 'Widget Alpha', category: 'Widgets', stock_quantity: 150, reorder_level: 50, unit_cost: 12.50, supplier: 'Acme Corp', last_restocked: '2024-01-10' },
+      { sku: 'SKU-002', product_name: 'Gadget Beta', category: 'Gadgets', stock_quantity: 75, reorder_level: 25, unit_cost: 34.99, supplier: 'Tech Solutions', last_restocked: '2024-01-12' },
+      { sku: 'SKU-003', product_name: 'Component X1', category: 'Components', stock_quantity: 500, reorder_level: 100, unit_cost: 2.25, supplier: 'Parts Plus', last_restocked: '2024-01-08' },
+      { sku: 'SKU-004', product_name: 'Widget Deluxe', category: 'Widgets', stock_quantity: 45, reorder_level: 30, unit_cost: 28.00, supplier: 'Acme Corp', last_restocked: '2024-01-15' },
+      { sku: 'SKU-005', product_name: 'Gadget Pro', category: 'Gadgets', stock_quantity: 120, reorder_level: 40, unit_cost: 56.75, supplier: 'Tech Solutions', last_restocked: '2024-01-11' },
+    ],
+  },
+  {
+    id: 'geo-locations',
+    name: 'Geographic Locations',
+    description: 'Location data with coordinates for mapping',
+    icon: MapPin,
+    category: 'geographical',
+    requiredColumns: ['name', 'latitude', 'longitude'],
+    optionalColumns: ['address', 'city', 'country', 'category', 'description', 'status'],
+    sampleData: [
+      { name: 'Central Office', latitude: 48.8566, longitude: 2.3522, address: '123 Main St', city: 'Paris', country: 'France', category: 'Office', status: 'Active' },
+      { name: 'Warehouse A', latitude: 52.5200, longitude: 13.4050, address: '456 Industrial Rd', city: 'Berlin', country: 'Germany', category: 'Warehouse', status: 'Active' },
+      { name: 'Distribution Center', latitude: 51.5074, longitude: -0.1278, address: '789 Logistics Ave', city: 'London', country: 'UK', category: 'Distribution', status: 'Active' },
+      { name: 'Regional Hub', latitude: 41.9028, longitude: 12.4964, address: '321 Commerce Blvd', city: 'Rome', country: 'Italy', category: 'Hub', status: 'Pending' },
+      { name: 'Retail Store', latitude: 40.4168, longitude: -3.7038, address: '654 Shopping Lane', city: 'Madrid', country: 'Spain', category: 'Retail', status: 'Active' },
+    ],
+  },
+  {
+    id: 'facility-data',
+    name: 'Facility Registry',
+    description: 'Facilities with location and operational details',
+    icon: Building2,
+    category: 'geographical',
+    requiredColumns: ['facility_id', 'facility_name', 'lat', 'lng', 'type'],
+    optionalColumns: ['capacity', 'status', 'manager', 'contact_email', 'opening_date'],
+    sampleData: [
+      { facility_id: 'FAC-001', facility_name: 'Manufacturing Plant A', lat: 47.3769, lng: 8.5417, type: 'Manufacturing', capacity: 500, status: 'Operational', manager: 'Hans Mueller' },
+      { facility_id: 'FAC-002', facility_name: 'Research Lab', lat: 50.1109, lng: 8.6821, type: 'R&D', capacity: 100, status: 'Operational', manager: 'Dr. Anna Schmidt' },
+      { facility_id: 'FAC-003', facility_name: 'Logistics Hub', lat: 52.3676, lng: 4.9041, type: 'Logistics', capacity: 300, status: 'Operational', manager: 'Jan de Vries' },
+      { facility_id: 'FAC-004', facility_name: 'Training Center', lat: 48.2082, lng: 16.3738, type: 'Training', capacity: 150, status: 'Under Renovation', manager: 'Maria Weber' },
+      { facility_id: 'FAC-005', facility_name: 'Data Center', lat: 59.3293, lng: 18.0686, type: 'IT', capacity: 50, status: 'Operational', manager: 'Erik Lindqvist' },
+    ],
+  },
+];
+
+export function TemplateSelector({ onSelectTemplate, onDownloadSample }: TemplateSelectorProps) {
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [filter, setFilter] = useState<'all' | 'general' | 'geographical'>('all');
+
+  const filteredTemplates = templates.filter(t => 
+    filter === 'all' || t.category === filter
+  );
+
+  const handleDownloadSample = (template: Template, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDownloadSample(template);
+  };
+
+  return (
+    <div className="w-full max-w-4xl mx-auto space-y-6">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold mb-2">
+          <span className="gradient-text">Select a Template</span>
+        </h2>
+        <p className="text-muted-foreground">
+          Choose a data template that matches your file structure
+        </p>
+      </div>
+
+      {/* Filter buttons */}
+      <div className="flex justify-center gap-2">
+        <Button
+          variant={filter === 'all' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setFilter('all')}
+        >
+          All Templates
+        </Button>
+        <Button
+          variant={filter === 'general' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setFilter('general')}
+        >
+          <FileSpreadsheet className="w-4 h-4 mr-2" />
+          General Data
+        </Button>
+        <Button
+          variant={filter === 'geographical' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setFilter('geographical')}
+        >
+          <MapPin className="w-4 h-4 mr-2" />
+          Geographical
+        </Button>
+      </div>
+
+      {/* Template grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredTemplates.map((template) => {
+          const Icon = template.icon;
+          const isSelected = selectedTemplate?.id === template.id;
+          
+          return (
+            <Card
+              key={template.id}
+              className={`cursor-pointer transition-all duration-200 hover:border-primary/50 hover:shadow-lg ${
+                isSelected ? 'border-primary ring-2 ring-primary/20' : ''
+              }`}
+              onClick={() => setSelectedTemplate(template)}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className={`p-2.5 rounded-xl ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-primary/10'}`}>
+                    <Icon className={`w-5 h-5 ${isSelected ? '' : 'text-primary'}`} />
+                  </div>
+                  {isSelected && (
+                    <div className="p-1 bg-primary rounded-full">
+                      <Check className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                  )}
+                </div>
+                <CardTitle className="text-lg mt-2">{template.name}</CardTitle>
+                <CardDescription className="text-sm">{template.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1.5">Required columns:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {template.requiredColumns.map((col) => (
+                      <Badge key={col} variant="secondary" className="text-xs">
+                        {col}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full text-muted-foreground hover:text-foreground"
+                  onClick={(e) => handleDownloadSample(template, e)}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Sample CSV
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Continue button */}
+      {selectedTemplate && (
+        <div className="flex justify-center pt-4 animate-fade-in">
+          <Button
+            size="lg"
+            className="gap-2"
+            onClick={() => onSelectTemplate(selectedTemplate)}
+          >
+            Continue with {selectedTemplate.name}
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Utility function to generate CSV from template sample data
+export function generateSampleCSV(template: Template): string {
+  const allColumns = [...template.requiredColumns, ...(template.optionalColumns || [])];
+  const headers = allColumns.join(',');
+  
+  const rows = template.sampleData.map(row => 
+    allColumns.map(col => {
+      const value = row[col];
+      if (value === undefined || value === null) return '';
+      if (typeof value === 'string' && value.includes(',')) return `"${value}"`;
+      return String(value);
+    }).join(',')
+  );
+  
+  return [headers, ...rows].join('\n');
+}
+
+// Utility function to validate uploaded data against template
+export function validateAgainstTemplate(
+  data: Record<string, unknown>[],
+  template: Template
+): { isValid: boolean; missingColumns: string[]; message: string } {
+  if (data.length === 0) {
+    return { isValid: false, missingColumns: [], message: 'No data found in file' };
+  }
+
+  const uploadedColumns = Object.keys(data[0]).map(col => col.toLowerCase().trim());
+  const requiredColumns = template.requiredColumns.map(col => col.toLowerCase().trim());
+  
+  const missingColumns = requiredColumns.filter(col => !uploadedColumns.includes(col));
+
+  if (missingColumns.length > 0) {
+    return {
+      isValid: false,
+      missingColumns: template.requiredColumns.filter(col => 
+        missingColumns.includes(col.toLowerCase().trim())
+      ),
+      message: `Missing required columns: ${missingColumns.join(', ')}`
+    };
+  }
+
+  return { isValid: true, missingColumns: [], message: 'File matches template structure' };
+}
