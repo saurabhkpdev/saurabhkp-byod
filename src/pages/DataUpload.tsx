@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { useDataStore } from '@/hooks/useDataStore';
 import { useUsageStats } from '@/hooks/useUsageStats';
 import { useAuditLog } from '@/hooks/useAuditLog';
@@ -11,7 +10,7 @@ import { DataVisualization } from '@/components/DataVisualization';
 import { DataQualityPanel } from '@/components/DataQualityPanel';
 import { TopBar } from '@/components/TopBar';
 import { UploadWizard } from '@/components/UploadWizard';
-import { DatabaseSelector } from '@/components/DatabaseSelector';
+import { TemplateSelector, Template, generateSampleCSV } from '@/components/TemplateSelector';
 
 import { LeafletMapEditor } from '@/components/LeafletMapEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,7 +27,7 @@ const DataUpload = () => {
   const navigate = useNavigate();
   const [wizardComplete, setWizardComplete] = useState(false);
   const [wizardData, setWizardData] = useState<WizardData | null>(null);
-  const [sourceMode, setSourceMode] = useState<'select' | 'upload' | 'database'>('select');
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [hasGeoData, setHasGeoData] = useState(false);
   const { recordUpload } = useUsageStats();
   const { logEvent } = useAuditLog();
@@ -55,28 +54,41 @@ const DataUpload = () => {
     setWizardComplete(true);
   };
 
-  const handleDataLoaded = (data: Record<string, unknown>[], fileName: string, geoData: boolean = false) => {
+  const handleTemplateSelect = (template: Template) => {
+    setSelectedTemplate(template);
+    setHasGeoData(template.category === 'geographical');
+    logEvent('template_selected', `Selected template: ${template.name}`, 'Data Upload', { templateId: template.id });
+  };
+
+  const handleDownloadSample = (template: Template) => {
+    const csvContent = generateSampleCSV(template);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${template.name.toLowerCase().replace(/\s+/g, '-')}-template.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDataLoaded = (data: Record<string, unknown>[], fileName: string) => {
     loadData(data, fileName);
-    setHasGeoData(geoData);
     recordUpload();
-    logEvent('data_upload', `Uploaded file: ${fileName} (${data.length} rows)`, 'Data Upload', { fileName, rowCount: data.length, hasGeoData: geoData });
+    logEvent('data_upload', `Uploaded file: ${fileName} (${data.length} rows)`, 'Data Upload', { fileName, rowCount: data.length, hasGeoData, templateId: selectedTemplate?.id });
   };
 
   const handleClear = () => {
     clearData();
     setWizardComplete(false);
     setWizardData(null);
-    setSourceMode('select');
+    setSelectedTemplate(null);
     setHasGeoData(false);
   };
 
-  const handleDatabaseSelect = (databaseData: Record<string, unknown>[], fileName: string, geoData: boolean) => {
-    logEvent('dataset_selected', `Selected dataset: ${fileName}`, 'Data Upload', { fileName, hasGeoData: geoData });
-    handleDataLoaded(databaseData, fileName, geoData);
-  };
-
-  const handleChooseUpload = () => {
-    setSourceMode('upload');
+  const handleBackToTemplates = () => {
+    setSelectedTemplate(null);
   };
 
   const handleUpdateCoordinates = (rowIndex: number, lat: number, lng: number) => {
@@ -115,21 +127,21 @@ const DataUpload = () => {
               </div>
               <UploadWizard onComplete={handleWizardComplete} />
             </div>
-          ) : sourceMode === 'select' && !data ? (
+          ) : !selectedTemplate && !data ? (
             <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
-              <DatabaseSelector 
-                onSelectDataset={handleDatabaseSelect}
-                onChooseUpload={handleChooseUpload}
+              <TemplateSelector 
+                onSelectTemplate={handleTemplateSelect}
+                onDownloadSample={handleDownloadSample}
               />
             </div>
-          ) : sourceMode === 'upload' && !data ? (
+          ) : selectedTemplate && !data ? (
             <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
-              <div className="text-center mb-12">
+              <div className="text-center mb-8">
                 <h2 className="text-4xl font-bold mb-4">
-                  <span className="gradient-text">Bring Your Own Data</span>
+                  <span className="gradient-text">Upload Your Data</span>
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-md mx-auto">
-                  Upload your CSV file to explore statistics, visualize patterns, and mark sensitive information
+                  Upload a CSV file matching the {selectedTemplate.name} template
                 </p>
                 {wizardData && (
                   <p className="text-sm text-muted-foreground mt-2">
@@ -137,7 +149,11 @@ const DataUpload = () => {
                   </p>
                 )}
               </div>
-              <FileUpload onDataLoaded={(d, f) => handleDataLoaded(d, f, false)} />
+              <FileUpload 
+                onDataLoaded={handleDataLoaded} 
+                template={selectedTemplate}
+                onBack={handleBackToTemplates}
+              />
             </div>
           ) : data ? (
             <div className="space-y-8 animate-slide-up">

@@ -9,6 +9,7 @@ export type AuditAction =
   | 'validation_run'
   | 'data_processed'
   | 'dataset_selected'
+  | 'template_selected'
   | 'map_feature_created'
   | 'map_feature_deleted'
   | 'coordinates_updated';
@@ -133,6 +134,7 @@ export const actionLabels: Record<AuditAction, string> = {
   validation_run: 'Validation Run',
   data_processed: 'Data Processed',
   dataset_selected: 'Dataset Selected',
+  template_selected: 'Template Selected',
   map_feature_created: 'Map Feature Created',
   map_feature_deleted: 'Map Feature Deleted',
   coordinates_updated: 'Coordinates Updated'
@@ -148,6 +150,7 @@ export const actionColors: Record<AuditAction, string> = {
   validation_run: 'bg-purple-500/10 text-purple-600',
   data_processed: 'bg-emerald-500/10 text-emerald-600',
   dataset_selected: 'bg-cyan-500/10 text-cyan-600',
+  template_selected: 'bg-violet-500/10 text-violet-600',
   map_feature_created: 'bg-indigo-500/10 text-indigo-600',
   map_feature_deleted: 'bg-pink-500/10 text-pink-600',
   coordinates_updated: 'bg-teal-500/10 text-teal-600'
