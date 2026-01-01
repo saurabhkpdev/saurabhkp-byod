@@ -28,6 +28,7 @@ export interface Template {
 interface TemplateSelectorProps {
   onSelectTemplate: (template: Template) => void;
   onDownloadSample: (template: Template) => void;
+  onBack?: () => void;
 }
 
 export const templates: Template[] = [
@@ -113,7 +114,7 @@ export const templates: Template[] = [
   },
 ];
 
-export function TemplateSelector({ onSelectTemplate, onDownloadSample }: TemplateSelectorProps) {
+export function TemplateSelector({ onSelectTemplate, onDownloadSample, onBack }: TemplateSelectorProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [filter, setFilter] = useState<'all' | 'general' | 'geographical'>('all');
 
@@ -136,6 +137,15 @@ export function TemplateSelector({ onSelectTemplate, onDownloadSample }: Templat
           Choose a data template that matches your file structure
         </p>
       </div>
+
+      {/* Back button */}
+      {onBack && (
+        <div className="flex justify-center">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            ← Back to data source selection
+          </Button>
+        </div>
+      )}
 
       {/* Filter buttons */}
       <div className="flex justify-center gap-2">

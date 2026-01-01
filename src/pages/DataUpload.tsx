@@ -10,6 +10,7 @@ import { DataVisualization } from '@/components/DataVisualization';
 import { DataQualityPanel } from '@/components/DataQualityPanel';
 import { TopBar } from '@/components/TopBar';
 import { UploadWizard } from '@/components/UploadWizard';
+import { DatabaseSelector } from '@/components/DatabaseSelector';
 import { TemplateSelector, Template, generateSampleCSV } from '@/components/TemplateSelector';
 
 import { LeafletMapEditor } from '@/components/LeafletMapEditor';
@@ -23,10 +24,13 @@ interface WizardData {
   consent: boolean;
 }
 
+type SourceMode = 'select' | 'upload-template' | 'upload-file';
+
 const DataUpload = () => {
   const navigate = useNavigate();
   const [wizardComplete, setWizardComplete] = useState(false);
   const [wizardData, setWizardData] = useState<WizardData | null>(null);
+  const [sourceMode, setSourceMode] = useState<SourceMode>('select');
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [hasGeoData, setHasGeoData] = useState(false);
   const { recordUpload } = useUsageStats();
@@ -54,9 +58,14 @@ const DataUpload = () => {
     setWizardComplete(true);
   };
 
+  const handleChooseUpload = () => {
+    setSourceMode('upload-template');
+  };
+
   const handleTemplateSelect = (template: Template) => {
     setSelectedTemplate(template);
     setHasGeoData(template.category === 'geographical');
+    setSourceMode('upload-file');
     logEvent('template_selected', `Selected template: ${template.name}`, 'Data Upload', { templateId: template.id });
   };
 
@@ -73,26 +82,40 @@ const DataUpload = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleDataLoaded = (data: Record<string, unknown>[], fileName: string) => {
-    loadData(data, fileName);
+  const handleDataLoaded = (rawData: Record<string, unknown>[], fileName: string, geoData: boolean = false) => {
+    loadData(rawData, fileName);
+    setHasGeoData(geoData || (selectedTemplate?.category === 'geographical'));
     recordUpload();
-    logEvent('data_upload', `Uploaded file: ${fileName} (${data.length} rows)`, 'Data Upload', { fileName, rowCount: data.length, hasGeoData, templateId: selectedTemplate?.id });
+    logEvent('data_upload', `Uploaded file: ${fileName} (${rawData.length} rows)`, 'Data Upload', { fileName, rowCount: rawData.length, hasGeoData: geoData, templateId: selectedTemplate?.id });
+  };
+
+  const handleDatabaseSelect = (databaseData: Record<string, unknown>[], fileName: string, geoData: boolean) => {
+    logEvent('dataset_selected', `Selected dataset: ${fileName}`, 'Data Upload', { fileName, hasGeoData: geoData });
+    loadData(databaseData, fileName);
+    setHasGeoData(geoData);
+    recordUpload();
   };
 
   const handleClear = () => {
     clearData();
     setWizardComplete(false);
     setWizardData(null);
+    setSourceMode('select');
     setSelectedTemplate(null);
     setHasGeoData(false);
   };
 
   const handleBackToTemplates = () => {
+    setSourceMode('upload-template');
+    setSelectedTemplate(null);
+  };
+
+  const handleBackToSourceSelect = () => {
+    setSourceMode('select');
     setSelectedTemplate(null);
   };
 
   const handleUpdateCoordinates = (rowIndex: number, lat: number, lng: number) => {
-    // Find lat/lng column names
     const latColumn = data?.columns.find(c => 
       c.name.toLowerCase().includes('lat') || c.name.toLowerCase() === 'latitude'
     );
@@ -115,6 +138,7 @@ const DataUpload = () => {
         <TopBar fileName={data?.fileName} onClear={handleClear} />
         
         <main className="flex-1 container mx-auto px-6 py-8">
+          {/* Step 1: Wizard */}
           {!wizardComplete ? (
             <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
               <div className="text-center mb-12">
@@ -127,14 +151,25 @@ const DataUpload = () => {
               </div>
               <UploadWizard onComplete={handleWizardComplete} />
             </div>
-          ) : !selectedTemplate && !data ? (
+          ) : sourceMode === 'select' && !data ? (
+            /* Step 2: Choose source - Upload new OR use existing */
+            <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
+              <DatabaseSelector 
+                onSelectDataset={handleDatabaseSelect}
+                onChooseUpload={handleChooseUpload}
+              />
+            </div>
+          ) : sourceMode === 'upload-template' && !data ? (
+            /* Step 3a: Select template for upload */
             <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
               <TemplateSelector 
                 onSelectTemplate={handleTemplateSelect}
                 onDownloadSample={handleDownloadSample}
+                onBack={handleBackToSourceSelect}
               />
             </div>
-          ) : selectedTemplate && !data ? (
+          ) : sourceMode === 'upload-file' && selectedTemplate && !data ? (
+            /* Step 3b: Upload file matching template */
             <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
               <div className="text-center mb-8">
                 <h2 className="text-4xl font-bold mb-4">
@@ -150,12 +185,13 @@ const DataUpload = () => {
                 )}
               </div>
               <FileUpload 
-                onDataLoaded={handleDataLoaded} 
+                onDataLoaded={(d, f) => handleDataLoaded(d, f, selectedTemplate.category === 'geographical')} 
                 template={selectedTemplate}
                 onBack={handleBackToTemplates}
               />
             </div>
           ) : data ? (
+            /* Step 4: Data loaded - show tabs */
             <div className="space-y-8 animate-slide-up">
               <Tabs defaultValue="data" className="w-full">
                 <TabsList className={`grid w-full max-w-2xl mx-auto ${hasGeoData ? 'grid-cols-5' : 'grid-cols-4'}`}>
