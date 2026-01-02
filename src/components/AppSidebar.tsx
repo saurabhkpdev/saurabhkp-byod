@@ -6,7 +6,8 @@ import {
   Shield, 
   ChevronLeft,
   ChevronRight,
-  Database
+  Database,
+  FileSpreadsheet
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 const navItems = [
   { title: "Home", url: "/", icon: Home },
   { title: "Data Studio", url: "/upload", icon: Sparkles },
+  { title: "Templates", url: "/templates", icon: FileSpreadsheet },
   { title: "Documentation", url: "/docs", icon: BookOpen },
   { title: "Admin", url: "/admin", icon: Shield },
 ];

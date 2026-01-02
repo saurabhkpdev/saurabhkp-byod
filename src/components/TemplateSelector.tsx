@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,18 +12,21 @@ import {
   Building2,
   Download,
   Check,
-  ArrowRight
+  ArrowRight,
+  Plus
 } from 'lucide-react';
+import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 
 export interface Template {
   id: string;
   name: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon?: React.ComponentType<{ className?: string }>;
   requiredColumns: string[];
   optionalColumns?: string[];
   sampleData: Record<string, unknown>[];
   category: 'general' | 'geographical';
+  isCustom?: boolean;
 }
 
 interface TemplateSelectorProps {
@@ -31,7 +35,7 @@ interface TemplateSelectorProps {
   onBack?: () => void;
 }
 
-export const templates: Template[] = [
+export const systemTemplates: Template[] = [
   {
     id: 'employee-directory',
     name: 'Employee Directory',
@@ -115,10 +119,22 @@ export const templates: Template[] = [
 ];
 
 export function TemplateSelector({ onSelectTemplate, onDownloadSample, onBack }: TemplateSelectorProps) {
+  const navigate = useNavigate();
+  const { customTemplates, isLoading } = useTemplateStore();
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [filter, setFilter] = useState<'all' | 'general' | 'geographical'>('all');
 
-  const filteredTemplates = templates.filter(t => 
+  // Combine system templates with custom templates
+  const allTemplates: Template[] = [
+    ...systemTemplates,
+    ...customTemplates.map((ct: CustomTemplate) => ({
+      ...ct,
+      icon: ct.category === 'geographical' ? MapPin : FileSpreadsheet,
+      optionalColumns: ct.optionalColumns,
+    })),
+  ];
+
+  const filteredTemplates = allTemplates.filter(t => 
     filter === 'all' || t.category === filter
   );
 
@@ -126,6 +142,14 @@ export function TemplateSelector({ onSelectTemplate, onDownloadSample, onBack }:
     e.stopPropagation();
     onDownloadSample(template);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
@@ -148,7 +172,7 @@ export function TemplateSelector({ onSelectTemplate, onDownloadSample, onBack }:
       )}
 
       {/* Filter buttons */}
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-2 flex-wrap">
         <Button
           variant={filter === 'all' ? 'default' : 'outline'}
           size="sm"
@@ -172,6 +196,15 @@ export function TemplateSelector({ onSelectTemplate, onDownloadSample, onBack }:
           <MapPin className="w-4 h-4 mr-2" />
           Geographical
         </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate('/templates')}
+          className="gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          Create Custom
+        </Button>
       </div>
 
       {/* Template grid */}
@@ -191,16 +224,25 @@ export function TemplateSelector({ onSelectTemplate, onDownloadSample, onBack }:
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className={`p-2.5 rounded-xl ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-primary/10'}`}>
-                    <Icon className={`w-5 h-5 ${isSelected ? '' : 'text-primary'}`} />
+                    {Icon ? (
+                      <Icon className={`w-5 h-5 ${isSelected ? '' : 'text-primary'}`} />
+                    ) : template.category === 'geographical' ? (
+                      <MapPin className={`w-5 h-5 ${isSelected ? '' : 'text-primary'}`} />
+                    ) : (
+                      <FileSpreadsheet className={`w-5 h-5 ${isSelected ? '' : 'text-primary'}`} />
+                    )}
                   </div>
-                  {isSelected && (
-                    <div className="p-1 bg-primary rounded-full">
-                      <Check className="w-4 h-4 text-primary-foreground" />
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1">
+                    {template.isCustom && (
+                      <Badge variant="secondary" className="text-xs">Custom</Badge>
+                    )}
+                    {isSelected && (
+                      <div className="p-1 bg-primary rounded-full">
+                        <Check className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <CardTitle className="text-lg mt-2">{template.name}</CardTitle>
-                <CardDescription className="text-sm">{template.description}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>

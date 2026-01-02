@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import DataUpload from "./pages/DataUpload";
 import Documentation from "./pages/Documentation";
 import Admin from "./pages/Admin";
+import TemplateLibrary from "./pages/TemplateLibrary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/upload" element={<DataUpload />} />
+              <Route path="/templates" element={<TemplateLibrary />} />
               <Route path="/docs" element={<Documentation />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
