@@ -11,7 +11,7 @@ import { DataQualityPanel } from '@/components/DataQualityPanel';
 import { TopBar } from '@/components/TopBar';
 import { UploadWizard } from '@/components/UploadWizard';
 import { DatabaseSelector } from '@/components/DatabaseSelector';
-import { TemplateSelector, Template, generateSampleCSV } from '@/components/TemplateSelector';
+import { Template } from '@/components/TemplateSelector';
 
 import { LeafletMapEditor } from '@/components/LeafletMapEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -24,7 +24,7 @@ interface WizardData {
   consent: boolean;
 }
 
-type SourceMode = 'select' | 'upload-template' | 'upload-file';
+type SourceMode = 'select' | 'upload-file';
 
 const DataUpload = () => {
   const navigate = useNavigate();
@@ -58,28 +58,11 @@ const DataUpload = () => {
     setWizardComplete(true);
   };
 
-  const handleChooseUpload = () => {
-    setSourceMode('upload-template');
-  };
-
   const handleTemplateSelect = (template: Template) => {
     setSelectedTemplate(template);
     setHasGeoData(template.category === 'geographical');
     setSourceMode('upload-file');
     logEvent('template_selected', `Selected template: ${template.name}`, 'Data Upload', { templateId: template.id });
-  };
-
-  const handleDownloadSample = (template: Template) => {
-    const csvContent = generateSampleCSV(template);
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${template.name.toLowerCase().replace(/\s+/g, '-')}-template.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   const handleDataLoaded = (rawData: Record<string, unknown>[], fileName: string, geoData: boolean = false) => {
@@ -103,11 +86,6 @@ const DataUpload = () => {
     setSourceMode('select');
     setSelectedTemplate(null);
     setHasGeoData(false);
-  };
-
-  const handleBackToTemplates = () => {
-    setSourceMode('upload-template');
-    setSelectedTemplate(null);
   };
 
   const handleBackToSourceSelect = () => {
@@ -152,20 +130,11 @@ const DataUpload = () => {
               <UploadWizard onComplete={handleWizardComplete} />
             </div>
           ) : sourceMode === 'select' && !data ? (
-            /* Step 2: Choose source - Upload new OR use existing */
+            /* Step 2: Choose source - shows templates or datasets based on selection */
             <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
               <DatabaseSelector 
                 onSelectDataset={handleDatabaseSelect}
-                onChooseUpload={handleChooseUpload}
-              />
-            </div>
-          ) : sourceMode === 'upload-template' && !data ? (
-            /* Step 3a: Select template for upload */
-            <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
-              <TemplateSelector 
                 onSelectTemplate={handleTemplateSelect}
-                onDownloadSample={handleDownloadSample}
-                onBack={handleBackToSourceSelect}
               />
             </div>
           ) : sourceMode === 'upload-file' && selectedTemplate && !data ? (
@@ -187,7 +156,7 @@ const DataUpload = () => {
               <FileUpload 
                 onDataLoaded={(d, f) => handleDataLoaded(d, f, selectedTemplate.category === 'geographical')} 
                 template={selectedTemplate}
-                onBack={handleBackToTemplates}
+                onBack={handleBackToSourceSelect}
               />
             </div>
           ) : data ? (
