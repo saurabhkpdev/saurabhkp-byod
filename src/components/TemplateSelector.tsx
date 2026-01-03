@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -10,12 +10,12 @@ import {
   Database, 
   MapPin, 
   Building2,
-  Download,
   Check,
   ArrowRight,
   Plus
 } from 'lucide-react';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
+import { SampleDownloadButton } from './SampleDownloadButton';
 
 export interface Template {
   id: string;
@@ -31,7 +31,6 @@ export interface Template {
 
 interface TemplateSelectorProps {
   onSelectTemplate: (template: Template) => void;
-  onDownloadSample: (template: Template) => void;
   onBack?: () => void;
 }
 
@@ -118,7 +117,7 @@ export const systemTemplates: Template[] = [
   },
 ];
 
-export function TemplateSelector({ onSelectTemplate, onDownloadSample, onBack }: TemplateSelectorProps) {
+export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorProps) {
   const navigate = useNavigate();
   const { customTemplates, isLoading } = useTemplateStore();
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
@@ -137,11 +136,6 @@ export function TemplateSelector({ onSelectTemplate, onDownloadSample, onBack }:
   const filteredTemplates = allTemplates.filter(t => 
     filter === 'all' || t.category === filter
   );
-
-  const handleDownloadSample = (template: Template, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDownloadSample(template);
-  };
 
   if (isLoading) {
     return (
@@ -256,15 +250,12 @@ export function TemplateSelector({ onSelectTemplate, onDownloadSample, onBack }:
                   </div>
                 </div>
                 
-                <Button
+                <SampleDownloadButton 
+                  template={template}
                   variant="ghost"
                   size="sm"
                   className="w-full text-muted-foreground hover:text-foreground"
-                  onClick={(e) => handleDownloadSample(template, e)}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Sample CSV
-                </Button>
+                />
               </CardContent>
             </Card>
           );
