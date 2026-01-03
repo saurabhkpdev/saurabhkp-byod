@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Download } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Download, Search } from 'lucide-react';
 import { MockDataset, mockDatasets } from '@/hooks/useMockDatabase';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { Template, systemTemplates, generateSampleCSV } from '@/components/TemplateSelector';
@@ -17,28 +18,52 @@ interface DatabaseSelectorProps {
 
 export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: DatabaseSelectorProps) => {
   const navigate = useNavigate();
-  const [sourceMode, setSourceMode] = useState<SourceMode>('existing');
+  const [sourceMode, setSourceMode] = useState<SourceMode>('upload');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'geographical'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const { customTemplates } = useTemplateStore();
 
-  // Filter datasets
-  const filteredDatasets = selectedCategory === 'all' 
-    ? mockDatasets 
-    : mockDatasets.filter(d => d.hasGeoData);
-
   // Combine system and custom templates
-  const allTemplates: Template[] = [
+  const allTemplates: Template[] = useMemo(() => [
     ...systemTemplates,
     ...customTemplates.map((ct: CustomTemplate) => ({
       ...ct,
       icon: ct.category === 'geographical' ? MapPin : FileText,
       optionalColumns: ct.optionalColumns,
     })),
-  ];
+  ], [customTemplates]);
 
-  const filteredTemplates = selectedCategory === 'all'
-    ? allTemplates
-    : allTemplates.filter(t => t.category === 'geographical');
+  // Filter templates by category and search
+  const filteredTemplates = useMemo(() => {
+    let templates = selectedCategory === 'all'
+      ? allTemplates
+      : allTemplates.filter(t => t.category === 'geographical');
+    
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      templates = templates.filter(t => 
+        t.name.toLowerCase().includes(query) || 
+        t.description.toLowerCase().includes(query)
+      );
+    }
+    return templates;
+  }, [allTemplates, selectedCategory, searchQuery]);
+
+  // Filter datasets by category and search
+  const filteredDatasets = useMemo(() => {
+    let datasets = selectedCategory === 'all' 
+      ? mockDatasets 
+      : mockDatasets.filter(d => d.hasGeoData);
+    
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      datasets = datasets.filter(d => 
+        d.name.toLowerCase().includes(query) || 
+        d.description.toLowerCase().includes(query)
+      );
+    }
+    return datasets;
+  }, [selectedCategory, searchQuery]);
 
   const handleSelectDataset = (dataset: MockDataset) => {
     onSelectDataset(dataset.data, dataset.name, dataset.hasGeoData);
@@ -120,26 +145,38 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: Database
         </Card>
       </div>
 
-      {/* Category Filter */}
-      <div className="flex items-center justify-center gap-2">
-        <Button
-          variant={selectedCategory === 'all' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setSelectedCategory('all')}
-          className="gap-2"
-        >
-          <Table2 className="w-4 h-4" />
-          {sourceMode === 'upload' ? 'All Templates' : 'All Datasets'}
-        </Button>
-        <Button
-          variant={selectedCategory === 'geographical' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setSelectedCategory('geographical')}
-          className="gap-2"
-        >
-          <Globe className="w-4 h-4" />
-          Geographical
-        </Button>
+      {/* Search and Category Filter */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="relative w-full sm:w-80">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder={sourceMode === 'upload' ? 'Search templates...' : 'Search datasets...'}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={selectedCategory === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedCategory('all')}
+            className="gap-2"
+          >
+            <Table2 className="w-4 h-4" />
+            {sourceMode === 'upload' ? 'All Templates' : 'All Datasets'}
+          </Button>
+          <Button
+            variant={selectedCategory === 'geographical' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedCategory('geographical')}
+            className="gap-2"
+          >
+            <Globe className="w-4 h-4" />
+            Geographical
+          </Button>
+        </div>
       </div>
 
       {/* Content based on selection */}
