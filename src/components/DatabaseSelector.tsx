@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Download, Search } from 'lucide-react';
+import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Search } from 'lucide-react';
 import { MockDataset, mockDatasets } from '@/hooks/useMockDatabase';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
-import { Template, systemTemplates, generateSampleCSV } from '@/components/TemplateSelector';
+import { Template, systemTemplates } from '@/components/TemplateSelector';
+import { SampleDownloadButton } from '@/components/SampleDownloadButton';
 
 type SourceMode = 'upload' | 'existing';
 
@@ -69,19 +70,6 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: Database
     onSelectDataset(dataset.data, dataset.name, dataset.hasGeoData);
   };
 
-  const handleDownloadSample = (template: Template, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const csvContent = generateSampleCSV(template);
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${template.name.toLowerCase().replace(/\s+/g, '-')}-template.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
 
   const isCustomTemplate = (templateId: string) => {
     return customTemplates.some(ct => ct.id === templateId);
@@ -227,15 +215,12 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: Database
                   </p>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>{template.requiredColumns.length} columns</span>
-                    <Button
-                      variant="ghost"
+                    <SampleDownloadButton 
+                      template={template} 
+                      variant="ghost" 
                       size="sm"
-                      className="h-6 px-2 text-xs gap-1"
-                      onClick={(e) => handleDownloadSample(template, e)}
-                    >
-                      <Download className="w-3 h-3" />
-                      Sample
-                    </Button>
+                      className="h-6 px-2 text-xs"
+                    />
                   </div>
                 </CardContent>
               </Card>

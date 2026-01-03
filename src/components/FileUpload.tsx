@@ -2,8 +2,9 @@ import { useCallback, useState } from 'react';
 import { Upload, FileSpreadsheet, X, AlertTriangle, FileJson, FileCode, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Template, validateAgainstTemplate, generateSampleCSV } from './TemplateSelector';
-import { getFileParser, ACCEPT_STRING, getFileTypeLabel } from '@/lib/fileParsers';
+import { Template, validateAgainstTemplate } from './TemplateSelector';
+import { getFileParser, ACCEPT_STRING } from '@/lib/fileParsers';
+import { SampleDownloadButton } from './SampleDownloadButton';
 
 interface FileUploadProps {
   onDataLoaded: (data: Record<string, unknown>[], fileName: string) => void;
@@ -63,19 +64,6 @@ export const FileUpload = ({ onDataLoaded, template, onBack }: FileUploadProps) 
 
   const handleSampleData = () => {
     onDataLoaded(template.sampleData, `${template.name} Sample.csv`);
-  };
-
-  const handleDownloadSample = () => {
-    const csvContent = generateSampleCSV(template);
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${template.name.toLowerCase().replace(/\s+/g, '-')}-template.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -215,9 +203,7 @@ export const FileUpload = ({ onDataLoaded, template, onBack }: FileUploadProps) 
             </div>
           )}
           <div className="pl-8 pt-2">
-            <Button variant="outline" size="sm" onClick={handleDownloadSample}>
-              Download Template CSV
-            </Button>
+            <SampleDownloadButton template={template} variant="outline" size="sm" />
           </div>
         </div>
       )}
@@ -234,9 +220,7 @@ export const FileUpload = ({ onDataLoaded, template, onBack }: FileUploadProps) 
             <FileSpreadsheet className="w-4 h-4 mr-2" />
             Load {template.name} Sample Data
           </Button>
-          <Button variant="ghost" onClick={handleDownloadSample}>
-            Download Template CSV
-          </Button>
+          <SampleDownloadButton template={template} variant="ghost" />
         </div>
       </div>
     </div>
