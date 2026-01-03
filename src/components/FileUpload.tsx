@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
-import { Upload, FileSpreadsheet, X, AlertTriangle } from 'lucide-react';
-import Papa from 'papaparse';
+import { Upload, FileSpreadsheet, X, AlertTriangle, FileJson, FileCode, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Template, validateAgainstTemplate, generateSampleCSV } from './TemplateSelector';
+import { getFileParser, ACCEPT_STRING, getFileTypeLabel } from '@/lib/fileParsers';
 
 interface FileUploadProps {
   onDataLoaded: (data: Record<string, unknown>[], fileName: string) => void;
@@ -13,47 +13,52 @@ interface FileUploadProps {
 
 export const FileUpload = ({ onDataLoaded, template, onBack }: FileUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<{ message: string; missingColumns: string[] } | null>(null);
 
-  const handleFile = useCallback((file: File) => {
+  const handleFile = useCallback(async (file: File) => {
     setError(null);
     setValidationError(null);
+    setIsLoading(true);
     
-    if (!file.name.match(/\.(csv|tsv|txt)$/i)) {
-      setError('Please upload a CSV file');
+    const parser = getFileParser(file.name);
+    
+    if (!parser) {
+      setError(`Unsupported file type. Supported formats: CSV, Excel, JSON, GeoJSON, XML, KML`);
+      setIsLoading(false);
       return;
     }
 
-    Papa.parse(file, {
-      header: true,
-      dynamicTyping: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        if (results.errors.length > 0) {
-          setError(`Error parsing file: ${results.errors[0].message}`);
-          return;
-        }
+    try {
+      const result = await parser(file);
+      
+      if (!result.success || !result.data) {
+        setError(result.error || 'Failed to parse file');
+        setIsLoading(false);
+        return;
+      }
 
-        const data = results.data as Record<string, unknown>[];
-        
-        // Validate against template
-        const validation = validateAgainstTemplate(data, template);
-        
-        if (!validation.isValid) {
-          setValidationError({
-            message: validation.message,
-            missingColumns: validation.missingColumns
-          });
-          return;
-        }
+      const data = result.data;
+      
+      // Validate against template
+      const validation = validateAgainstTemplate(data, template);
+      
+      if (!validation.isValid) {
+        setValidationError({
+          message: validation.message,
+          missingColumns: validation.missingColumns
+        });
+        setIsLoading(false);
+        return;
+      }
 
-        onDataLoaded(data, file.name);
-      },
-      error: (err) => {
-        setError(`Error reading file: ${err.message}`);
-      },
-    });
+      onDataLoaded(data, file.name);
+    } catch (err) {
+      setError(`Error processing file: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsLoading(false);
+    }
   }, [onDataLoaded, template]);
 
   const handleSampleData = () => {
@@ -129,9 +134,10 @@ export const FileUpload = ({ onDataLoaded, template, onBack }: FileUploadProps) 
       >
         <input
           type="file"
-          accept=".csv,.tsv,.txt"
+          accept={ACCEPT_STRING}
           onChange={handleInputChange}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          disabled={isLoading}
         />
         
         <div className="flex flex-col items-center gap-4 text-center pointer-events-none">
@@ -139,7 +145,9 @@ export const FileUpload = ({ onDataLoaded, template, onBack }: FileUploadProps) 
             "p-4 rounded-2xl transition-all duration-300",
             isDragging ? "bg-primary text-primary-foreground scale-110" : "bg-muted group-hover:bg-primary/10"
           )}>
-            {isDragging ? (
+            {isLoading ? (
+              <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            ) : isDragging ? (
               <FileSpreadsheet className="w-10 h-10" />
             ) : (
               <Upload className="w-10 h-10 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -148,16 +156,30 @@ export const FileUpload = ({ onDataLoaded, template, onBack }: FileUploadProps) 
           
           <div>
             <p className="text-lg font-semibold text-foreground">
-              {isDragging ? "Drop your file here" : "Upload your data"}
+              {isLoading ? "Processing file..." : isDragging ? "Drop your file here" : "Upload your data"}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Drag and drop a CSV file matching the {template.name} template
+              Drag and drop a file matching the {template.name} template
             </p>
           </div>
           
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>Supports CSV, TSV files</span>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              CSV, Excel
+            </span>
+            <span className="flex items-center gap-1">
+              <FileJson className="w-3.5 h-3.5" />
+              JSON
+            </span>
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />
+              GeoJSON, KML
+            </span>
+            <span className="flex items-center gap-1">
+              <FileCode className="w-3.5 h-3.5" />
+              XML
+            </span>
           </div>
         </div>
       </div>
