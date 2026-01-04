@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Upload, FileSpreadsheet, X, AlertTriangle, FileJson, FileCode, MapPin } from 'lucide-react';
+import { Upload, FileSpreadsheet, X, AlertTriangle, FileJson, FileCode, MapPin, FileArchive } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Template, validateAgainstTemplate } from './TemplateSelector';
@@ -26,7 +26,7 @@ export const FileUpload = ({ onDataLoaded, template, onBack }: FileUploadProps) 
     const parser = getFileParser(file.name);
     
     if (!parser) {
-      setError(`Unsupported file type. Supported formats: CSV, Excel, JSON, GeoJSON, XML, KML`);
+      setError(`Unsupported file type. Supported formats: CSV, Excel, JSON, GeoJSON, XML, KML, Shapefile (ZIP)`);
       setIsLoading(false);
       return;
     }
@@ -154,7 +154,7 @@ export const FileUpload = ({ onDataLoaded, template, onBack }: FileUploadProps) 
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <FileSpreadsheet className="w-3.5 h-3.5" />
-              CSV, Excel
+              CSV, TSV, Excel
             </span>
             <span className="flex items-center gap-1">
               <FileJson className="w-3.5 h-3.5" />
@@ -167,6 +167,10 @@ export const FileUpload = ({ onDataLoaded, template, onBack }: FileUploadProps) 
             <span className="flex items-center gap-1">
               <FileCode className="w-3.5 h-3.5" />
               XML
+            </span>
+            <span className="flex items-center gap-1">
+              <FileArchive className="w-3.5 h-3.5" />
+              Shapefile (ZIP)
             </span>
           </div>
         </div>
