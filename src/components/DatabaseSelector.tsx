@@ -9,6 +9,7 @@ import { MockDataset, mockDatasets } from '@/hooks/useMockDatabase';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { Template, systemTemplates } from '@/components/TemplateSelector';
 import { SampleDownloadButton } from '@/components/SampleDownloadButton';
+import { getAvailableFormats } from '@/lib/sampleGenerators';
 
 type SourceMode = 'upload' | 'existing';
 
@@ -210,9 +211,20 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: Database
                   <CardTitle className="text-base mt-2">{template.name}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                  <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
                     {template.description}
                   </p>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {getAvailableFormats(template).map((format) => (
+                      <Badge 
+                        key={format.id} 
+                        variant="outline" 
+                        className="text-[10px] px-1.5 py-0 h-5 font-medium"
+                      >
+                        {format.label}
+                      </Badge>
+                    ))}
+                  </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>{template.requiredColumns.length} columns</span>
                     <SampleDownloadButton 
