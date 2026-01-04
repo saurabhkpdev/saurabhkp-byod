@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, ChevronDown, FileSpreadsheet, FileJson, FileCode, MapPin, FileText } from 'lucide-react';
+import { Download, ChevronDown, FileSpreadsheet, FileJson, FileCode, MapPin, FileText, FileArchive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -28,6 +28,7 @@ const formatIcons: Record<SampleFormat, React.ReactNode> = {
   xml: <FileCode className="w-4 h-4" />,
   geojson: <MapPin className="w-4 h-4" />,
   kml: <MapPin className="w-4 h-4" />,
+  shp: <FileArchive className="w-4 h-4" />,
 };
 
 export function SampleDownloadButton({ 
@@ -40,14 +41,18 @@ export function SampleDownloadButton({
   const [isOpen, setIsOpen] = useState(false);
   const availableFormats = getAvailableFormats(template);
   
-  const handleDownload = (format: SampleFormat, e: React.MouseEvent) => {
+  const handleDownload = async (format: SampleFormat, e: React.MouseEvent) => {
     e.stopPropagation();
-    const success = downloadSample(template, format);
-    
-    if (success) {
-      toast.success(`Downloaded ${template.name} sample as ${format.toUpperCase()}`);
-    } else {
-      toast.error(`Failed to generate ${format.toUpperCase()} sample`);
+    try {
+      const success = await downloadSample(template, format);
+      
+      if (success) {
+        toast.success(`Downloaded ${template.name} sample as ${format.toUpperCase()}`);
+      } else {
+        toast.error(`Failed to generate ${format.toUpperCase()} sample`);
+      }
+    } catch (err) {
+      toast.error(`Error generating ${format.toUpperCase()} sample`);
     }
     
     setIsOpen(false);
