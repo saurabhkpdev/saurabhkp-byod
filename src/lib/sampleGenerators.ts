@@ -150,6 +150,58 @@ export function generateSampleExcel(template: Template): Blob {
   return new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 }
 
+// Generate Shapefile ZIP archive (for geographical templates)
+export async function generateSampleShapefile(template: Template): Promise<Blob | null> {
+  if (template.category !== 'geographical') return null;
+  
+  // Generate GeoJSON first, then provide as ZIP with info
+  const geojsonContent = generateSampleGeoJSON(template);
+  if (!geojsonContent) return null;
+  
+  // Since browser-side shapefile creation is complex, we create a ZIP with GeoJSON + readme
+  // explaining it can be converted using tools like QGIS or ogr2ogr
+  const JSZip = (await import('jszip')).default;
+  const zip = new JSZip();
+  
+  // Add GeoJSON that can be converted
+  zip.file(`${template.name.toLowerCase().replace(/\s+/g, '_')}.geojson`, geojsonContent);
+  
+  // Add a readme explaining how to convert
+  const readme = `# Shapefile Export
+
+This ZIP contains a GeoJSON file that can be converted to Shapefile format.
+
+## Converting to Shapefile
+
+Use one of these methods:
+
+1. **QGIS** (Free, Open Source):
+   - Open the .geojson file in QGIS
+   - Right-click the layer > Export > Save Features As...
+   - Choose "ESRI Shapefile" format
+
+2. **ogr2ogr** (Command Line):
+   \`\`\`
+   ogr2ogr -f "ESRI Shapefile" output.shp input.geojson
+   \`\`\`
+
+3. **Online Converters**:
+   - https://mygeodata.cloud/converter/geojson-to-shp
+   - https://mapshaper.org/
+
+## Why GeoJSON?
+
+Browser-based Shapefile generation requires complex binary encoding.
+GeoJSON is widely supported and can be easily converted to Shapefile
+using the methods above.
+`;
+  
+  zip.file('README.txt', readme);
+  
+  const blob = await zip.generateAsync({ type: 'blob' });
+  return blob;
+}
+
 // Helper to escape XML special characters
 function escapeXML(str: string): string {
   return str
@@ -160,7 +212,7 @@ function escapeXML(str: string): string {
     .replace(/'/g, '&apos;');
 }
 
-export type SampleFormat = 'csv' | 'xlsx' | 'json' | 'geojson' | 'xml' | 'kml';
+export type SampleFormat = 'csv' | 'xlsx' | 'json' | 'geojson' | 'xml' | 'kml' | 'shp';
 
 export interface FormatOption {
   id: SampleFormat;
@@ -177,10 +229,11 @@ export const FORMAT_OPTIONS: FormatOption[] = [
   { id: 'xml', label: 'XML', extension: 'xml', mimeType: 'application/xml' },
   { id: 'geojson', label: 'GeoJSON', extension: 'geojson', mimeType: 'application/geo+json', geoOnly: true },
   { id: 'kml', label: 'KML', extension: 'kml', mimeType: 'application/vnd.google-earth.kml+xml', geoOnly: true },
+  { id: 'shp', label: 'Shapefile', extension: 'zip', mimeType: 'application/zip', geoOnly: true },
 ];
 
 // Download sample in specified format
-export function downloadSample(template: Template, format: SampleFormat): boolean {
+export async function downloadSample(template: Template, format: SampleFormat): Promise<boolean> {
   const fileName = template.name.toLowerCase().replace(/\s+/g, '-');
   const formatOption = FORMAT_OPTIONS.find(f => f.id === format);
   
@@ -206,6 +259,9 @@ export function downloadSample(template: Template, format: SampleFormat): boolea
       break;
     case 'kml':
       content = generateSampleKML(template);
+      break;
+    case 'shp':
+      content = await generateSampleShapefile(template);
       break;
   }
   

@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
+import shp from 'shpjs';
 
 export type ParseResult = {
   success: boolean;
@@ -249,14 +250,38 @@ export const parseKML = async (file: File): Promise<ParseResult> => {
   }
 };
 
-// Parse Shapefile (requires .shp, .dbf files - simplified single-file approach)
+// Parse Shapefile ZIP archive
 export const parseShapefile = async (file: File): Promise<ParseResult> => {
-  // Note: Full shapefile support requires multiple files (.shp, .dbf, .shx)
-  // This is a simplified handler that informs users about the limitation
-  return { 
-    success: false, 
-    error: 'Shapefile support requires uploading a ZIP containing .shp, .dbf, and .shx files. Please convert to GeoJSON for best results.' 
-  };
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const geojson = await shp(arrayBuffer);
+    
+    // Handle both single and multiple layers
+    const features = Array.isArray(geojson) 
+      ? geojson.flatMap((fc: any) => fc.features || [])
+      : geojson.features || [];
+    
+    if (features.length === 0) {
+      return { success: false, error: 'No features found in Shapefile' };
+    }
+    
+    // Convert features to records similar to GeoJSON parsing
+    const data = features.map((feature: any, index: number) => ({
+      _id: index + 1,
+      _geometry_type: feature.geometry?.type || 'Unknown',
+      _coordinates: JSON.stringify(feature.geometry?.coordinates),
+      latitude: extractLatitude(feature.geometry),
+      longitude: extractLongitude(feature.geometry),
+      ...feature.properties,
+    }));
+    
+    return { success: true, data };
+  } catch (err) {
+    return { 
+      success: false, 
+      error: `Error parsing Shapefile: ${err instanceof Error ? err.message : 'Unknown error'}. Ensure the ZIP contains valid .shp, .dbf, and .shx files.` 
+    };
+  }
 };
 
 // Helper functions
