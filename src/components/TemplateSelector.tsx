@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { SampleDownloadButton } from './SampleDownloadButton';
+import { getAvailableFormats } from '@/lib/sampleGenerators';
 
 export interface Template {
   id: string;
@@ -245,6 +246,21 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                     {template.requiredColumns.map((col) => (
                       <Badge key={col} variant="secondary" className="text-xs">
                         {col}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1.5">Available formats:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {getAvailableFormats(template).map((format) => (
+                      <Badge 
+                        key={format.id} 
+                        variant="outline" 
+                        className="text-[10px] px-1.5 py-0 h-5 font-medium"
+                      >
+                        {format.label}
                       </Badge>
                     ))}
                   </div>
