@@ -62,18 +62,18 @@ const DataUpload = () => {
     setSelectedTemplate(template);
     setHasGeoData(template.category === 'geographical');
     setSourceMode('upload-file');
-    logEvent('template_selected', `Selected template: ${template.name}`, 'Data Upload', { templateId: template.id });
+    logEvent('template_selected', `Selected template: ${template.name}`, 'Data Studio', { templateId: template.id });
   };
 
   const handleDataLoaded = (rawData: Record<string, unknown>[], fileName: string, geoData: boolean = false) => {
     loadData(rawData, fileName);
     setHasGeoData(geoData || (selectedTemplate?.category === 'geographical'));
     recordUpload();
-    logEvent('data_upload', `Uploaded file: ${fileName} (${rawData.length} rows)`, 'Data Upload', { fileName, rowCount: rawData.length, hasGeoData: geoData, templateId: selectedTemplate?.id });
+    logEvent('data_upload', `Uploaded file: ${fileName} (${rawData.length} rows)`, 'Data Studio', { fileName, rowCount: rawData.length, hasGeoData: geoData, templateId: selectedTemplate?.id });
   };
 
   const handleDatabaseSelect = (databaseData: Record<string, unknown>[], fileName: string, geoData: boolean) => {
-    logEvent('dataset_selected', `Selected dataset: ${fileName}`, 'Data Upload', { fileName, hasGeoData: geoData });
+    logEvent('dataset_selected', `Selected dataset: ${fileName}`, 'Data Studio', { fileName, hasGeoData: geoData });
     loadData(databaseData, fileName);
     setHasGeoData(geoData);
     recordUpload();
@@ -106,7 +106,7 @@ const DataUpload = () => {
     if (latColumn && lngColumn) {
       updateCell(rowIndex, latColumn.name, lat);
       updateCell(rowIndex, lngColumn.name, lng);
-      logEvent('coordinates_updated', `Updated coordinates for row ${rowIndex + 1}`, 'Data Upload', { rowIndex, lat, lng });
+      logEvent('coordinates_updated', `Updated coordinates for row ${rowIndex + 1}`, 'Data Studio', { rowIndex, lat, lng });
     }
   };
 
@@ -124,7 +124,7 @@ const DataUpload = () => {
                   <span className="gradient-text">Before You Begin</span>
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-md mx-auto">
-                  Please complete the following questionnaire to proceed with data upload
+                  Please complete the following questionnaire to proceed
                 </p>
               </div>
               <UploadWizard onComplete={handleWizardComplete} />
@@ -145,7 +145,7 @@ const DataUpload = () => {
                   <span className="gradient-text">Upload Your Data</span>
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-md mx-auto">
-                  Upload a CSV file matching the {selectedTemplate.name} template
+                  Upload a file matching the {selectedTemplate.name} template
                 </p>
                 {wizardData && (
                   <p className="text-sm text-muted-foreground mt-2">
@@ -215,7 +215,7 @@ const DataUpload = () => {
                     columns={data.columns} 
                     rows={data.rows} 
                     onProcessData={() => {
-                      logEvent('data_processed', `Processed ${data.rows.length} rows from "${data.fileName}"`, 'Data Upload', { fileName: data.fileName, rowCount: data.rows.length });
+                      logEvent('data_processed', `Processed ${data.rows.length} rows from "${data.fileName}"`, 'Data Studio', { fileName: data.fileName, rowCount: data.rows.length });
                       toast.success('🎉 Congratulations! Data successfully processed!', {
                         description: `${data.rows.length} rows from "${data.fileName}" have been submitted to the platform. Redirecting to home...`
                       });

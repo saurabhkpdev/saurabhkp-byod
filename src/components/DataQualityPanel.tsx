@@ -274,7 +274,7 @@ export const DataQualityPanel = ({ columns, rows, onProcessData }: DataQualityPa
     setTimeout(() => {
       setIsValidating(false);
       setHasValidated(true);
-      logEvent('validation_run', `Validation complete: Score ${qualityMetrics.overallScore}%, ${qualityMetrics.issues.length} issues found`, 'Data Upload', { 
+      logEvent('validation_run', `Validation complete: Score ${qualityMetrics.overallScore}%, ${qualityMetrics.issues.length} issues found`, 'Data Studio', { 
         overallScore: qualityMetrics.overallScore, 
         issueCount: qualityMetrics.issues.length 
       });

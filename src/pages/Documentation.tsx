@@ -18,7 +18,7 @@ const Documentation = () => {
   const quickStartSteps = [{
     step: 1,
     title: "Complete the Wizard",
-    description: "Answer a quick questionnaire about your data region and consent before proceeding with data upload.",
+    description: "Answer a quick questionnaire about your data region and consent before proceeding to Data Studio.",
     icon: CheckCircle2,
     tips: ["Select your country & region", "Confirm data consent", "Enables compliant data handling"]
   }, {
@@ -136,7 +136,7 @@ const Documentation = () => {
   return <>
       <Helmet>
         <title>Documentation - BYOD</title>
-        <meta name="description" content="Learn how to use BYOD for data upload, editing, visualization, and quality validation." />
+        <meta name="description" content="Learn how to use BYOD Data Studio for data editing, visualization, and quality validation." />
       </Helmet>
 
       <div className="min-h-screen bg-background">

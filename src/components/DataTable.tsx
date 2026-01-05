@@ -67,7 +67,7 @@ export const DataTable = ({ columns, rows, onCellUpdate, onTogglePII }: DataTabl
     }
     
     onCellUpdate(editingCell.rowIndex, editingCell.columnName, parsedValue);
-    logEvent('data_edit', `Edited cell [${editingCell.rowIndex + 1}, ${editingCell.columnName}]`, 'Data Upload', { rowIndex: editingCell.rowIndex, column: editingCell.columnName, newValue: parsedValue });
+    logEvent('data_edit', `Edited cell [${editingCell.rowIndex + 1}, ${editingCell.columnName}]`, 'Data Studio', { rowIndex: editingCell.rowIndex, column: editingCell.columnName, newValue: parsedValue });
     setEditingCell(null);
   }, [editingCell, columns, onCellUpdate, logEvent]);
 
@@ -79,7 +79,7 @@ export const DataTable = ({ columns, rows, onCellUpdate, onTogglePII }: DataTabl
     const column = columns.find(c => c.name === columnName);
     const isCurrentlyPII = column?.isPII ?? false;
     onTogglePII(columnName);
-    logEvent(isCurrentlyPII ? 'pii_untagged' : 'pii_tagged', `${isCurrentlyPII ? 'Untagged' : 'Tagged'} column "${columnName}" as PII`, 'Data Upload', { column: columnName });
+    logEvent(isCurrentlyPII ? 'pii_untagged' : 'pii_tagged', `${isCurrentlyPII ? 'Untagged' : 'Tagged'} column "${columnName}" as PII`, 'Data Studio', { column: columnName });
   }, [columns, onTogglePII, logEvent]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
