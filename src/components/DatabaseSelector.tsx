@@ -104,7 +104,7 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: Database
             <div className="flex-1">
               <h3 className="font-semibold text-lg">Upload New Data</h3>
               <p className="text-sm text-muted-foreground">
-                Select a template and upload your CSV file
+                Select a template and upload your data file
               </p>
             </div>
             {sourceMode === 'upload' && <Badge variant="secondary">Selected</Badge>}

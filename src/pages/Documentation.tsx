@@ -24,7 +24,7 @@ const Documentation = () => {
   }, {
     step: 2,
     title: "Upload or Select Data",
-    description: "Choose from 10+ sample datasets or upload your own CSV file. Geographical data enables the interactive map feature.",
+    description: "Choose from 10+ sample datasets or upload your own files. Geographical data enables the interactive map feature.",
     icon: Upload,
     tips: ["Drag & drop or browse files", "10 sample datasets available", "Geo data unlocks Map tab"]
   }, {
@@ -61,8 +61,8 @@ const Documentation = () => {
   const features = [{
     category: "Data Input",
     items: [{
-      title: "CSV File Upload",
-      description: "Upload CSV files via drag-and-drop or file browser. The system automatically detects column types and headers.",
+      title: "Multi-Format File Upload",
+      description: "Upload CSV, Excel, JSON, GeoJSON, XML, KML, or Shapefile via drag-and-drop or file browser. The system automatically detects column types and headers.",
       icon: FileSpreadsheet
     }, {
       title: "Sample Databases",
@@ -113,7 +113,7 @@ const Documentation = () => {
   }];
   const faqs = [{
     question: "What file formats are supported?",
-    answer: "Currently, BYOD supports CSV (Comma-Separated Values) files. The system automatically detects delimiters and header rows."
+    answer: "BYOD supports multiple file formats including CSV, TSV, Excel (.xlsx, .xls), JSON, GeoJSON, XML, KML, and Shapefile (.zip). The system automatically detects delimiters and header rows."
   }, {
     question: "How do I edit geographical data?",
     answer: "If your dataset contains latitude and longitude columns, a Map tab will appear. You can drag markers to update coordinates, or use the drawing tools to create new points and polygons. BYOD uses OpenStreetMap, so no API key is required."
