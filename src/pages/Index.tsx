@@ -22,7 +22,7 @@ const Index = () => {
   const features = [{
     icon: Database,
     title: '10+ Sample Datasets',
-    description: 'Choose from landmarks, cities, sales data, and more—or upload your own CSV'
+    description: 'Choose from landmarks, cities, sales data, and more—or upload your own files'
   }, {
     icon: Edit3,
     title: 'Inline Data Editing',
@@ -62,7 +62,7 @@ const Index = () => {
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
               Your complete data studio for uploading, editing, visualizing, and validating data. 
-              Work with sample datasets or bring your own CSV files.
+              Work with sample datasets or bring your own data files.
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
               <Link to="/upload">
@@ -157,7 +157,7 @@ const Index = () => {
               step: 1,
               title: 'Select Data',
               icon: Database,
-              desc: 'Choose a sample dataset or upload CSV'
+              desc: 'Choose a sample dataset or upload files'
             }, {
               step: 2,
               title: 'Edit & Tag',
