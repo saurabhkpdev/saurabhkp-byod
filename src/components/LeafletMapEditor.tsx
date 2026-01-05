@@ -130,7 +130,7 @@ export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: Leaflet
       setDrawnShapesCount(prev => prev + 1);
       
       const shapeType = event.layerType;
-      logEvent('map_feature_created', `Created ${shapeType} on map`, 'Data Upload', { shapeType });
+      logEvent('map_feature_created', `Created ${shapeType} on map`, 'Data Studio', { shapeType });
       toast.success(`Created ${shapeType}`);
       
       // Reset to select mode
@@ -180,7 +180,7 @@ export const LeafletMapEditor = ({ columns, rows, onUpdateCoordinates }: Leaflet
       marker.on('dragend', () => {
         const latlng = marker.getLatLng();
         onUpdateCoordinates(point.index, latlng.lat, latlng.lng);
-        logEvent('coordinates_updated', `Updated coordinates for row ${point.index + 1} via map`, 'Data Upload', { 
+        logEvent('coordinates_updated', `Updated coordinates for row ${point.index + 1} via map`, 'Data Studio', { 
           rowIndex: point.index, 
           lat: latlng.lat, 
           lng: latlng.lng 
