@@ -198,7 +198,7 @@ export function UploadWizard({ onComplete }: UploadWizardProps) {
             Back
           </Button>
           <Button onClick={handleNext} disabled={!canProceed()} className="gap-2">
-            {currentStep === steps.length - 1 ? 'Continue to Upload' : 'Next'}
+            {currentStep === steps.length - 1 ? 'Continue to Data Studio' : 'Next'}
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
