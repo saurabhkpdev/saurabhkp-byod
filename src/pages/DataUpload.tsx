@@ -47,7 +47,11 @@ const DataUpload = () => {
     updateCell,
     togglePII,
     getStats,
-    clearData
+    clearData,
+    addFormulaColumn,
+    bulkReplace,
+    bulkSetValue,
+    bulkTransform,
   } = useDataStore();
 
   const stats = data ? getStats() : [];
@@ -189,7 +193,16 @@ const DataUpload = () => {
                 </TabsList>
 
                 <TabsContent value="data" className="mt-6">
-                  <DataTable columns={data.columns} rows={data.rows} onCellUpdate={updateCell} onTogglePII={togglePII} />
+                  <DataTable 
+                    columns={data.columns} 
+                    rows={data.rows} 
+                    onCellUpdate={updateCell} 
+                    onTogglePII={togglePII}
+                    onAddFormulaColumn={addFormulaColumn}
+                    onBulkReplace={bulkReplace}
+                    onBulkSetValue={bulkSetValue}
+                    onBulkTransform={bulkTransform}
+                  />
                 </TabsContent>
 
                 <TabsContent value="stats" className="mt-6">
