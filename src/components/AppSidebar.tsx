@@ -10,6 +10,7 @@ import {
   FileSpreadsheet
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -82,8 +83,20 @@ export function AppSidebar({ children }: AppSidebarProps) {
           ))}
         </nav>
 
-        {/* Collapse Toggle */}
-        <div className="p-3 border-t">
+        {/* Footer with Theme Toggle and Collapse */}
+        <div className="p-3 border-t space-y-2">
+          {/* Theme Toggle */}
+          <div className={cn(
+            "flex items-center",
+            collapsed ? "justify-center" : "justify-between px-2"
+          )}>
+            {!collapsed && (
+              <span className="text-xs text-muted-foreground">Theme</span>
+            )}
+            <ThemeToggle size="sm" />
+          </div>
+
+          {/* Collapse Toggle */}
           <Button
             variant="ghost"
             size="sm"
