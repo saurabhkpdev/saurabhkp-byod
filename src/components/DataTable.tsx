@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react';
-import { Shield, ShieldOff, Edit2, Check, X } from 'lucide-react';
+import { Shield, ShieldOff, Edit2, Check, X, Calculator, Edit3 } from 'lucide-react';
 import { DataColumn, DataRow } from '@/types/data';
 import { cn } from '@/lib/utils';
 import { useAuditLog } from '@/hooks/useAuditLog';
+import { ColumnFormulaEditor } from '@/components/ColumnFormulaEditor';
+import { BulkEditPanel, BulkReplaceOptions, TransformType } from '@/components/BulkEditPanel';
 import {
   Table,
   TableBody,
@@ -26,6 +28,10 @@ interface DataTableProps {
   rows: DataRow[];
   onCellUpdate: (rowIndex: number, columnName: string, value: string | number | boolean | null) => void;
   onTogglePII: (columnName: string) => void;
+  onAddFormulaColumn?: (name: string, formula: string) => void;
+  onBulkReplace?: (columnName: string, findValue: string, replaceValue: string, options: BulkReplaceOptions) => number;
+  onBulkSetValue?: (columnName: string, value: string | number | boolean | null) => number;
+  onBulkTransform?: (columnName: string, transform: TransformType) => number;
 }
 
 interface EditingCell {
@@ -34,9 +40,20 @@ interface EditingCell {
   value: string;
 }
 
-export const DataTable = ({ columns, rows, onCellUpdate, onTogglePII }: DataTableProps) => {
+export const DataTable = ({ 
+  columns, 
+  rows, 
+  onCellUpdate, 
+  onTogglePII,
+  onAddFormulaColumn,
+  onBulkReplace,
+  onBulkSetValue,
+  onBulkTransform,
+}: DataTableProps) => {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [page, setPage] = useState(0);
+  const [formulaEditorOpen, setFormulaEditorOpen] = useState(false);
+  const [bulkEditOpen, setBulkEditOpen] = useState(false);
   const pageSize = 50;
   const { logEvent } = useAuditLog();
 
@@ -100,8 +117,39 @@ export const DataTable = ({ columns, rows, onCellUpdate, onTogglePII }: DataTabl
     return String(value);
   };
 
+  const hasTransformFeatures = onAddFormulaColumn || onBulkReplace;
+
   return (
     <div className="space-y-4">
+      {/* Toolbar */}
+      {hasTransformFeatures && (
+        <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/30">
+          <span className="text-sm font-medium text-muted-foreground mr-2">Data Transforms:</span>
+          {onAddFormulaColumn && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setFormulaEditorOpen(true)}
+              className="gap-2"
+            >
+              <Calculator className="w-4 h-4" />
+              Add Formula Column
+            </Button>
+          )}
+          {onBulkReplace && onBulkSetValue && onBulkTransform && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setBulkEditOpen(true)}
+              className="gap-2"
+            >
+              <Edit3 className="w-4 h-4" />
+              Bulk Edit
+            </Button>
+          )}
+        </div>
+      )}
+
       <ScrollArea className="rounded-xl border border-border bg-card">
         <div className="min-w-max">
           <Table>
@@ -232,6 +280,28 @@ export const DataTable = ({ columns, rows, onCellUpdate, onTogglePII }: DataTabl
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Formula Editor Dialog */}
+      {onAddFormulaColumn && (
+        <ColumnFormulaEditor
+          open={formulaEditorOpen}
+          onOpenChange={setFormulaEditorOpen}
+          columns={columns}
+          onAddFormulaColumn={onAddFormulaColumn}
+        />
+      )}
+
+      {/* Bulk Edit Dialog */}
+      {onBulkReplace && onBulkSetValue && onBulkTransform && (
+        <BulkEditPanel
+          open={bulkEditOpen}
+          onOpenChange={setBulkEditOpen}
+          columns={columns}
+          onBulkReplace={onBulkReplace}
+          onBulkSetValue={onBulkSetValue}
+          onBulkTransform={onBulkTransform}
+        />
       )}
     </div>
   );

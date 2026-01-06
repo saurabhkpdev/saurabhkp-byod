@@ -12,7 +12,11 @@ export type AuditAction =
   | 'template_selected'
   | 'map_feature_created'
   | 'map_feature_deleted'
-  | 'coordinates_updated';
+  | 'coordinates_updated'
+  | 'formula_column_added'
+  | 'bulk_replace'
+  | 'bulk_set_value'
+  | 'bulk_transform';
 
 export interface AuditEvent {
   id: string;
@@ -137,7 +141,11 @@ export const actionLabels: Record<AuditAction, string> = {
   template_selected: 'Template Selected',
   map_feature_created: 'Map Feature Created',
   map_feature_deleted: 'Map Feature Deleted',
-  coordinates_updated: 'Coordinates Updated'
+  coordinates_updated: 'Coordinates Updated',
+  formula_column_added: 'Formula Column Added',
+  bulk_replace: 'Bulk Replace',
+  bulk_set_value: 'Bulk Set Value',
+  bulk_transform: 'Bulk Transform'
 };
 
 // Action colors for badges
@@ -153,5 +161,9 @@ export const actionColors: Record<AuditAction, string> = {
   template_selected: 'bg-violet-500/10 text-violet-600',
   map_feature_created: 'bg-indigo-500/10 text-indigo-600',
   map_feature_deleted: 'bg-pink-500/10 text-pink-600',
-  coordinates_updated: 'bg-teal-500/10 text-teal-600'
+  coordinates_updated: 'bg-teal-500/10 text-teal-600',
+  formula_column_added: 'bg-amber-500/10 text-amber-600',
+  bulk_replace: 'bg-rose-500/10 text-rose-600',
+  bulk_set_value: 'bg-fuchsia-500/10 text-fuchsia-600',
+  bulk_transform: 'bg-lime-500/10 text-lime-600'
 };

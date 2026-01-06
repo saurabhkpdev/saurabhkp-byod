@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { DataColumn, DataRow, UploadedData, DataStats } from '@/types/data';
+import { BulkReplaceOptions, TransformType } from '@/components/BulkEditPanel';
 
 export const useDataStore = () => {
   const [data, setData] = useState<UploadedData | null>(null);
@@ -124,6 +125,180 @@ export const useDataStore = () => {
     setData(null);
   }, []);
 
+  // Add a formula-computed column
+  const addFormulaColumn = useCallback((columnName: string, formula: string) => {
+    setData(prev => {
+      if (!prev) return null;
+
+      // Create new column definition
+      const newColumn: DataColumn = {
+        name: columnName,
+        type: 'string', // Will be inferred from results
+        isPII: false,
+      };
+
+      // Evaluate formula for each row
+      const newRows = prev.rows.map(row => {
+        let result: string | number | boolean | null = null;
+        try {
+          // Replace [column_name] with actual values
+          let evalFormula = formula;
+          prev.columns.forEach(col => {
+            const value = row[col.name];
+            const replacement = value === null ? 'null' : 
+              typeof value === 'string' ? `"${value.replace(/"/g, '\\"')}"` : String(value);
+            evalFormula = evalFormula.replace(new RegExp(`\\[${col.name}\\]`, 'g'), replacement);
+          });
+          
+          // Safely evaluate the formula
+          // eslint-disable-next-line no-new-func
+          const fn = new Function(`return ${evalFormula}`);
+          result = fn();
+          
+          // Clean up result
+          if (result === undefined || result === null || (typeof result === 'number' && isNaN(result))) {
+            result = null;
+          }
+        } catch {
+          result = null;
+        }
+        return { ...row, [columnName]: result };
+      });
+
+      // Infer the type from results
+      const sampleResults = newRows.slice(0, 100).map(r => r[columnName]).filter(v => v !== null);
+      let inferredType: 'string' | 'number' | 'boolean' | 'date' = 'string';
+      if (sampleResults.length > 0) {
+        if (sampleResults.every(v => typeof v === 'number')) {
+          inferredType = 'number';
+        } else if (sampleResults.every(v => typeof v === 'boolean')) {
+          inferredType = 'boolean';
+        }
+      }
+
+      return {
+        ...prev,
+        columns: [...prev.columns, { ...newColumn, type: inferredType }],
+        rows: newRows,
+      };
+    });
+  }, []);
+
+  // Bulk find and replace
+  const bulkReplace = useCallback((
+    columnName: string, 
+    findValue: string, 
+    replaceValue: string, 
+    options: BulkReplaceOptions
+  ): number => {
+    let count = 0;
+    
+    setData(prev => {
+      if (!prev) return null;
+
+      const newRows = prev.rows.map(row => {
+        const cellValue = row[columnName];
+        if (cellValue === null) return row;
+
+        const cellStr = String(cellValue);
+        let matched = false;
+
+        if (options.matchWholeCell) {
+          matched = options.caseSensitive 
+            ? cellStr === findValue
+            : cellStr.toLowerCase() === findValue.toLowerCase();
+        } else {
+          matched = options.caseSensitive
+            ? cellStr.includes(findValue)
+            : cellStr.toLowerCase().includes(findValue.toLowerCase());
+        }
+
+        if (matched) {
+          count++;
+          let newValue: string;
+          if (options.matchWholeCell) {
+            newValue = replaceValue;
+          } else {
+            const regex = new RegExp(
+              findValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+              options.caseSensitive ? 'g' : 'gi'
+            );
+            newValue = cellStr.replace(regex, replaceValue);
+          }
+          return { ...row, [columnName]: newValue };
+        }
+        return row;
+      });
+
+      return { ...prev, rows: newRows };
+    });
+
+    return count;
+  }, []);
+
+  // Bulk set value for entire column
+  const bulkSetValue = useCallback((columnName: string, value: string | number | boolean | null): number => {
+    let count = 0;
+
+    setData(prev => {
+      if (!prev) return null;
+
+      const newRows = prev.rows.map(row => {
+        count++;
+        return { ...row, [columnName]: value };
+      });
+
+      return { ...prev, rows: newRows };
+    });
+
+    return count;
+  }, []);
+
+  // Bulk transform column
+  const bulkTransform = useCallback((columnName: string, transform: TransformType): number => {
+    let count = 0;
+
+    setData(prev => {
+      if (!prev) return null;
+
+      const newRows = prev.rows.map(row => {
+        const value = row[columnName];
+        
+        if (transform === 'clear_nulls' && value === null) {
+          count++;
+          return { ...row, [columnName]: '' };
+        }
+
+        if (value === null || typeof value !== 'string') return row;
+
+        let newValue: string = value;
+        switch (transform) {
+          case 'uppercase':
+            newValue = value.toUpperCase();
+            break;
+          case 'lowercase':
+            newValue = value.toLowerCase();
+            break;
+          case 'capitalize':
+            newValue = value.replace(/\b\w/g, c => c.toUpperCase());
+            break;
+          case 'trim':
+            newValue = value.trim();
+            break;
+        }
+
+        if (newValue !== value) {
+          count++;
+        }
+        return { ...row, [columnName]: newValue };
+      });
+
+      return { ...prev, rows: newRows };
+    });
+
+    return count;
+  }, []);
+
   return {
     data,
     isLoading,
@@ -132,5 +307,9 @@ export const useDataStore = () => {
     togglePII,
     getStats,
     clearData,
+    addFormulaColumn,
+    bulkReplace,
+    bulkSetValue,
+    bulkTransform,
   };
 };
