@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, Shield, RefreshCw } from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { ThemeCustomizer } from "@/components/ThemeCustomizer";
 const Admin = () => {
   const {
     events,
@@ -149,6 +150,10 @@ const Admin = () => {
                 <BarChart3 className="h-4 w-4" />
                 Analytics
               </TabsTrigger>
+              <TabsTrigger value="customization" className="gap-2">
+                <Palette className="h-4 w-4" />
+                Customization
+              </TabsTrigger>
             </TabsList>
 
             {/* Event Log Tab */}
@@ -274,6 +279,11 @@ const Admin = () => {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+
+            {/* Customization Tab */}
+            <TabsContent value="customization">
+              <ThemeCustomizer />
             </TabsContent>
           </Tabs>
         </main>
