@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette } from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { ThemeCustomizer } from "@/components/ThemeCustomizer";
+import { DataSourceConfig } from "@/components/DataSourceConfig";
 const Admin = () => {
   const {
     events,
@@ -154,6 +155,10 @@ const Admin = () => {
                 <Palette className="h-4 w-4" />
                 Customization
               </TabsTrigger>
+              <TabsTrigger value="datasources" className="gap-2">
+                <Database className="h-4 w-4" />
+                Data Sources
+              </TabsTrigger>
             </TabsList>
 
             {/* Event Log Tab */}
@@ -284,6 +289,11 @@ const Admin = () => {
             {/* Customization Tab */}
             <TabsContent value="customization">
               <ThemeCustomizer />
+            </TabsContent>
+
+            {/* Data Sources Tab */}
+            <TabsContent value="datasources">
+              <DataSourceConfig />
             </TabsContent>
           </Tabs>
         </main>
