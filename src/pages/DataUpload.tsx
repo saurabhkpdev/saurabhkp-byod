@@ -229,12 +229,15 @@ const DataUpload = () => {
                     rows={data.rows} 
                     onProcessData={() => {
                       logEvent('data_processed', `Processed ${data.rows.length} rows from "${data.fileName}"`, 'Data Studio', { fileName: data.fileName, rowCount: data.rows.length });
-                      toast.success('🎉 Congratulations! Data successfully processed!', {
-                        description: `${data.rows.length} rows from "${data.fileName}" have been submitted to the platform. Redirecting to home...`
+                      toast.success('🎉 Data successfully processed!', {
+                        description: `${data.rows.length} rows from "${data.fileName}" have been submitted. You can upload more data or continue editing.`
                       });
-                      setTimeout(() => {
-                        navigate('/');
-                      }, 2000);
+                      // Stay in data studio - clear current data to allow new upload
+                      clearData();
+                      setSourceMode('select');
+                      setSelectedTemplate(null);
+                      setHasGeoData(false);
+                      // Keep wizard complete so user doesn't need to redo consent
                     }}
                   />
                 </TabsContent>
