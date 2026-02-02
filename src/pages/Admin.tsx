@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database } from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -12,6 +12,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { ThemeCustomizer } from "@/components/ThemeCustomizer";
 import { DataSourceConfig } from "@/components/DataSourceConfig";
+import UserManagement from "@/components/UserManagement";
+
 const Admin = () => {
   const {
     events,
@@ -159,6 +161,10 @@ const Admin = () => {
                 <Database className="h-4 w-4" />
                 Data Sources
               </TabsTrigger>
+              <TabsTrigger value="users" className="gap-2">
+                <Users className="h-4 w-4" />
+                Users
+              </TabsTrigger>
             </TabsList>
 
             {/* Event Log Tab */}
@@ -294,6 +300,11 @@ const Admin = () => {
             {/* Data Sources Tab */}
             <TabsContent value="datasources">
               <DataSourceConfig />
+            </TabsContent>
+
+            {/* Users Tab */}
+            <TabsContent value="users">
+              <UserManagement />
             </TabsContent>
           </Tabs>
         </main>

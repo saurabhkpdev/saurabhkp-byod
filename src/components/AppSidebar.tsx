@@ -7,13 +7,17 @@ import {
   ChevronLeft,
   ChevronRight,
   Database,
-  FileSpreadsheet
+  FileSpreadsheet,
+  LogOut,
+  User
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const navItems = [
   { title: "Home", url: "/", icon: Home },
@@ -29,6 +33,13 @@ interface AppSidebarProps {
 
 export function AppSidebar({ children }: AppSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <div className="flex min-h-screen w-full">
@@ -83,8 +94,26 @@ export function AppSidebar({ children }: AppSidebarProps) {
           ))}
         </nav>
 
-        {/* Footer with Theme Toggle and Collapse */}
+        {/* Footer with User, Theme Toggle and Collapse */}
         <div className="p-3 border-t space-y-2">
+          {/* Current User */}
+          {currentUser && (
+            <div className={cn(
+              "flex items-center gap-2 px-2 py-2 rounded-lg bg-muted/50",
+              collapsed && "justify-center px-0"
+            )}>
+              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <User className="w-4 h-4 text-primary" />
+              </div>
+              {!collapsed && (
+                <div className="flex-1 overflow-hidden">
+                  <p className="text-sm font-medium truncate">{currentUser.username}</p>
+                  <p className="text-xs text-muted-foreground capitalize">{currentUser.role}</p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Theme Toggle */}
           <div className={cn(
             "flex items-center",
@@ -95,6 +124,29 @@ export function AppSidebar({ children }: AppSidebarProps) {
             )}
             <ThemeToggle size="sm" />
           </div>
+
+          {/* Logout Button */}
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className={cn(
+                  "w-full text-muted-foreground hover:text-destructive hover:bg-destructive/10",
+                  collapsed ? "justify-center" : "justify-start"
+                )}
+              >
+                <LogOut className="w-4 h-4" />
+                {!collapsed && <span className="ml-2">Logout</span>}
+              </Button>
+            </TooltipTrigger>
+            {collapsed && (
+              <TooltipContent side="right">
+                Logout
+              </TooltipContent>
+            )}
+          </Tooltip>
 
           {/* Collapse Toggle */}
           <Button
