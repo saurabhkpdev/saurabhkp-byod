@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users } from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users, ClipboardCheck } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
+import { useApprovalStore } from "@/hooks/useApprovalStore";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -13,8 +14,10 @@ import { toast } from "sonner";
 import { ThemeCustomizer } from "@/components/ThemeCustomizer";
 import { DataSourceConfig } from "@/components/DataSourceConfig";
 import UserManagement from "@/components/UserManagement";
+import ApprovalWorkflow from "@/components/ApprovalWorkflow";
 
 const Admin = () => {
+  const { getPendingRequests } = useApprovalStore();
   const {
     events,
     clearLogs,
@@ -143,8 +146,17 @@ const Admin = () => {
             </Card>
           </div>
 
-          <Tabs defaultValue="events" className="space-y-6">
-            <TabsList>
+          <Tabs defaultValue="approvals" className="space-y-6">
+            <TabsList className="flex-wrap h-auto gap-1">
+              <TabsTrigger value="approvals" className="gap-2">
+                <ClipboardCheck className="h-4 w-4" />
+                Approvals
+                {getPendingRequests().length > 0 && (
+                  <Badge variant="secondary" className="ml-1 h-5 px-1.5 bg-orange-500/20 text-orange-600">
+                    {getPendingRequests().length}
+                  </Badge>
+                )}
+              </TabsTrigger>
               <TabsTrigger value="events" className="gap-2">
                 <Clock className="h-4 w-4" />
                 Event Log
@@ -166,6 +178,11 @@ const Admin = () => {
                 Users
               </TabsTrigger>
             </TabsList>
+
+            {/* Approvals Tab */}
+            <TabsContent value="approvals">
+              <ApprovalWorkflow />
+            </TabsContent>
 
             {/* Event Log Tab */}
             <TabsContent value="events">

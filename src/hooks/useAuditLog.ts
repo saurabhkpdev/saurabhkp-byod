@@ -8,6 +8,10 @@ export type AuditAction =
   | 'pii_untagged'
   | 'validation_run'
   | 'data_processed'
+  | 'data_submitted'
+  | 'approval_submitted'
+  | 'approval_approved'
+  | 'approval_rejected'
   | 'dataset_selected'
   | 'template_selected'
   | 'map_feature_created'
@@ -137,6 +141,10 @@ export const actionLabels: Record<AuditAction, string> = {
   pii_untagged: 'PII Untagged',
   validation_run: 'Validation Run',
   data_processed: 'Data Processed',
+  data_submitted: 'Data Submitted',
+  approval_submitted: 'Approval Submitted',
+  approval_approved: 'Approval Approved',
+  approval_rejected: 'Approval Rejected',
   dataset_selected: 'Dataset Selected',
   template_selected: 'Template Selected',
   map_feature_created: 'Map Feature Created',
@@ -157,6 +165,10 @@ export const actionColors: Record<AuditAction, string> = {
   pii_untagged: 'bg-orange-500/10 text-orange-600',
   validation_run: 'bg-purple-500/10 text-purple-600',
   data_processed: 'bg-emerald-500/10 text-emerald-600',
+  data_submitted: 'bg-sky-500/10 text-sky-600',
+  approval_submitted: 'bg-orange-500/10 text-orange-600',
+  approval_approved: 'bg-green-500/10 text-green-600',
+  approval_rejected: 'bg-red-500/10 text-red-600',
   dataset_selected: 'bg-cyan-500/10 text-cyan-600',
   template_selected: 'bg-violet-500/10 text-violet-600',
   map_feature_created: 'bg-indigo-500/10 text-indigo-600',
