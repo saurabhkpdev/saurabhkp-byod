@@ -226,12 +226,10 @@ const DataUpload = () => {
                 <TabsContent value="quality" className="mt-6">
                   <DataQualityPanel 
                     columns={data.columns} 
-                    rows={data.rows} 
+                    rows={data.rows}
+                    fileName={data.fileName}
                     onProcessData={() => {
-                      logEvent('data_processed', `Processed ${data.rows.length} rows from "${data.fileName}"`, 'Data Studio', { fileName: data.fileName, rowCount: data.rows.length });
-                      toast.success('🎉 Data successfully processed!', {
-                        description: `${data.rows.length} rows from "${data.fileName}" have been submitted. You can upload more data or continue editing.`
-                      });
+                      logEvent('data_submitted', `Submitted ${data.rows.length} rows from "${data.fileName}" for approval`, 'Data Studio', { fileName: data.fileName, rowCount: data.rows.length });
                       // Stay in data studio - clear current data to allow new upload
                       clearData();
                       setSourceMode('select');

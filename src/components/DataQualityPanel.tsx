@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { DataColumn, DataRow } from '@/types/data';
 import { useAuditLog } from '@/hooks/useAuditLog';
+import { useApprovalStore } from '@/hooks/useApprovalStore';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,13 +10,14 @@ import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
   AlertTriangle, CheckCircle2, XCircle, AlertCircle, 
-  RefreshCw, ArrowRight, Database, FileCheck, Loader2
+  RefreshCw, ArrowRight, Database, FileCheck, Loader2, SendHorizonal
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface DataQualityPanelProps {
   columns: DataColumn[];
   rows: DataRow[];
+  fileName?: string;
   onProcessData: () => void;
 }
 
@@ -39,10 +42,13 @@ interface QualityMetrics {
   issues: QualityIssue[];
 }
 
-export const DataQualityPanel = ({ columns, rows, onProcessData }: DataQualityPanelProps) => {
+export const DataQualityPanel = ({ columns, rows, fileName, onProcessData }: DataQualityPanelProps) => {
   const [isValidating, setIsValidating] = useState(false);
   const [hasValidated, setHasValidated] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { logEvent } = useAuditLog();
+  const { submitForApproval } = useApprovalStore();
+  const { currentUser } = useAuth();
 
   const qualityMetrics = useMemo((): QualityMetrics => {
     const issues: QualityIssue[] = [];
@@ -506,12 +512,12 @@ export const DataQualityPanel = ({ columns, rows, onProcessData }: DataQualityPa
                 <div className="flex items-center gap-4">
                   <Database className={`w-10 h-10 ${canProcess ? 'text-green-500' : 'text-muted-foreground'}`} />
                   <div>
-                    <h3 className="font-semibold">Process to Data Platform</h3>
+                    <h3 className="font-semibold">Submit for Approval</h3>
                     <p className="text-sm text-muted-foreground">
                       {canProcess 
-                        ? 'Your data is ready for processing'
+                        ? 'Your data is ready - submit for review before committing'
                         : errorCount > 0 
-                          ? `Fix ${errorCount} error${errorCount > 1 ? 's' : ''} before processing`
+                          ? `Fix ${errorCount} error${errorCount > 1 ? 's' : ''} before submitting`
                           : 'Run validation first'
                       }
                     </p>
@@ -521,18 +527,57 @@ export const DataQualityPanel = ({ columns, rows, onProcessData }: DataQualityPa
                   <Button 
                     variant="outline" 
                     onClick={runValidation}
-                    disabled={isValidating}
+                    disabled={isValidating || isSubmitting}
                   >
                     <RefreshCw className={`w-4 h-4 mr-2 ${isValidating ? 'animate-spin' : ''}`} />
                     Re-validate
                   </Button>
                   <Button 
-                    onClick={onProcessData}
-                    disabled={!canProcess}
+                    onClick={() => {
+                      if (!currentUser) {
+                        toast.error('Please log in to submit');
+                        return;
+                      }
+                      setIsSubmitting(true);
+                      
+                      // Submit for approval
+                      const requestId = submitForApproval({
+                        type: 'data_upload',
+                        submittedBy: currentUser.username,
+                        fileName: fileName || 'Untitled',
+                        rowCount: rows.length,
+                        columnCount: columns.length,
+                        data: { columns, rows },
+                      });
+                      
+                      logEvent('approval_submitted', `Submitted data for approval: ${fileName || 'Untitled'} (${rows.length} rows)`, 'Data Studio', { 
+                        requestId,
+                        fileName,
+                        rowCount: rows.length 
+                      });
+                      
+                      setTimeout(() => {
+                        setIsSubmitting(false);
+                        toast.success('🎉 Submitted for approval!', {
+                          description: 'Your data will be reviewed before being committed to the database.',
+                        });
+                        onProcessData();
+                      }, 800);
+                    }}
+                    disabled={!canProcess || isSubmitting}
                     className="bg-green-600 hover:bg-green-700"
                   >
-                    Process Data
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <SendHorizonal className="w-4 h-4 mr-2" />
+                        Submit for Approval
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>

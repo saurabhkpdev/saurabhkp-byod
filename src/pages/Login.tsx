@@ -127,9 +127,6 @@ const Login = () => {
               </Button>
             </div>
 
-            <p className="text-center text-xs text-muted-foreground">
-              Default credentials: admin / admin
-            </p>
           </CardContent>
         </Card>
       </div>
