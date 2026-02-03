@@ -49,8 +49,8 @@ const Login = () => {
   return (
     <>
       <Helmet>
-        <title>Login - DataLens</title>
-        <meta name="description" content="Login to access DataLens platform" />
+        <title>Login - BYOD</title>
+        <meta name="description" content="Login to access BYOD platform" />
       </Helmet>
 
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4">
@@ -59,7 +59,7 @@ const Login = () => {
             <div className="mx-auto w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-2">
               <LogIn className="w-6 h-6 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold">Welcome to DataLens</CardTitle>
+            <CardTitle className="text-2xl font-bold">Welcome to BYOD</CardTitle>
             <CardDescription>Sign in to your account to continue</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
