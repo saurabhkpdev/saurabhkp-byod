@@ -144,7 +144,7 @@ const Documentation = () => {
           {/* Hero Section */}
           <div className="text-center mb-12">
             
-            <h1 className="text-4xl font-bold mb-4">Learn BYOD</h1>
+            <h1 className="text-4xl font-bold mb-4">Learn <span className="gradient-text">BYOD</span></h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Everything you need to know about uploading, editing, visualizing, and validating your data with Bring Your Own Data.
             </p>
