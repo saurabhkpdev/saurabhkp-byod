@@ -283,7 +283,7 @@ const ApprovalWorkflow = () => {
 
       {/* Request Details Dialog */}
       <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className={selectedRequest?.type === "data_manipulation" && selectedRequest?.data ? "max-w-4xl" : "max-w-lg"}>
           <DialogHeader>
             <DialogTitle>Request Details</DialogTitle>
             <DialogDescription>
@@ -332,6 +332,53 @@ const ApprovalWorkflow = () => {
                   <p className="text-sm text-muted-foreground">
                     Affected {selectedRequest.changes.affectedRows} rows
                   </p>
+                </div>
+              )}
+
+              {/* Data Preview for Data Manipulation */}
+              {selectedRequest.type === "data_manipulation" && selectedRequest.data && selectedRequest.data.rows.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground flex items-center gap-2">
+                    <Eye className="h-4 w-4" />
+                    Data Preview (First 10 rows)
+                  </Label>
+                  <ScrollArea className="h-[250px] rounded-lg border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          {selectedRequest.data.columns.slice(0, 8).map((col) => (
+                            <TableHead key={col.name} className="text-xs whitespace-nowrap">
+                              {col.name}
+                            </TableHead>
+                          ))}
+                          {selectedRequest.data.columns.length > 8 && (
+                            <TableHead className="text-xs text-muted-foreground">
+                              +{selectedRequest.data.columns.length - 8} more
+                            </TableHead>
+                          )}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {selectedRequest.data.rows.slice(0, 10).map((row, rowIndex) => (
+                          <TableRow key={rowIndex}>
+                            {selectedRequest.data!.columns.slice(0, 8).map((col) => (
+                              <TableCell key={col.name} className="text-xs py-2 max-w-[150px] truncate">
+                                {String(row[col.name] ?? "")}
+                              </TableCell>
+                            ))}
+                            {selectedRequest.data!.columns.length > 8 && (
+                              <TableCell className="text-xs text-muted-foreground">...</TableCell>
+                            )}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </ScrollArea>
+                  {selectedRequest.data.rows.length > 10 && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      Showing 10 of {selectedRequest.data.rows.length} rows
+                    </p>
+                  )}
                 </div>
               )}
 
