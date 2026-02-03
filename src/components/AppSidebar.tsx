@@ -96,21 +96,41 @@ export function AppSidebar({ children }: AppSidebarProps) {
 
         {/* Footer with User, Theme Toggle and Collapse */}
         <div className="p-3 border-t space-y-2">
-          {/* Current User */}
+          {/* Current User with Hover Logout */}
           {currentUser && (
-            <div className={cn(
-              "flex items-center gap-2 px-2 py-2 rounded-lg bg-muted/50",
-              collapsed && "justify-center px-0"
-            )}>
-              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <User className="w-4 h-4 text-primary" />
-              </div>
-              {!collapsed && (
-                <div className="flex-1 overflow-hidden">
-                  <p className="text-sm font-medium truncate">{currentUser.username}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{currentUser.role}</p>
+            <div className="group relative">
+              <div className={cn(
+                "flex items-center gap-2 px-2 py-2 rounded-lg bg-muted/50 cursor-pointer transition-colors group-hover:bg-muted",
+                collapsed && "justify-center px-0"
+              )}>
+                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <User className="w-4 h-4 text-primary" />
                 </div>
-              )}
+                {!collapsed && (
+                  <div className="flex-1 overflow-hidden">
+                    <p className="text-sm font-medium truncate">{currentUser.username}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{currentUser.role}</p>
+                  </div>
+                )}
+              </div>
+              {/* Logout on hover */}
+              <div className={cn(
+                "absolute left-0 right-0 top-full mt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50",
+                collapsed && "left-full top-0 mt-0 ml-2"
+              )}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  className={cn(
+                    "w-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 justify-start gap-2 bg-card border shadow-md",
+                    collapsed && "w-auto px-3"
+                  )}
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </Button>
+              </div>
             </div>
           )}
 
@@ -125,48 +145,26 @@ export function AppSidebar({ children }: AppSidebarProps) {
             <ThemeToggle size="sm" />
           </div>
 
-          {/* Logout Button */}
+          {/* Collapse Toggle */}
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleLogout}
-                className={cn(
-                  "w-full text-muted-foreground hover:text-destructive hover:bg-destructive/10",
-                  collapsed ? "justify-center" : "justify-start"
-                )}
+                onClick={() => setCollapsed(!collapsed)}
+                className="w-full justify-center"
               >
-                <LogOut className="w-4 h-4" />
-                {!collapsed && <span className="ml-2">Logout</span>}
+                {collapsed ? (
+                  <ChevronRight className="w-4 h-4" />
+                ) : (
+                  <ChevronLeft className="w-4 h-4" />
+                )}
               </Button>
             </TooltipTrigger>
-            {collapsed && (
-              <TooltipContent side="right">
-                Logout
-              </TooltipContent>
-            )}
+            <TooltipContent side={collapsed ? "right" : "top"}>
+              {collapsed ? "Expand" : "Collapse"}
+            </TooltipContent>
           </Tooltip>
-
-          {/* Collapse Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setCollapsed(!collapsed)}
-            className={cn(
-              "w-full justify-center",
-              !collapsed && "justify-start"
-            )}
-          >
-            {collapsed ? (
-              <ChevronRight className="w-4 h-4" />
-            ) : (
-              <>
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                <span>Collapse</span>
-              </>
-            )}
-          </Button>
         </div>
       </aside>
 

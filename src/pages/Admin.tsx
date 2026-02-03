@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users, ClipboardCheck } from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users, ClipboardCheck, Globe } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
 import { useApprovalStore } from "@/hooks/useApprovalStore";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
@@ -15,6 +15,7 @@ import { ThemeCustomizer } from "@/components/ThemeCustomizer";
 import { DataSourceConfig } from "@/components/DataSourceConfig";
 import UserManagement from "@/components/UserManagement";
 import ApprovalWorkflow from "@/components/ApprovalWorkflow";
+import LanguageSettings from "@/components/LanguageSettings";
 
 const Admin = () => {
   const { getPendingRequests } = useApprovalStore();
@@ -52,8 +53,8 @@ const Admin = () => {
   const topPages = Object.entries(stats.pageCounts).sort(([, a], [, b]) => b - a).slice(0, 5);
   return <>
       <Helmet>
-        <title>Admin Dashboard - DataLens</title>
-        <meta name="description" content="Admin dashboard for auditing user activity on the DataLens platform." />
+        <title>Admin Dashboard - BYOD</title>
+        <meta name="description" content="Admin dashboard for auditing user activity on the BYOD platform." />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -176,6 +177,10 @@ const Admin = () => {
               <TabsTrigger value="users" className="gap-2">
                 <Users className="h-4 w-4" />
                 Users
+              </TabsTrigger>
+              <TabsTrigger value="languages" className="gap-2">
+                <Globe className="h-4 w-4" />
+                Languages
               </TabsTrigger>
             </TabsList>
 
@@ -322,6 +327,11 @@ const Admin = () => {
             {/* Users Tab */}
             <TabsContent value="users">
               <UserManagement />
+            </TabsContent>
+
+            {/* Languages Tab */}
+            <TabsContent value="languages">
+              <LanguageSettings />
             </TabsContent>
           </Tabs>
         </main>
