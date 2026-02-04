@@ -8,9 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { useAuth, User } from "@/hooks/useAuth";
+import { useAuth, User, UserRole } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Shield, User as UserIcon, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Shield, User as UserIcon, UserCheck, Eye, EyeOff } from "lucide-react";
 import { format } from "date-fns";
 
 const UserManagement = () => {
@@ -24,7 +24,7 @@ const UserManagement = () => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    role: "user" as "admin" | "user",
+    role: "user" as UserRole,
   });
 
   const resetForm = () => {
@@ -156,13 +156,14 @@ const UserManagement = () => {
                     <Label htmlFor="new-role">Role</Label>
                     <Select
                       value={formData.role}
-                      onValueChange={(value: "admin" | "user") => setFormData({ ...formData, role: value })}
+                      onValueChange={(value: UserRole) => setFormData({ ...formData, role: value })}
                     >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="user">User</SelectItem>
+                        <SelectItem value="approver">Approver</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>
@@ -195,6 +196,8 @@ const UserManagement = () => {
                     <div className="flex items-center gap-2">
                       {user.role === "admin" ? (
                         <Shield className="h-4 w-4 text-primary" />
+                      ) : user.role === "approver" ? (
+                        <UserCheck className="h-4 w-4 text-green-600" />
                       ) : (
                         <UserIcon className="h-4 w-4 text-muted-foreground" />
                       )}
@@ -205,7 +208,7 @@ const UserManagement = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.role === "admin" ? "default" : "secondary"}>
+                    <Badge variant={user.role === "admin" ? "default" : user.role === "approver" ? "outline" : "secondary"}>
                       {user.role}
                     </Badge>
                   </TableCell>
@@ -301,13 +304,14 @@ const UserManagement = () => {
               <Label htmlFor="edit-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: "admin" | "user") => setFormData({ ...formData, role: value })}
+                onValueChange={(value: UserRole) => setFormData({ ...formData, role: value })}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="approver">Approver</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>

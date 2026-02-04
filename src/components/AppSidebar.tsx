@@ -9,7 +9,8 @@ import {
   Database,
   FileSpreadsheet,
   LogOut,
-  User
+  User,
+  ClipboardCheck
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -17,14 +18,18 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
+import { useRoleStore } from "@/hooks/useRoleStore";
+import { useApprovalStore } from "@/hooks/useApprovalStore";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
-const navItems = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Data Studio", url: "/upload", icon: Sparkles },
-  { title: "Templates", url: "/templates", icon: FileSpreadsheet },
-  { title: "Documentation", url: "/docs", icon: BookOpen },
-  { title: "Admin", url: "/admin", icon: Shield },
+const allNavItems = [
+  { id: 'home', title: "Home", url: "/", icon: Home },
+  { id: 'data-studio', title: "Data Studio", url: "/upload", icon: Sparkles },
+  { id: 'templates', title: "Templates", url: "/templates", icon: FileSpreadsheet },
+  { id: 'documentation', title: "Documentation", url: "/docs", icon: BookOpen },
+  { id: 'approvals', title: "Approvals", url: "/approvals", icon: ClipboardCheck },
+  { id: 'admin', title: "Admin", url: "/admin", icon: Shield },
 ];
 
 interface AppSidebarProps {
@@ -34,7 +39,18 @@ interface AppSidebarProps {
 export function AppSidebar({ children }: AppSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const { currentUser, logout } = useAuth();
+  const { getVisiblePages } = useRoleStore();
+  const { getPendingRequests } = useApprovalStore();
   const navigate = useNavigate();
+
+  // Filter nav items based on user's role permissions
+  const userRole = (currentUser?.role || 'user') as 'user' | 'approver' | 'admin';
+  const visiblePages = getVisiblePages(userRole);
+  const navItems = allNavItems.filter(item => 
+    visiblePages.some(page => page.pageId === item.id)
+  );
+
+  const pendingCount = getPendingRequests().length;
 
   const handleLogout = () => {
     logout();
@@ -102,12 +118,25 @@ export function AppSidebar({ children }: AppSidebarProps) {
                   activeClassName="bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
                 >
                   <item.icon className="w-5 h-5 shrink-0" />
-                  {!collapsed && <span>{item.title}</span>}
+                  {!collapsed && (
+                    <span className="flex-1">{item.title}</span>
+                  )}
+                  {/* Show pending count for approvals */}
+                  {item.id === 'approvals' && pendingCount > 0 && !collapsed && (
+                    <Badge variant="secondary" className="h-5 px-1.5 bg-orange-500/20 text-orange-600 text-xs">
+                      {pendingCount}
+                    </Badge>
+                  )}
                 </NavLink>
               </TooltipTrigger>
               {collapsed && (
-                <TooltipContent side="right">
+                <TooltipContent side="right" className="flex items-center gap-2">
                   {item.title}
+                  {item.id === 'approvals' && pendingCount > 0 && (
+                    <Badge variant="secondary" className="h-5 px-1.5 bg-orange-500/20 text-orange-600 text-xs">
+                      {pendingCount}
+                    </Badge>
+                  )}
                 </TooltipContent>
               )}
             </Tooltip>

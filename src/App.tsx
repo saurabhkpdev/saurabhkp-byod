@@ -7,22 +7,31 @@ import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "next-themes";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/hooks/useAuth";
+import { useRoleStore } from "@/hooks/useRoleStore";
 import Index from "./pages/Index";
 import DataUpload from "./pages/DataUpload";
 import Documentation from "./pages/Documentation";
 import Admin from "./pages/Admin";
 import TemplateLibrary from "./pages/TemplateLibrary";
+import Approvals from "./pages/Approvals";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Protected route wrapper
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+// Protected route wrapper with role-based access
+const ProtectedRoute = ({ children, path }: { children: React.ReactNode; path: string }) => {
   const { currentUser } = useAuth();
+  const { canAccessPage } = useRoleStore();
   
   if (!currentUser) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Check role-based access
+  const userRole = currentUser.role as 'user' | 'approver' | 'admin';
+  if (!canAccessPage(userRole, path)) {
+    return <Navigate to="/" replace />;
   }
   
   return <>{children}</>;
@@ -40,7 +49,7 @@ const AppRoutes = () => {
       <Route
         path="/"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute path="/">
             <AppSidebar>
               <Index />
             </AppSidebar>
@@ -50,7 +59,7 @@ const AppRoutes = () => {
       <Route
         path="/upload"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute path="/upload">
             <AppSidebar>
               <DataUpload />
             </AppSidebar>
@@ -60,7 +69,7 @@ const AppRoutes = () => {
       <Route
         path="/templates"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute path="/templates">
             <AppSidebar>
               <TemplateLibrary />
             </AppSidebar>
@@ -70,7 +79,7 @@ const AppRoutes = () => {
       <Route
         path="/docs"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute path="/docs">
             <AppSidebar>
               <Documentation />
             </AppSidebar>
@@ -78,9 +87,19 @@ const AppRoutes = () => {
         }
       />
       <Route
+        path="/approvals"
+        element={
+          <ProtectedRoute path="/approvals">
+            <AppSidebar>
+              <Approvals />
+            </AppSidebar>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute path="/admin">
             <AppSidebar>
               <Admin />
             </AppSidebar>

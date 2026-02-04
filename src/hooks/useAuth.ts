@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export type UserRole = 'admin' | 'approver' | 'user';
+
 export interface User {
   id: string;
   username: string;
   password: string;
-  role: 'admin' | 'user';
+  role: UserRole;
   createdAt: string;
 }
 
@@ -14,7 +16,7 @@ interface AuthState {
   users: User[];
   login: (username: string, password: string) => boolean;
   logout: () => void;
-  addUser: (username: string, password: string, role: 'admin' | 'user') => boolean;
+  addUser: (username: string, password: string, role: UserRole) => boolean;
   updateUser: (id: string, updates: Partial<Pick<User, 'username' | 'password' | 'role'>>) => boolean;
   deleteUser: (id: string) => boolean;
   isAuthenticated: () => boolean;
@@ -54,7 +56,7 @@ export const useAuth = create<AuthState>()(
         set({ currentUser: null });
       },
 
-      addUser: (username: string, password: string, role: 'admin' | 'user') => {
+      addUser: (username: string, password: string, role: UserRole) => {
         const { users } = get();
         
         // Check if username already exists
