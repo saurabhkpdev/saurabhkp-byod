@@ -16,6 +16,7 @@ import TemplateLibrary from "./pages/TemplateLibrary";
 import Approvals from "./pages/Approvals";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -102,6 +103,16 @@ const AppRoutes = () => {
           <ProtectedRoute path="/admin">
             <AppSidebar>
               <Admin />
+            </AppSidebar>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute path="/profile">
+            <AppSidebar>
+              <Profile />
             </AppSidebar>
           </ProtectedRoute>
         }
