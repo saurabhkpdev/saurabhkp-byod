@@ -10,10 +10,12 @@ import {
   FileSpreadsheet,
   LogOut,
   User,
-  ClipboardCheck
+  ClipboardCheck,
+  Settings,
+  Moon,
+  Sun
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -22,6 +24,14 @@ import { useRoleStore } from "@/hooks/useRoleStore";
 import { useApprovalStore } from "@/hooks/useApprovalStore";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { useTheme } from "next-themes";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const allNavItems = [
   { id: 'home', title: "Home", url: "/", icon: Home },
@@ -42,6 +52,7 @@ export function AppSidebar({ children }: AppSidebarProps) {
   const { getVisiblePages } = useRoleStore();
   const { getPendingRequests } = useApprovalStore();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
 
   // Filter nav items based on user's role permissions
   const userRole = (currentUser?.role || 'user') as 'user' | 'approver' | 'admin';
@@ -55,6 +66,10 @@ export function AppSidebar({ children }: AppSidebarProps) {
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
@@ -145,45 +160,51 @@ export function AppSidebar({ children }: AppSidebarProps) {
 
         {/* Footer with User Profile */}
         <div className="p-3 border-t">
-          {/* User Profile with Theme & Logout on hover */}
           {currentUser && (
-            <div className="group relative">
-              <div className={cn(
-                "flex items-center gap-2 px-2 py-2 rounded-lg bg-muted/50 cursor-pointer transition-colors group-hover:bg-muted",
-                collapsed && "justify-center px-0"
-              )}>
-                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <User className="w-4 h-4 text-primary" />
-                </div>
-                {!collapsed && (
-                  <div className="flex-1 overflow-hidden">
-                    <p className="text-sm font-medium truncate">{currentUser.username}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{currentUser.role}</p>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className={cn(
+                  "w-full flex items-center gap-2 px-2 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors",
+                  collapsed && "justify-center px-0"
+                )}>
+                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <User className="w-4 h-4 text-primary" />
                   </div>
-                )}
-              </div>
-              {/* Hover menu with Theme & Logout */}
-              <div className={cn(
-                "absolute left-0 right-0 top-full mt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 bg-card border rounded-lg shadow-lg p-2 space-y-1",
-                collapsed && "left-full top-0 mt-0 ml-2 w-40"
-              )}>
-                {/* Theme Toggle */}
-                <div className="flex items-center justify-between px-2 py-1.5">
-                  <span className="text-sm text-muted-foreground">Theme</span>
-                  <ThemeToggle size="sm" />
-                </div>
-                {/* Logout */}
-                <Button
-                  variant="ghost"
-                  size="sm"
+                  {!collapsed && (
+                    <div className="flex-1 overflow-hidden text-left">
+                      <p className="text-sm font-medium truncate">{currentUser.username}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{currentUser.role}</p>
+                    </div>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                side={collapsed ? "right" : "top"} 
+                align={collapsed ? "start" : "center"}
+                className="w-56"
+              >
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Profile Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={toggleTheme}>
+                  {theme === 'dark' ? (
+                    <Sun className="w-4 h-4 mr-2" />
+                  ) : (
+                    <Moon className="w-4 h-4 mr-2" />
+                  )}
+                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
                   onClick={handleLogout}
-                  className="w-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 justify-start gap-2"
+                  className="text-destructive focus:text-destructive"
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </Button>
-              </div>
-            </div>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </aside>
