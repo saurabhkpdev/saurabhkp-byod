@@ -17,6 +17,7 @@ import Approvals from "./pages/Approvals";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
+import { GenieChat } from "./components/GenieChat";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const AppRoutes = () => {
   const { currentUser } = useAuth();
 
   return (
+    <>
     <Routes>
       <Route 
         path="/login" 
@@ -119,6 +121,8 @@ const AppRoutes = () => {
       />
       <Route path="*" element={<NotFound />} />
     </Routes>
+    <GenieChat />
+    </>
   );
 };
 
