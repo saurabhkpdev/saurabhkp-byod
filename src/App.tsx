@@ -14,6 +14,7 @@ import Documentation from "./pages/Documentation";
 import Admin from "./pages/Admin";
 import TemplateLibrary from "./pages/TemplateLibrary";
 import Approvals from "./pages/Approvals";
+import ActionsConfigPage from "./pages/ActionsConfig";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
@@ -95,6 +96,16 @@ const AppRoutes = () => {
           <ProtectedRoute path="/approvals">
             <AppSidebar>
               <Approvals />
+            </AppSidebar>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/actions"
+        element={
+          <ProtectedRoute path="/actions">
+            <AppSidebar>
+              <ActionsConfigPage />
             </AppSidebar>
           </ProtectedRoute>
         }

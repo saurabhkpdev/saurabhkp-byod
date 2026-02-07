@@ -37,6 +37,7 @@ const allNavItems = [
   { id: 'home', title: "Home", url: "/", icon: Home },
   { id: 'data-studio', title: "Data Studio", url: "/upload", icon: Sparkles },
   { id: 'templates', title: "Templates", url: "/templates", icon: FileSpreadsheet },
+  { id: 'actions', title: "Actions", url: "/actions", icon: Settings },
   { id: 'documentation', title: "Documentation", url: "/docs", icon: BookOpen },
   { id: 'approvals', title: "Approvals", url: "/approvals", icon: ClipboardCheck },
   { id: 'admin', title: "Admin", url: "/admin", icon: Shield },
