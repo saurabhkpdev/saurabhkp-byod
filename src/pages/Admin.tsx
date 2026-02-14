@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users, Globe, ShieldCheck, Zap } from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users, Globe, ShieldCheck } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -15,7 +15,7 @@ import { DataSourceConfig } from "@/components/DataSourceConfig";
 import UserManagement from "@/components/UserManagement";
 import RoleManagement from "@/components/RoleManagement";
 import LanguageSettings from "@/components/LanguageSettings";
-import { ActionsConfig } from "@/components/ActionsConfig";
+
 
 const Admin = () => {
   const {
@@ -176,10 +176,6 @@ const Admin = () => {
                 <Globe className="h-4 w-4" />
                 Languages
               </TabsTrigger>
-              <TabsTrigger value="actions" className="gap-2">
-                <Zap className="h-4 w-4" />
-                Actions
-              </TabsTrigger>
             </TabsList>
 
             {/* Event Log Tab */}
@@ -332,10 +328,6 @@ const Admin = () => {
               <LanguageSettings />
             </TabsContent>
 
-            {/* Actions Tab */}
-            <TabsContent value="actions">
-              <ActionsConfig />
-            </TabsContent>
           </Tabs>
         </main>
       </div>
