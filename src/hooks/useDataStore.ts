@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { DataColumn, DataRow, UploadedData, DataStats } from '@/types/data';
 import { BulkReplaceOptions, TransformType } from '@/components/BulkEditPanel';
+import { safeEvaluate } from '@/lib/safeEval';
 
 export const useDataStore = () => {
   const [data, setData] = useState<UploadedData | null>(null);
@@ -150,10 +151,8 @@ export const useDataStore = () => {
             evalFormula = evalFormula.replace(new RegExp(`\\[${col.name}\\]`, 'g'), replacement);
           });
           
-          // Safely evaluate the formula
-          // eslint-disable-next-line no-new-func
-          const fn = new Function(`return ${evalFormula}`);
-          result = fn();
+          // Safely evaluate the formula using sandboxed parser (no eval/Function)
+          result = safeEvaluate(evalFormula) as string | number | boolean | null;
           
           // Clean up result
           if (result === undefined || result === null || (typeof result === 'number' && isNaN(result))) {

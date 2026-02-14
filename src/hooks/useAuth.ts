@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import bcrypt from 'bcryptjs';
 
 export type UserRole = 'admin' | 'approver' | 'user';
 
 export interface User {
   id: string;
   username: string;
-  password: string;
+  password: string; // Now stores bcrypt hash
   role: UserRole;
   createdAt: string;
 }
@@ -22,15 +23,21 @@ interface AuthState {
   isAuthenticated: () => boolean;
 }
 
+// Pre-computed bcrypt hash for 'admin' (cost factor 10)
+const DEFAULT_ADMIN_HASH = bcrypt.hashSync('admin', 10);
+
 const defaultUsers: User[] = [
   {
     id: 'default-admin',
     username: 'admin',
-    password: 'admin',
+    password: DEFAULT_ADMIN_HASH,
     role: 'admin',
     createdAt: new Date().toISOString(),
   },
 ];
+
+// Helper to check if a stored password is already hashed
+const isHashed = (password: string) => password.startsWith('$2a$') || password.startsWith('$2b$');
 
 export const useAuth = create<AuthState>()(
   persist(
@@ -41,13 +48,29 @@ export const useAuth = create<AuthState>()(
       login: (username: string, password: string) => {
         const { users } = get();
         const user = users.find(
-          (u) => u.username.toLowerCase() === username.toLowerCase() && u.password === password
+          (u) => u.username.toLowerCase() === username.toLowerCase()
         );
         
         if (user) {
-          const { password: _, ...userWithoutPassword } = user;
-          set({ currentUser: userWithoutPassword });
-          return true;
+          // Support both hashed and legacy plaintext passwords (auto-migrate)
+          const matches = isHashed(user.password)
+            ? bcrypt.compareSync(password, user.password)
+            : user.password === password;
+
+          if (matches) {
+            // Auto-migrate plaintext password to hash on successful login
+            if (!isHashed(user.password)) {
+              const hashedPassword = bcrypt.hashSync(password, 10);
+              const updatedUsers = users.map((u) =>
+                u.id === user.id ? { ...u, password: hashedPassword } : u
+              );
+              set({ users: updatedUsers });
+            }
+
+            const { password: _, ...userWithoutPassword } = user;
+            set({ currentUser: userWithoutPassword });
+            return true;
+          }
         }
         return false;
       },
@@ -59,15 +82,16 @@ export const useAuth = create<AuthState>()(
       addUser: (username: string, password: string, role: UserRole) => {
         const { users } = get();
         
-        // Check if username already exists
         if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) {
           return false;
         }
 
+        const hashedPassword = bcrypt.hashSync(password, 10);
+
         const newUser: User = {
           id: crypto.randomUUID(),
           username,
-          password,
+          password: hashedPassword,
           role,
           createdAt: new Date().toISOString(),
         };
@@ -79,7 +103,6 @@ export const useAuth = create<AuthState>()(
       updateUser: (id: string, updates: Partial<Pick<User, 'username' | 'password' | 'role'>>) => {
         const { users, currentUser } = get();
         
-        // Check if new username conflicts with existing
         if (updates.username) {
           const conflict = users.find(
             (u) => u.id !== id && u.username.toLowerCase() === updates.username!.toLowerCase()
@@ -87,13 +110,18 @@ export const useAuth = create<AuthState>()(
           if (conflict) return false;
         }
 
+        // Hash the password if it's being updated
+        const processedUpdates = { ...updates };
+        if (processedUpdates.password) {
+          processedUpdates.password = bcrypt.hashSync(processedUpdates.password, 10);
+        }
+
         const updatedUsers = users.map((user) =>
-          user.id === id ? { ...user, ...updates } : user
+          user.id === id ? { ...user, ...processedUpdates } : user
         );
 
         set({ users: updatedUsers });
 
-        // Update current user if they updated themselves
         if (currentUser?.id === id) {
           const updatedUser = updatedUsers.find((u) => u.id === id);
           if (updatedUser) {
@@ -108,14 +136,12 @@ export const useAuth = create<AuthState>()(
       deleteUser: (id: string) => {
         const { users, currentUser } = get();
         
-        // Prevent deleting the last admin
         const user = users.find((u) => u.id === id);
         if (user?.role === 'admin') {
           const adminCount = users.filter((u) => u.role === 'admin').length;
           if (adminCount <= 1) return false;
         }
 
-        // Prevent deleting yourself
         if (currentUser?.id === id) return false;
 
         set({ users: users.filter((u) => u.id !== id) });
