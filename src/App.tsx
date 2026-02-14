@@ -20,6 +20,7 @@ import ActionsConfigPage from "./pages/ActionsConfig";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
+import SetPassword from "./pages/SetPassword";
 import { GenieChat } from "./components/GenieChat";
 import { Loader2 } from "lucide-react";
 
@@ -97,6 +98,10 @@ const AppRoutes = () => {
       <Route
         path="/login"
         element={currentUser ? <Navigate to="/" replace /> : <Login />}
+      />
+      <Route
+        path="/set-password"
+        element={<SetPassword />}
       />
       <Route
         path="/"
