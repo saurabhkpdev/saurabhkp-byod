@@ -4,14 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Search } from 'lucide-react';
+import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Search, Cloud } from 'lucide-react';
 import { MockDataset, mockDatasets } from '@/hooks/useMockDatabase';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { Template, systemTemplates } from '@/components/TemplateSelector';
 import { SampleDownloadButton } from '@/components/SampleDownloadButton';
 import { getAvailableFormats } from '@/lib/sampleGenerators';
 
-type SourceMode = 'upload' | 'existing';
+type SourceMode = 'upload' | 'existing' | 'google-drive';
 
 interface DatabaseSelectorProps {
   onSelectDataset: (data: Record<string, unknown>[], fileName: string, hasGeoData: boolean) => void;
@@ -88,7 +88,7 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: Database
       </div>
 
       {/* Source Options - Toggle Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card 
           className={`cursor-pointer border-2 transition-all ${
             sourceMode === 'upload' 
@@ -130,6 +130,28 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: Database
               </p>
             </div>
             {sourceMode === 'existing' && <Badge variant="secondary">Selected</Badge>}
+          </CardContent>
+        </Card>
+
+        <Card 
+          className={`cursor-pointer border-2 transition-all ${
+            sourceMode === 'google-drive' 
+              ? 'border-primary/20 bg-primary/5' 
+              : 'border-dashed hover:border-primary/50 hover:bg-muted/50'
+          }`}
+          onClick={() => setSourceMode('google-drive')}
+        >
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className={`p-4 rounded-xl ${sourceMode === 'google-drive' ? 'bg-primary/20' : 'bg-primary/10'}`}>
+              <Cloud className="w-8 h-8 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg">Google Drive</h3>
+              <p className="text-sm text-muted-foreground">
+                Import files directly from Google Drive
+              </p>
+            </div>
+            {sourceMode === 'google-drive' && <Badge variant="secondary">Selected</Badge>}
           </CardContent>
         </Card>
       </div>
@@ -239,7 +261,7 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: Database
             ))}
           </div>
         </div>
-      ) : (
+      ) : sourceMode === 'existing' ? (
         /* Datasets Grid */
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Available Datasets</h3>
@@ -282,6 +304,29 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: Database
               </Card>
             ))}
           </div>
+        </div>
+      ) : (
+        /* Google Drive - Coming Soon */
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Google Drive</h3>
+          <Card className="border-dashed border-2">
+            <CardContent className="p-12 flex flex-col items-center justify-center text-center gap-4">
+              <div className="p-6 rounded-2xl bg-primary/10">
+                <Cloud className="w-12 h-12 text-primary" />
+              </div>
+              <div>
+                <h4 className="text-xl font-semibold mb-2">Connect to Google Drive</h4>
+                <p className="text-muted-foreground max-w-md">
+                  Import spreadsheets, CSV files, and other data directly from your Google Drive. 
+                  Sign in with your Google account to browse and select files.
+                </p>
+              </div>
+              <Button className="mt-2 gap-2" disabled>
+                <Cloud className="w-4 h-4" />
+                Coming Soon
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
