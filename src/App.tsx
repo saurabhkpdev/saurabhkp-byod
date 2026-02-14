@@ -34,7 +34,7 @@ const ProtectedRoute = ({ children, path }: { children: React.ReactNode; path: s
   }
 
   // Check role-based access
-  const userRole = currentUser.role as 'user' | 'approver' | 'admin';
+  const userRole = currentUser.activeRole;
   if (!canAccessPage(userRole, path)) {
     return <Navigate to="/" replace />;
   }
@@ -54,7 +54,8 @@ const AppRoutes = () => {
           setCurrentUser({
             id: session.user.id,
             username: meta?.full_name || meta?.name || session.user.email || 'User',
-            role: 'user',
+            roles: ['user'],
+            activeRole: 'user',
             createdAt: session.user.created_at,
           });
         } else if (!session && currentUser) {
@@ -70,7 +71,8 @@ const AppRoutes = () => {
         setCurrentUser({
           id: session.user.id,
           username: meta?.full_name || meta?.name || session.user.email || 'User',
-          role: 'user',
+          roles: ['user'],
+          activeRole: 'user',
           createdAt: session.user.created_at,
         });
       }

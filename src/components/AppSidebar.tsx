@@ -19,7 +19,7 @@ import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, UserRole } from "@/hooks/useAuth";
 import { useRoleStore } from "@/hooks/useRoleStore";
 import { useApprovalStore } from "@/hooks/useApprovalStore";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +31,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 
 const allNavItems = [
@@ -49,14 +52,14 @@ interface AppSidebarProps {
 
 export function AppSidebar({ children }: AppSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, switchRole } = useAuth();
   const { getVisiblePages } = useRoleStore();
   const { getPendingRequests } = useApprovalStore();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
 
   // Filter nav items based on user's role permissions
-  const userRole = (currentUser?.role || 'user') as 'user' | 'approver' | 'admin';
+  const userRole = currentUser?.activeRole || 'user';
   const visiblePages = getVisiblePages(userRole);
   const navItems = allNavItems.filter(item => 
     visiblePages.some(page => page.pageId === item.id)
@@ -174,7 +177,7 @@ export function AppSidebar({ children }: AppSidebarProps) {
                   {!collapsed && (
                     <div className="flex-1 overflow-hidden text-left">
                       <p className="text-sm font-medium truncate">{currentUser.username}</p>
-                      <p className="text-xs text-muted-foreground capitalize">{currentUser.role}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{currentUser.activeRole}</p>
                     </div>
                   )}
                 </button>
@@ -196,6 +199,22 @@ export function AppSidebar({ children }: AppSidebarProps) {
                   )}
                   {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                 </DropdownMenuItem>
+                {currentUser.roles.length > 1 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel className="text-xs text-muted-foreground">Switch Role</DropdownMenuLabel>
+                    <DropdownMenuRadioGroup
+                      value={currentUser.activeRole}
+                      onValueChange={(value) => switchRole(value as UserRole)}
+                    >
+                      {currentUser.roles.map((role) => (
+                        <DropdownMenuRadioItem key={role} value={role} className="capitalize">
+                          {role}
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   onClick={handleLogout}

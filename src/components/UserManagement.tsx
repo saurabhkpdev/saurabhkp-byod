@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -13,6 +13,12 @@ import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Shield, User as UserIcon, UserCheck, Eye, EyeOff } from "lucide-react";
 import { format } from "date-fns";
 
+const allRoles: { value: UserRole; label: string }[] = [
+  { value: 'user', label: 'User' },
+  { value: 'approver', label: 'Approver' },
+  { value: 'admin', label: 'Admin' },
+];
+
 const UserManagement = () => {
   const { users, currentUser, addUser, updateUser, deleteUser } = useAuth();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -20,16 +26,24 @@ const UserManagement = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   
-  // Form state
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    role: "user" as UserRole,
+    roles: ['user'] as UserRole[],
   });
 
   const resetForm = () => {
-    setFormData({ username: "", password: "", role: "user" });
+    setFormData({ username: "", password: "", roles: ['user'] });
     setShowPassword(false);
+  };
+
+  const toggleRole = (role: UserRole) => {
+    setFormData(prev => ({
+      ...prev,
+      roles: prev.roles.includes(role)
+        ? prev.roles.filter(r => r !== role)
+        : [...prev.roles, role],
+    }));
   };
 
   const handleAddUser = () => {
@@ -37,8 +51,12 @@ const UserManagement = () => {
       toast.error("Please fill in all fields");
       return;
     }
+    if (formData.roles.length === 0) {
+      toast.error("Select at least one role");
+      return;
+    }
 
-    const success = addUser(formData.username, formData.password, formData.role);
+    const success = addUser(formData.username, formData.password, formData.roles);
     
     if (success) {
       toast.success("User added successfully");
@@ -51,9 +69,13 @@ const UserManagement = () => {
 
   const handleEditUser = () => {
     if (!editingUser) return;
+    if (formData.roles.length === 0) {
+      toast.error("Select at least one role");
+      return;
+    }
 
-    const updates: Partial<Pick<User, 'username' | 'password' | 'role'>> = {
-      role: formData.role,
+    const updates: Partial<Pick<User, 'username' | 'password' | 'roles'>> = {
+      roles: formData.roles,
     };
 
     if (formData.username && formData.username !== editingUser.username) {
@@ -95,10 +117,30 @@ const UserManagement = () => {
     setFormData({
       username: user.username,
       password: "",
-      role: user.role,
+      roles: user.roles || ['user'],
     });
     setIsEditDialogOpen(true);
   };
+
+  const getRoleIcon = (roles: UserRole[]) => {
+    if (roles.includes('admin')) return <Shield className="h-4 w-4 text-primary" />;
+    if (roles.includes('approver')) return <UserCheck className="h-4 w-4 text-green-600" />;
+    return <UserIcon className="h-4 w-4 text-muted-foreground" />;
+  };
+
+  const RoleCheckboxes = () => (
+    <div className="flex flex-wrap gap-4">
+      {allRoles.map((role) => (
+        <label key={role.value} className="flex items-center gap-2 cursor-pointer">
+          <Checkbox
+            checked={formData.roles.includes(role.value)}
+            onCheckedChange={() => toggleRole(role.value)}
+          />
+          <span className="text-sm">{role.label}</span>
+        </label>
+      ))}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -153,20 +195,8 @@ const UserManagement = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="new-role">Role</Label>
-                    <Select
-                      value={formData.role}
-                      onValueChange={(value: UserRole) => setFormData({ ...formData, role: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="user">User</SelectItem>
-                        <SelectItem value="approver">Approver</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label>Roles</Label>
+                    <RoleCheckboxes />
                   </div>
                 </div>
                 <DialogFooter>
@@ -184,7 +214,7 @@ const UserManagement = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Username</TableHead>
-                <TableHead>Role</TableHead>
+                <TableHead>Roles</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -194,13 +224,7 @@ const UserManagement = () => {
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                      {user.role === "admin" ? (
-                        <Shield className="h-4 w-4 text-primary" />
-                      ) : user.role === "approver" ? (
-                        <UserCheck className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <UserIcon className="h-4 w-4 text-muted-foreground" />
-                      )}
+                      {getRoleIcon(user.roles || ['user'])}
                       {user.username}
                       {user.id === currentUser?.id && (
                         <Badge variant="secondary" className="text-xs">You</Badge>
@@ -208,20 +232,23 @@ const UserManagement = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.role === "admin" ? "default" : user.role === "approver" ? "outline" : "secondary"}>
-                      {user.role}
-                    </Badge>
+                    <div className="flex flex-wrap gap-1">
+                      {(user.roles || ['user']).map((role) => (
+                        <Badge
+                          key={role}
+                          variant={role === "admin" ? "default" : role === "approver" ? "outline" : "secondary"}
+                        >
+                          {role}
+                        </Badge>
+                      ))}
+                    </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {format(new Date(user.createdAt), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => openEditDialog(user)}
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => openEditDialog(user)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <AlertDialog>
@@ -301,20 +328,8 @@ const UserManagement = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-role">Role</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value: UserRole) => setFormData({ ...formData, role: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="approver">Approver</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>Roles</Label>
+              <RoleCheckboxes />
             </div>
           </div>
           <DialogFooter>
