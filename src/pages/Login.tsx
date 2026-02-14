@@ -6,39 +6,51 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
-import { LogIn, User, Lock, Chrome, Building2, Loader2 } from "lucide-react";
+import { LogIn, Mail, Lock, Chrome, Building2, Loader2 } from "lucide-react";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const success = login(username, password);
-    
-    if (success) {
-      toast.success("Welcome back!", {
-        description: "You have successfully logged in.",
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: window.location.origin },
+        });
+        if (error) throw error;
+        toast.success("Check your email", {
+          description: "We've sent you a confirmation link to verify your account.",
+        });
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast.success("Welcome back!", {
+          description: "You have successfully logged in.",
+        });
+        navigate("/");
+      }
+    } catch (error: any) {
+      toast.error(isSignUp ? "Sign up failed" : "Login failed", {
+        description: error.message || "Please check your credentials.",
       });
-      navigate("/");
-    } else {
-      toast.error("Login failed", {
-        description: "Invalid username or password.",
-      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const [socialLoading, setSocialLoading] = useState(false);
@@ -65,7 +77,7 @@ const Login = () => {
 
   const handleSocialLogin = (provider: string) => {
     toast.info(`${provider} login`, {
-      description: "Social login is not yet configured. Please use username and password.",
+      description: "Social login is not yet configured. Please use email and password.",
     });
   };
 
@@ -83,20 +95,22 @@ const Login = () => {
               <LogIn className="w-6 h-6 text-primary" />
             </div>
             <CardTitle className="text-2xl font-bold">Welcome to BYOD</CardTitle>
-            <CardDescription>Sign in to your account to continue</CardDescription>
+            <CardDescription>
+              {isSignUp ? "Create your account to get started" : "Sign in to your account to continue"}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="email">Email</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="username"
-                    type="text"
-                    placeholder="Enter your username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
                     required
                   />
@@ -118,9 +132,22 @@ const Login = () => {
                 </div>
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign In"}
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : null}
+                {isSignUp ? "Sign Up" : "Sign In"}
               </Button>
             </form>
+
+            <div className="text-center text-sm">
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-primary hover:underline"
+              >
+                {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+              </button>
+            </div>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -150,7 +177,6 @@ const Login = () => {
                 Microsoft
               </Button>
             </div>
-
           </CardContent>
         </Card>
       </div>

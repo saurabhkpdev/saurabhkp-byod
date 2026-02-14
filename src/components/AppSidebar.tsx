@@ -67,8 +67,8 @@ export function AppSidebar({ children }: AppSidebarProps) {
 
   const pendingCount = getPendingRequests().length;
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/login");
   };
 
