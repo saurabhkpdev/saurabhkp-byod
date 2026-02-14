@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
+import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
-import { LogIn, User, Lock, Chrome, Building2 } from "lucide-react";
+import { LogIn, User, Lock, Chrome, Building2, Loader2 } from "lucide-react";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -38,6 +39,28 @@ const Login = () => {
     }
     
     setIsLoading(false);
+  };
+
+  const [socialLoading, setSocialLoading] = useState(false);
+
+  const handleGoogleLogin = async () => {
+    setSocialLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error("Google login failed", {
+          description: String(result.error),
+        });
+      }
+    } catch {
+      toast.error("Google login failed", {
+        description: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setSocialLoading(false);
+    }
   };
 
   const handleSocialLogin = (provider: string) => {
@@ -111,10 +134,11 @@ const Login = () => {
             <div className="grid grid-cols-2 gap-3">
               <Button
                 variant="outline"
-                onClick={() => handleSocialLogin("Google")}
+                onClick={handleGoogleLogin}
                 className="gap-2"
+                disabled={socialLoading}
               >
-                <Chrome className="h-4 w-4" />
+                {socialLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Chrome className="h-4 w-4" />}
                 Google
               </Button>
               <Button
