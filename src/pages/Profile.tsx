@@ -71,7 +71,7 @@
              <div className="space-y-2">
                <Label>Role</Label>
                <div className="px-3 py-2 rounded-md bg-muted text-sm capitalize">
-                 {currentUser.role}
+                 {currentUser.roles.join(', ')}
                </div>
              </div>
              <Button onClick={handleSaveProfile}>Save Changes</Button>

@@ -8,38 +8,37 @@ export type UserRole = 'admin' | 'approver' | 'user';
 export interface User {
   id: string;
   username: string;
-  password: string; // Now stores bcrypt hash
-  role: UserRole;
+  password: string;
+  roles: UserRole[];
   createdAt: string;
 }
 
 interface AuthState {
-  currentUser: Omit<User, 'password'> | null;
+  currentUser: (Omit<User, 'password'> & { activeRole: UserRole }) | null;
   users: User[];
   login: (username: string, password: string) => boolean;
   logout: () => void;
-  setCurrentUser: (user: Omit<User, 'password'> | null) => void;
-  addUser: (username: string, password: string, role: UserRole) => boolean;
-  updateUser: (id: string, updates: Partial<Pick<User, 'username' | 'password' | 'role'>>) => boolean;
+  setCurrentUser: (user: (Omit<User, 'password'> & { activeRole: UserRole }) | null) => void;
+  switchRole: (role: UserRole) => boolean;
+  addUser: (username: string, password: string, roles: UserRole[]) => boolean;
+  updateUser: (id: string, updates: Partial<Pick<User, 'username' | 'password' | 'roles'>>) => boolean;
   deleteUser: (id: string) => boolean;
   isAuthenticated: () => boolean;
 }
 
-// Pre-computed bcrypt hash for 'admin' (cost factor 10)
 const DEFAULT_ADMIN_HASH = bcrypt.hashSync('admin', 10);
+
+const isHashed = (password: string) => password.startsWith('$2a$') || password.startsWith('$2b$');
 
 const defaultUsers: User[] = [
   {
     id: 'default-admin',
     username: 'admin',
     password: DEFAULT_ADMIN_HASH,
-    role: 'admin',
+    roles: ['admin', 'approver', 'user'],
     createdAt: new Date().toISOString(),
   },
 ];
-
-// Helper to check if a stored password is already hashed
-const isHashed = (password: string) => password.startsWith('$2a$') || password.startsWith('$2b$');
 
 export const useAuth = create<AuthState>()(
   persist(
@@ -52,25 +51,33 @@ export const useAuth = create<AuthState>()(
         const user = users.find(
           (u) => u.username.toLowerCase() === username.toLowerCase()
         );
-        
+
         if (user) {
-          // Support both hashed and legacy plaintext passwords (auto-migrate)
+          // Migrate legacy single-role users
+          const userRoles: UserRole[] = (user as any).role
+            ? [(user as any).role as UserRole]
+            : user.roles || ['user'];
+
           const matches = isHashed(user.password)
             ? bcrypt.compareSync(password, user.password)
             : user.password === password;
 
           if (matches) {
-            // Auto-migrate plaintext password to hash on successful login
             if (!isHashed(user.password)) {
               const hashedPassword = bcrypt.hashSync(password, 10);
               const updatedUsers = users.map((u) =>
-                u.id === user.id ? { ...u, password: hashedPassword } : u
+                u.id === user.id ? { ...u, password: hashedPassword, roles: userRoles } : u
               );
               set({ users: updatedUsers });
             }
 
-            const { password: _, ...userWithoutPassword } = user;
-            set({ currentUser: userWithoutPassword });
+            const { password: _, ...userWithoutPassword } = { ...user, roles: userRoles };
+            set({
+              currentUser: {
+                ...userWithoutPassword,
+                activeRole: userRoles[0],
+              },
+            });
             return true;
           }
         }
@@ -82,13 +89,21 @@ export const useAuth = create<AuthState>()(
         supabase.auth.signOut();
       },
 
-      setCurrentUser: (user: Omit<User, 'password'> | null) => {
+      setCurrentUser: (user) => {
         set({ currentUser: user });
       },
 
-      addUser: (username: string, password: string, role: UserRole) => {
+      switchRole: (role: UserRole) => {
+        const { currentUser } = get();
+        if (!currentUser) return false;
+        if (!currentUser.roles.includes(role)) return false;
+        set({ currentUser: { ...currentUser, activeRole: role } });
+        return true;
+      },
+
+      addUser: (username: string, password: string, roles: UserRole[]) => {
         const { users } = get();
-        
+
         if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) {
           return false;
         }
@@ -99,7 +114,7 @@ export const useAuth = create<AuthState>()(
           id: crypto.randomUUID(),
           username,
           password: hashedPassword,
-          role,
+          roles: roles.length > 0 ? roles : ['user'],
           createdAt: new Date().toISOString(),
         };
 
@@ -107,9 +122,9 @@ export const useAuth = create<AuthState>()(
         return true;
       },
 
-      updateUser: (id: string, updates: Partial<Pick<User, 'username' | 'password' | 'role'>>) => {
+      updateUser: (id: string, updates: Partial<Pick<User, 'username' | 'password' | 'roles'>>) => {
         const { users, currentUser } = get();
-        
+
         if (updates.username) {
           const conflict = users.find(
             (u) => u.id !== id && u.username.toLowerCase() === updates.username!.toLowerCase()
@@ -117,7 +132,6 @@ export const useAuth = create<AuthState>()(
           if (conflict) return false;
         }
 
-        // Hash the password if it's being updated
         const processedUpdates = { ...updates };
         if (processedUpdates.password) {
           processedUpdates.password = bcrypt.hashSync(processedUpdates.password, 10);
@@ -133,7 +147,16 @@ export const useAuth = create<AuthState>()(
           const updatedUser = updatedUsers.find((u) => u.id === id);
           if (updatedUser) {
             const { password: _, ...userWithoutPassword } = updatedUser;
-            set({ currentUser: userWithoutPassword });
+            const newRoles = updates.roles || currentUser.roles;
+            const activeRole = newRoles.includes(currentUser.activeRole)
+              ? currentUser.activeRole
+              : newRoles[0];
+            set({
+              currentUser: {
+                ...userWithoutPassword,
+                activeRole,
+              },
+            });
           }
         }
 
@@ -142,10 +165,10 @@ export const useAuth = create<AuthState>()(
 
       deleteUser: (id: string) => {
         const { users, currentUser } = get();
-        
+
         const user = users.find((u) => u.id === id);
-        if (user?.role === 'admin') {
-          const adminCount = users.filter((u) => u.role === 'admin').length;
+        if (user?.roles?.includes('admin')) {
+          const adminCount = users.filter((u) => u.roles?.includes('admin')).length;
           if (adminCount <= 1) return false;
         }
 
