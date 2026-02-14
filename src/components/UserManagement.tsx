@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +8,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { useAuth, User, UserRole } from "@/hooks/useAuth";
+import { useAuth, UserRole } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Shield, User as UserIcon, UserCheck, Eye, EyeOff } from "lucide-react";
-import { format } from "date-fns";
+import { Pencil, Trash2, Shield, User as UserIcon, UserCheck, Loader2 } from "lucide-react";
+
+interface UserWithRoles {
+  id: string;
+  username: string;
+  roles: UserRole[];
+  created_at: string;
+}
 
 const allRoles: { value: UserRole; label: string }[] = [
   { value: 'user', label: 'User' },
@@ -20,105 +27,100 @@ const allRoles: { value: UserRole; label: string }[] = [
 ];
 
 const UserManagement = () => {
-  const { users, currentUser, addUser, updateUser, deleteUser } = useAuth();
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { currentUser } = useAuth();
+  const [users, setUsers] = useState<UserWithRoles[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    roles: ['user'] as UserRole[],
-  });
+  const [editingUser, setEditingUser] = useState<UserWithRoles | null>(null);
+  const [formRoles, setFormRoles] = useState<UserRole[]>(['user']);
 
-  const resetForm = () => {
-    setFormData({ username: "", password: "", roles: ['user'] });
-    setShowPassword(false);
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      // Fetch all profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, created_at');
+
+      if (profilesError) throw profilesError;
+
+      // Fetch all roles (admin can see all via RLS)
+      const { data: roleRows, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      const usersWithRoles: UserWithRoles[] = (profiles || []).map((p: any) => ({
+        id: p.id,
+        username: p.username || 'Unknown',
+        created_at: p.created_at,
+        roles: (roleRows || [])
+          .filter((r: any) => r.user_id === p.id)
+          .map((r: any) => r.role as UserRole),
+      }));
+
+      setUsers(usersWithRoles);
+    } catch (error: any) {
+      toast.error("Failed to load users", { description: error.message });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const toggleRole = (role: UserRole) => {
-    setFormData(prev => ({
-      ...prev,
-      roles: prev.roles.includes(role)
-        ? prev.roles.filter(r => r !== role)
-        : [...prev.roles, role],
-    }));
+    setFormRoles(prev =>
+      prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]
+    );
   };
 
-  const handleAddUser = () => {
-    if (!formData.username || !formData.password) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-    if (formData.roles.length === 0) {
-      toast.error("Select at least one role");
-      return;
-    }
-
-    const success = addUser(formData.username, formData.password, formData.roles);
-    
-    if (success) {
-      toast.success("User added successfully");
-      setIsAddDialogOpen(false);
-      resetForm();
-    } else {
-      toast.error("Username already exists");
-    }
-  };
-
-  const handleEditUser = () => {
+  const handleUpdateRoles = async () => {
     if (!editingUser) return;
-    if (formData.roles.length === 0) {
+    if (formRoles.length === 0) {
       toast.error("Select at least one role");
       return;
     }
 
-    const updates: Partial<Pick<User, 'username' | 'password' | 'roles'>> = {
-      roles: formData.roles,
-    };
+    try {
+      // Delete existing roles
+      const { error: deleteError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', editingUser.id);
 
-    if (formData.username && formData.username !== editingUser.username) {
-      updates.username = formData.username;
-    }
+      if (deleteError) throw deleteError;
 
-    if (formData.password) {
-      updates.password = formData.password;
-    }
+      // Insert new roles
+      const { error: insertError } = await supabase
+        .from('user_roles')
+        .insert(formRoles.map(role => ({ user_id: editingUser.id, role })));
 
-    const success = updateUser(editingUser.id, updates);
-    
-    if (success) {
-      toast.success("User updated successfully");
+      if (insertError) throw insertError;
+
+      toast.success("User roles updated");
       setIsEditDialogOpen(false);
       setEditingUser(null);
-      resetForm();
-    } else {
-      toast.error("Username already exists");
-    }
-  };
 
-  const handleDeleteUser = (user: User) => {
-    const success = deleteUser(user.id);
-    
-    if (success) {
-      toast.success("User deleted successfully");
-    } else {
-      if (user.id === currentUser?.id) {
-        toast.error("You cannot delete yourself");
-      } else {
-        toast.error("Cannot delete the last admin user");
+      // Refresh user list and current user if editing self
+      fetchUsers();
+      if (editingUser.id === currentUser?.id) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          useAuth.getState().fetchUserProfile(user);
+        }
       }
+    } catch (error: any) {
+      toast.error("Failed to update roles", { description: error.message });
     }
   };
 
-  const openEditDialog = (user: User) => {
+  const openEditDialog = (user: UserWithRoles) => {
     setEditingUser(user);
-    setFormData({
-      username: user.username,
-      password: "",
-      roles: user.roles || ['user'],
-    });
+    setFormRoles(user.roles.length > 0 ? [...user.roles] : ['user']);
     setIsEditDialogOpen(true);
   };
 
@@ -133,7 +135,7 @@ const UserManagement = () => {
       {allRoles.map((role) => (
         <label key={role.value} className="flex items-center gap-2 cursor-pointer">
           <Checkbox
-            checked={formData.roles.includes(role.value)}
+            checked={formRoles.includes(role.value)}
             onCheckedChange={() => toggleRole(role.value)}
           />
           <span className="text-sm">{role.label}</span>
@@ -142,6 +144,14 @@ const UserManagement = () => {
     </div>
   );
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -149,64 +159,8 @@ const UserManagement = () => {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>User Management</CardTitle>
-              <CardDescription>Manage user accounts and permissions</CardDescription>
+              <CardDescription>Manage user roles and permissions (users register via sign-up)</CardDescription>
             </div>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2" onClick={resetForm}>
-                  <Plus className="h-4 w-4" />
-                  Add User
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New User</DialogTitle>
-                  <DialogDescription>Create a new user account</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="new-username">Username</Label>
-                    <Input
-                      id="new-username"
-                      value={formData.username}
-                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                      placeholder="Enter username"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="new-password">Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="new-password"
-                        type={showPassword ? "text" : "password"}
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        placeholder="Enter password"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Roles</Label>
-                    <RoleCheckboxes />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddUser}>Add User</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
           </div>
         </CardHeader>
         <CardContent>
@@ -215,7 +169,7 @@ const UserManagement = () => {
               <TableRow>
                 <TableHead>Username</TableHead>
                 <TableHead>Roles</TableHead>
-                <TableHead>Created</TableHead>
+                <TableHead>Joined</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -224,7 +178,7 @@ const UserManagement = () => {
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                      {getRoleIcon(user.roles || ['user'])}
+                      {getRoleIcon(user.roles)}
                       {user.username}
                       {user.id === currentUser?.id && (
                         <Badge variant="secondary" className="text-xs">You</Badge>
@@ -233,7 +187,7 @@ const UserManagement = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {(user.roles || ['user']).map((role) => (
+                      {(user.roles.length > 0 ? user.roles : ['user']).map((role) => (
                         <Badge
                           key={role}
                           variant={role === "admin" ? "default" : role === "approver" ? "outline" : "secondary"}
@@ -244,43 +198,12 @@ const UserManagement = () => {
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {format(new Date(user.createdAt), "MMM d, yyyy")}
+                    {new Date(user.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => openEditDialog(user)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:text-destructive"
-                            disabled={user.id === currentUser?.id}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete user "{user.username}"?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. The user will be permanently deleted.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteUser(user)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => openEditDialog(user)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -289,54 +212,22 @@ const UserManagement = () => {
         </CardContent>
       </Card>
 
-      {/* Edit User Dialog */}
+      {/* Edit Roles Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>Update user account details</DialogDescription>
+            <DialogTitle>Edit Roles for {editingUser?.username}</DialogTitle>
+            <DialogDescription>Select the roles this user should have</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-username">Username</Label>
-              <Input
-                id="edit-username"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                placeholder="Enter username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-password">New Password (leave blank to keep current)</Label>
-              <div className="relative">
-                <Input
-                  id="edit-password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Enter new password"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Roles</Label>
-              <RoleCheckboxes />
-            </div>
+          <div className="py-4">
+            <Label className="mb-3 block">Roles</Label>
+            <RoleCheckboxes />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleEditUser}>Save Changes</Button>
+            <Button onClick={handleUpdateRoles}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

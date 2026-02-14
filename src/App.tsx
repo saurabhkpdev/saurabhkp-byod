@@ -21,72 +21,82 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import { GenieChat } from "./components/GenieChat";
+import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
 
 // Protected route wrapper with role-based access
 const ProtectedRoute = ({ children, path }: { children: React.ReactNode; path: string }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, loading } = useAuth();
   const { canAccessPage } = useRoleStore();
-  
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
 
-  // Check role-based access
-  const userRole = currentUser.activeRole;
-  if (!canAccessPage(userRole, path)) {
+  // Check role-based access using server-provided role
+  if (!canAccessPage(currentUser.activeRole, path)) {
     return <Navigate to="/" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
 const AppRoutes = () => {
-  const { currentUser, setCurrentUser } = useAuth();
+  const { currentUser, loading, setSession, fetchUserProfile } = useAuth();
 
-  // Listen for Supabase auth state changes (Google OAuth)
+  // Listen for Supabase auth state changes
   useEffect(() => {
+    // Set up listener BEFORE checking existing session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (session?.user && !currentUser) {
-          const meta = session.user.user_metadata;
-          setCurrentUser({
-            id: session.user.id,
-            username: meta?.full_name || meta?.name || session.user.email || 'User',
-            roles: ['user'],
-            activeRole: 'user',
-            createdAt: session.user.created_at,
-          });
-        } else if (!session && currentUser) {
-          // Session ended externally
+        setSession(session);
+        if (session?.user) {
+          // Use setTimeout to avoid Supabase client deadlock
+          setTimeout(() => {
+            fetchUserProfile(session.user);
+          }, 0);
+        } else {
+          useAuth.setState({ currentUser: null, loading: false });
         }
       }
     );
 
     // Check existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user && !currentUser) {
-        const meta = session.user.user_metadata;
-        setCurrentUser({
-          id: session.user.id,
-          username: meta?.full_name || meta?.name || session.user.email || 'User',
-          roles: ['user'],
-          activeRole: 'user',
-          createdAt: session.user.created_at,
-        });
+      setSession(session);
+      if (session?.user) {
+        fetchUserProfile(session.user);
+      } else {
+        useAuth.setState({ loading: false });
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <>
     <Routes>
-      <Route 
-        path="/login" 
-        element={currentUser ? <Navigate to="/" replace /> : <Login />} 
+      <Route
+        path="/login"
+        element={currentUser ? <Navigate to="/" replace /> : <Login />}
       />
       <Route
         path="/"
