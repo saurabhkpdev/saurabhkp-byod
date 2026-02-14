@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "next-themes";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { useRoleStore } from "@/hooks/useRoleStore";
 import Index from "./pages/Index";
 import DataUpload from "./pages/DataUpload";
@@ -41,7 +43,41 @@ const ProtectedRoute = ({ children, path }: { children: React.ReactNode; path: s
 };
 
 const AppRoutes = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, setCurrentUser } = useAuth();
+
+  // Listen for Supabase auth state changes (Google OAuth)
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user && !currentUser) {
+          const meta = session.user.user_metadata;
+          setCurrentUser({
+            id: session.user.id,
+            username: meta?.full_name || meta?.name || session.user.email || 'User',
+            role: 'user',
+            createdAt: session.user.created_at,
+          });
+        } else if (!session && currentUser) {
+          // Session ended externally
+        }
+      }
+    );
+
+    // Check existing session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user && !currentUser) {
+        const meta = session.user.user_metadata;
+        setCurrentUser({
+          id: session.user.id,
+          username: meta?.full_name || meta?.name || session.user.email || 'User',
+          role: 'user',
+          createdAt: session.user.created_at,
+        });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <>
