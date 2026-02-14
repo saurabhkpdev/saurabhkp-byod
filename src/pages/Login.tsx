@@ -9,43 +9,33 @@ import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
-import { LogIn, Mail, Lock, Chrome, Building2, Loader2 } from "lucide-react";
+import { LogIn, Mail, Lock, Chrome, Building2, Loader2, CheckCircle } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [signUpSent, setSignUpSent] = useState(false);
+  const [socialLoading, setSocialLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
-        toast.success("Check your email", {
-          description: "We've sent you a confirmation link to verify your account.",
-        });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        toast.success("Welcome back!", {
-          description: "You have successfully logged in.",
-        });
-        navigate("/");
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      toast.success("Welcome back!", {
+        description: "You have successfully logged in.",
+      });
+      navigate("/");
     } catch (error: any) {
-      toast.error(isSignUp ? "Sign up failed" : "Login failed", {
+      toast.error("Login failed", {
         description: error.message || "Please check your credentials.",
       });
     } finally {
@@ -53,7 +43,33 @@ const Login = () => {
     }
   };
 
-  const [socialLoading, setSocialLoading] = useState(false);
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      toast.error("Please enter your email address");
+      return;
+    }
+    setIsLoading(true);
+
+    try {
+      // Sign up with email only — Supabase sends a confirmation link
+      // The user will set their password after verifying via the set-password page
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/set-password`,
+        },
+      });
+      if (error) throw error;
+      setSignUpSent(true);
+    } catch (error: any) {
+      toast.error("Sign up failed", {
+        description: error.message || "Something went wrong.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleGoogleLogin = async () => {
     setSocialLoading(true);
@@ -77,14 +93,50 @@ const Login = () => {
 
   const handleSocialLogin = (provider: string) => {
     toast.info(`${provider} login`, {
-      description: "Social login is not yet configured. Please use email and password.",
+      description: "Social login is not yet configured.",
     });
   };
+
+  // Show confirmation screen after signup email is sent
+  if (signUpSent) {
+    return (
+      <>
+        <Helmet>
+          <title>Check Your Email - BYOD</title>
+        </Helmet>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4">
+          <Card className="w-full max-w-md shadow-xl">
+            <CardHeader className="text-center space-y-2">
+              <div className="mx-auto w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-2">
+                <CheckCircle className="w-6 h-6 text-primary" />
+              </div>
+              <CardTitle className="text-2xl font-bold">Check Your Email</CardTitle>
+              <CardDescription>
+                We've sent a verification link to <strong>{email}</strong>. Click the link to verify your email and set your password.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  setSignUpSent(false);
+                  setIsSignUp(false);
+                }}
+              >
+                Back to Sign In
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <Helmet>
-        <title>Login - BYOD</title>
+        <title>{isSignUp ? "Sign Up" : "Login"} - BYOD</title>
         <meta name="description" content="Login to access BYOD platform" />
       </Helmet>
 
@@ -96,48 +148,74 @@ const Login = () => {
             </div>
             <CardTitle className="text-2xl font-bold">Welcome to BYOD</CardTitle>
             <CardDescription>
-              {isSignUp ? "Create your account to get started" : "Sign in to your account to continue"}
+              {isSignUp
+                ? "Enter your email to create an account"
+                : "Sign in to your account to continue"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
+            {isSignUp ? (
+              /* Sign Up Form — email only */
+              <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Send Verification Link
+                </Button>
+              </form>
+            ) : (
+              /* Login Form — email + password */
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : null}
-                {isSignUp ? "Sign Up" : "Sign In"}
-              </Button>
-            </form>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  Sign In
+                </Button>
+              </form>
+            )}
 
             <div className="text-center text-sm">
               <button
