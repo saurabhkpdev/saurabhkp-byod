@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import bcrypt from 'bcryptjs';
+import { supabase } from '@/integrations/supabase/client';
 
 export type UserRole = 'admin' | 'approver' | 'user';
 
@@ -17,6 +18,7 @@ interface AuthState {
   users: User[];
   login: (username: string, password: string) => boolean;
   logout: () => void;
+  setCurrentUser: (user: Omit<User, 'password'> | null) => void;
   addUser: (username: string, password: string, role: UserRole) => boolean;
   updateUser: (id: string, updates: Partial<Pick<User, 'username' | 'password' | 'role'>>) => boolean;
   deleteUser: (id: string) => boolean;
@@ -77,6 +79,11 @@ export const useAuth = create<AuthState>()(
 
       logout: () => {
         set({ currentUser: null });
+        supabase.auth.signOut();
+      },
+
+      setCurrentUser: (user: Omit<User, 'password'> | null) => {
+        set({ currentUser: user });
       },
 
       addUser: (username: string, password: string, role: UserRole) => {
