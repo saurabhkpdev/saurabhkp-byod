@@ -13,12 +13,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Webhook, Trash2, Pencil, Zap, Cloud, Mail, Play, TestTube } from "lucide-react";
+import { Plus, Webhook, Trash2, Pencil, Zap, Cloud, Mail, Play, TestTube, FileSpreadsheet, Database } from "lucide-react";
 import { toast } from "sonner";
 import { 
   useActionsStore, 
   ActionConfig, 
   ActionType, 
+  ActionScope,
   TriggerEvent, 
   WebhookConfig,
   AirflowConfig,
@@ -27,6 +28,8 @@ import {
   triggerEventLabels, 
   actionTypeLabels 
 } from "@/hooks/useActionsStore";
+import { useTemplateStore } from "@/hooks/useTemplateStore";
+import { mockDatasets } from "@/hooks/useMockDatabase";
 
 const defaultWebhookConfig: WebhookConfig = {
   url: "",
@@ -65,8 +68,12 @@ const actionTypeIcons: Record<ActionType, React.ReactNode> = {
 
 export function ActionsConfig() {
   const { actions, addAction, updateAction, deleteAction, toggleAction } = useActionsStore();
+  const { customTemplates } = useTemplateStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAction, setEditingAction] = useState<ActionConfig | null>(null);
+  const [scope, setScope] = useState<ActionScope>("template");
+  const [scopeId, setScopeId] = useState("");
+  const [scopeName, setScopeName] = useState("");
   
   // Form state
   const [name, setName] = useState("");
@@ -79,6 +86,32 @@ export function ActionsConfig() {
   const [emailConfig, setEmailConfig] = useState<EmailConfig>(defaultEmailConfig);
   const [emailInput, setEmailInput] = useState("");
 
+  const BUILT_IN_TEMPLATES = [
+    { id: 'customer-data', name: 'Customer Data' },
+    { id: 'sales-pipeline', name: 'Sales Pipeline' },
+    { id: 'inventory', name: 'Inventory Management' },
+    { id: 'hr-employees', name: 'HR Employees' },
+    { id: 'geo-locations', name: 'Geographical Locations' },
+    { id: 'geo-regions', name: 'Regional Boundaries' },
+  ];
+
+  const allTemplates = [
+    ...BUILT_IN_TEMPLATES,
+    ...customTemplates.map(t => ({ id: t.id, name: t.name })),
+  ];
+
+  const allDatasets = mockDatasets.map(d => ({ id: `dataset-${d.id}`, name: d.name }));
+
+  const scopeItems = scope === 'template' ? allTemplates : allDatasets;
+
+  const handleScopeItemSelect = (itemId: string) => {
+    const item = scopeItems.find(i => i.id === itemId);
+    if (item) {
+      setScopeId(item.id);
+      setScopeName(item.name);
+    }
+  };
+
   const resetForm = () => {
     setName("");
     setDescription("");
@@ -90,6 +123,9 @@ export function ActionsConfig() {
     setEmailConfig(defaultEmailConfig);
     setEmailInput("");
     setEditingAction(null);
+    setScope("template");
+    setScopeId("");
+    setScopeName("");
   };
 
   const openCreateDialog = () => {
@@ -103,6 +139,9 @@ export function ActionsConfig() {
     setDescription(action.description || "");
     setActionType(action.type);
     setSelectedEvents(action.triggerEvents);
+    setScope(action.scope || "template");
+    setScopeId(action.scopeId || "");
+    setScopeName(action.scopeName || "");
     
     if (action.type === "webhook") {
       setWebhookConfig(action.config as WebhookConfig);
@@ -145,6 +184,10 @@ export function ActionsConfig() {
       toast.error("Please enter an action name");
       return;
     }
+    if (!scopeId) {
+      toast.error(`Please select a ${scope}`);
+      return;
+    }
     if (selectedEvents.length === 0) {
       toast.error("Please select at least one trigger event");
       return;
@@ -177,6 +220,9 @@ export function ActionsConfig() {
         type: actionType,
         triggerEvents: selectedEvents,
         config,
+        scope,
+        scopeId,
+        scopeName,
       });
       toast.success("Action updated successfully");
     } else {
@@ -187,6 +233,9 @@ export function ActionsConfig() {
         type: actionType,
         triggerEvents: selectedEvents,
         config,
+        scope,
+        scopeId,
+        scopeName,
       });
       toast.success("Action created successfully");
     }
@@ -228,6 +277,40 @@ export function ActionsConfig() {
               </DialogHeader>
               
               <div className="space-y-6 py-4">
+                {/* Scope Selection */}
+                <div className="space-y-4">
+                  <Label>Scope *</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Select value={scope} onValueChange={(v) => { setScope(v as ActionScope); setScopeId(""); setScopeName(""); }}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="template">
+                            <div className="flex items-center gap-2"><FileSpreadsheet className="w-4 h-4" /> Template</div>
+                          </SelectItem>
+                          <SelectItem value="dataset">
+                            <div className="flex items-center gap-2"><Database className="w-4 h-4" /> Dataset</div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Select value={scopeId} onValueChange={handleScopeItemSelect}>
+                        <SelectTrigger>
+                          <SelectValue placeholder={`Select a ${scope}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {scopeItems.map(item => (
+                            <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Basic Info */}
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -510,6 +593,7 @@ export function ActionsConfig() {
                 <TableRow>
                   <TableHead className="w-[50px]">Active</TableHead>
                   <TableHead>Name</TableHead>
+                  <TableHead>Scope</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Triggers</TableHead>
                   <TableHead className="w-[150px]">Actions</TableHead>
@@ -531,6 +615,12 @@ export function ActionsConfig() {
                           <p className="text-xs text-muted-foreground">{action.description}</p>
                         )}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="gap-1 text-xs">
+                        {action.scope === 'dataset' ? <Database className="h-3 w-3" /> : <FileSpreadsheet className="h-3 w-3" />}
+                        {action.scopeName || '—'}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="gap-1">
