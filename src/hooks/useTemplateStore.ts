@@ -13,18 +13,34 @@ export interface CustomTemplate {
   isCustom: true;
 }
 
+export interface SystemTemplateOverride {
+  name?: string;
+  description?: string;
+  requiredColumns?: string[];
+  optionalColumns?: string[];
+  sampleData?: Record<string, unknown>[];
+  category?: 'general' | 'geographical';
+  updatedAt: string;
+}
+
 const STORAGE_KEY = 'byod-custom-templates';
+const SYSTEM_OVERRIDES_KEY = 'byod-system-template-overrides';
 
 export function useTemplateStore() {
   const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
+  const [systemOverrides, setSystemOverrides] = useState<Record<string, SystemTemplateOverride>>({});
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load templates from localStorage on mount
+  // Load templates and overrides from localStorage on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         setCustomTemplates(JSON.parse(stored));
+      }
+      const overrides = localStorage.getItem(SYSTEM_OVERRIDES_KEY);
+      if (overrides) {
+        setSystemOverrides(JSON.parse(overrides));
       }
     } catch (error) {
       console.error('Failed to load custom templates:', error);
@@ -33,7 +49,6 @@ export function useTemplateStore() {
     }
   }, []);
 
-  // Save templates to localStorage whenever they change
   const saveTemplates = useCallback((templates: CustomTemplate[]) => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
@@ -41,6 +56,16 @@ export function useTemplateStore() {
     } catch (error) {
       console.error('Failed to save custom templates:', error);
       throw new Error('Failed to save template');
+    }
+  }, []);
+
+  const saveSystemOverrides = useCallback((overrides: Record<string, SystemTemplateOverride>) => {
+    try {
+      localStorage.setItem(SYSTEM_OVERRIDES_KEY, JSON.stringify(overrides));
+      setSystemOverrides(overrides);
+    } catch (error) {
+      console.error('Failed to save system overrides:', error);
+      throw new Error('Failed to save override');
     }
   }, []);
 
@@ -90,13 +115,38 @@ export function useTemplateStore() {
     return customTemplates.find(t => t.id === id);
   }, [customTemplates]);
 
+  const updateSystemTemplate = useCallback((
+    systemTemplateId: string,
+    updates: Omit<SystemTemplateOverride, 'updatedAt'>
+  ) => {
+    const newOverrides = {
+      ...systemOverrides,
+      [systemTemplateId]: { ...updates, updatedAt: new Date().toISOString() },
+    };
+    saveSystemOverrides(newOverrides);
+  }, [systemOverrides, saveSystemOverrides]);
+
+  const resetSystemTemplate = useCallback((systemTemplateId: string) => {
+    const newOverrides = { ...systemOverrides };
+    delete newOverrides[systemTemplateId];
+    saveSystemOverrides(newOverrides);
+  }, [systemOverrides, saveSystemOverrides]);
+
+  const getSystemOverride = useCallback((systemTemplateId: string): SystemTemplateOverride | undefined => {
+    return systemOverrides[systemTemplateId];
+  }, [systemOverrides]);
+
   return {
     customTemplates,
+    systemOverrides,
     isLoading,
     addTemplate,
     updateTemplate,
     deleteTemplate,
     getTemplate,
+    updateSystemTemplate,
+    resetSystemTemplate,
+    getSystemOverride,
   };
 }
 
