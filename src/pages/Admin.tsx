@@ -98,57 +98,6 @@ const Admin = () => {
             </div>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <Card>
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-primary/10">
-                  <Activity className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.totalEvents}</p>
-                  <p className="text-sm text-muted-foreground">Total Events</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-green-500/10">
-                  <Calendar className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.todayEvents}</p>
-                  <p className="text-sm text-muted-foreground">Today's Events</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-blue-500/10">
-                  <FileUp className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.actionCounts['data_upload'] || 0}</p>
-                  <p className="text-sm text-muted-foreground">Uploads</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-purple-500/10">
-                  <Eye className="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.actionCounts['page_view'] || 0}</p>
-                  <p className="text-sm text-muted-foreground">Page Views</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
           <Tabs defaultValue="events" className="space-y-6">
             <TabsList className="flex-wrap h-auto gap-1">
               <TabsTrigger value="events" className="gap-2">
@@ -242,7 +191,53 @@ const Admin = () => {
 
             {/* Analytics Tab */}
             <TabsContent value="analytics">
-              {/* Usage Stats */}
+              {/* Event Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <Card>
+                  <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-primary/10">
+                      <Activity className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">{stats.totalEvents}</p>
+                      <p className="text-sm text-muted-foreground">Total Events</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-primary/10">
+                      <Calendar className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">{stats.todayEvents}</p>
+                      <p className="text-sm text-muted-foreground">Today's Events</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-primary/10">
+                      <FileUp className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">{stats.actionCounts['data_upload'] || 0}</p>
+                      <p className="text-sm text-muted-foreground">Uploads</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-primary/10">
+                      <Eye className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">{stats.actionCounts['page_view'] || 0}</p>
+                      <p className="text-sm text-muted-foreground">Page Views</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <Card>
                   <CardContent className="p-6 flex items-center gap-4">
