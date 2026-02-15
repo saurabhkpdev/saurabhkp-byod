@@ -30,10 +30,20 @@ interface WizardData {
 
 type SourceMode = 'select' | 'upload-file';
 
+const CONSENT_SESSION_KEY = 'byod_wizard_consent';
+
+const getStoredConsent = (): WizardData | null => {
+  try {
+    const stored = sessionStorage.getItem(CONSENT_SESSION_KEY);
+    return stored ? JSON.parse(stored) : null;
+  } catch { return null; }
+};
+
 const DataUpload = () => {
   const navigate = useNavigate();
-  const [wizardComplete, setWizardComplete] = useState(false);
-  const [wizardData, setWizardData] = useState<WizardData | null>(null);
+  const storedConsent = getStoredConsent();
+  const [wizardComplete, setWizardComplete] = useState(!!storedConsent);
+  const [wizardData, setWizardData] = useState<WizardData | null>(storedConsent);
   const [sourceMode, setSourceMode] = useState<SourceMode>('select');
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [hasGeoData, setHasGeoData] = useState(false);
@@ -73,6 +83,7 @@ const DataUpload = () => {
   const handleWizardComplete = (wizardInfo: WizardData) => {
     setWizardData(wizardInfo);
     setWizardComplete(true);
+    sessionStorage.setItem(CONSENT_SESSION_KEY, JSON.stringify(wizardInfo));
   };
 
   const handleTemplateSelect = (template: Template) => {
@@ -105,8 +116,6 @@ const DataUpload = () => {
 
   const handleClear = () => {
     clearData();
-    setWizardComplete(false);
-    setWizardData(null);
     setSourceMode('select');
     setSelectedTemplate(null);
     setHasGeoData(false);
