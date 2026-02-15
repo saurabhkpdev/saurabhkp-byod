@@ -71,6 +71,48 @@ export type Database = {
         }
         Relationships: []
       }
+      template_load_configs: {
+        Row: {
+          allow_user_override: boolean
+          auto_version: boolean
+          created_at: string
+          created_by: string
+          id: string
+          load_strategy: Database["public"]["Enums"]["load_strategy"]
+          primary_key_columns: string[]
+          template_id: string
+          template_name: string
+          updated_at: string
+          validation_rules: Json
+        }
+        Insert: {
+          allow_user_override?: boolean
+          auto_version?: boolean
+          created_at?: string
+          created_by: string
+          id?: string
+          load_strategy?: Database["public"]["Enums"]["load_strategy"]
+          primary_key_columns?: string[]
+          template_id: string
+          template_name: string
+          updated_at?: string
+          validation_rules?: Json
+        }
+        Update: {
+          allow_user_override?: boolean
+          auto_version?: boolean
+          created_at?: string
+          created_by?: string
+          id?: string
+          load_strategy?: Database["public"]["Enums"]["load_strategy"]
+          primary_key_columns?: string[]
+          template_id?: string
+          template_name?: string
+          updated_at?: string
+          validation_rules?: Json
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -108,6 +150,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "approver" | "user"
+      load_strategy: "truncate_load" | "merge_upsert" | "append_only"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -236,6 +279,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "approver", "user"],
+      load_strategy: ["truncate_load", "merge_upsert", "append_only"],
     },
   },
 } as const

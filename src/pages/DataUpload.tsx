@@ -4,6 +4,7 @@ import { useDataStore } from '@/hooks/useDataStore';
 import { useUsageStats } from '@/hooks/useUsageStats';
 import { useAuditLog } from '@/hooks/useAuditLog';
 import { useDataVersions } from '@/hooks/useDataVersions';
+import { useLoadConfig, LoadStrategy } from '@/hooks/useLoadConfig';
 import { FileUpload } from '@/components/FileUpload';
 import { DataTable } from '@/components/DataTable';
 import { StatsPanel } from '@/components/StatsPanel';
@@ -14,6 +15,7 @@ import { UploadWizard } from '@/components/UploadWizard';
 import { DatabaseSelector } from '@/components/DatabaseSelector';
 import { Template } from '@/components/TemplateSelector';
 import { VersionHistory } from '@/components/VersionHistory';
+import LoadStrategyPicker from '@/components/LoadStrategyPicker';
 
 import { LeafletMapEditor } from '@/components/LeafletMapEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -38,7 +40,8 @@ const DataUpload = () => {
   const { recordUpload } = useUsageStats();
   const { logEvent } = useAuditLog();
   const { versions, isLoading: versionsLoading, fetchVersions, saveVersion, restoreVersion, deleteVersion } = useDataVersions();
-  
+  const { configs, getConfigForTemplate } = useLoadConfig();
+  const [loadStrategy, setLoadStrategy] = useState<LoadStrategy>('append_only');
   // Log page view
   useEffect(() => {
     logEvent('page_view', 'Visited Data Studio page', 'Data Studio');
@@ -76,6 +79,13 @@ const DataUpload = () => {
     setSelectedTemplate(template);
     setHasGeoData(template.category === 'geographical');
     setSourceMode('upload-file');
+    // Set load strategy from admin config default
+    const config = getConfigForTemplate(template.id);
+    if (config) {
+      setLoadStrategy(config.load_strategy);
+    } else {
+      setLoadStrategy('append_only');
+    }
     logEvent('template_selected', `Selected template: ${template.name}`, 'Data Studio', { templateId: template.id });
   };
 
@@ -166,6 +176,13 @@ const DataUpload = () => {
                     Uploading from {wizardData.region}, {wizardData.country}
                   </p>
                 )}
+              </div>
+              <div className="w-full max-w-xl mx-auto mb-6">
+                <LoadStrategyPicker
+                  config={getConfigForTemplate(selectedTemplate.id)}
+                  selectedStrategy={loadStrategy}
+                  onStrategyChange={setLoadStrategy}
+                />
               </div>
               <FileUpload 
                 onDataLoaded={(d, f) => handleDataLoaded(d, f, selectedTemplate.category === 'geographical')} 
