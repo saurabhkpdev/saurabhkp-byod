@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users, Globe, ShieldCheck, Settings2 } from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users, Globe, ShieldCheck, Settings2, Upload } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -16,6 +16,7 @@ import UserManagement from "@/components/UserManagement";
 import RoleManagement from "@/components/RoleManagement";
 import LanguageSettings from "@/components/LanguageSettings";
 import LoadConfigPanel from "@/components/LoadConfigPanel";
+import { useUsageStats } from "@/hooks/useUsageStats";
 
 
 const Admin = () => {
@@ -25,6 +26,7 @@ const Admin = () => {
     getStats
   } = useAuditLog();
   const stats = getStats();
+  const { totalVisits, totalUploads, getLastVisitFormatted } = useUsageStats();
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     if (isToday(date)) {
@@ -240,6 +242,43 @@ const Admin = () => {
 
             {/* Analytics Tab */}
             <TabsContent value="analytics">
+              {/* Usage Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <Card>
+                  <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-primary/10">
+                      <Activity className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">{totalVisits}</p>
+                      <p className="text-sm text-muted-foreground">Total Visits</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-primary/10">
+                      <Upload className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">{totalUploads}</p>
+                      <p className="text-sm text-muted-foreground">Files Uploaded</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-6 flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-primary/10">
+                      <Clock className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold">{getLastVisitFormatted()}</p>
+                      <p className="text-sm text-muted-foreground">Last Visit</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
               <div className="grid md:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
