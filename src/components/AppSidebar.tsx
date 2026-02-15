@@ -204,17 +204,20 @@ export function AppSidebar({ children }: AppSidebarProps) {
                 {currentUser.roles.length > 1 && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuLabel className="text-xs text-muted-foreground">Switch Role</DropdownMenuLabel>
-                    <DropdownMenuRadioGroup
-                      value={currentUser.activeRole}
-                      onValueChange={(value) => switchRole(value as UserRole)}
-                    >
-                      {currentUser.roles.map((role) => (
-                        <DropdownMenuRadioItem key={role} value={role} className="capitalize">
-                          {role}
-                        </DropdownMenuRadioItem>
-                      ))}
-                    </DropdownMenuRadioGroup>
+                    <div className="px-2 py-1.5 flex items-center justify-between gap-2">
+                      <span className="text-xs text-muted-foreground">Role</span>
+                      <select
+                        value={currentUser.activeRole}
+                        onChange={(e) => switchRole(e.target.value as UserRole)}
+                        className="text-xs bg-muted border border-border rounded px-2 py-1 capitalize cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
+                      >
+                        {currentUser.roles.map((role) => (
+                          <option key={role} value={role} className="capitalize">
+                            {role}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </>
                 )}
                 <DropdownMenuSeparator />
