@@ -5,6 +5,8 @@ export type TriggerEvent = 'upload_success' | 'manipulation_complete' | 'approva
 
 export type ActionType = 'webhook' | 'airflow_dag' | 'snowflake_task' | 'email';
 
+export type ActionScope = 'template' | 'dataset';
+
 export interface ActionConfig {
   id: string;
   name: string;
@@ -13,6 +15,9 @@ export interface ActionConfig {
   type: ActionType;
   triggerEvents: TriggerEvent[];
   config: WebhookConfig | AirflowConfig | SnowflakeConfig | EmailConfig;
+  scope: ActionScope;
+  scopeId: string;
+  scopeName: string;
   createdAt: string;
   updatedAt: string;
 }
