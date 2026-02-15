@@ -31,6 +31,7 @@ const defaultPagePermissions: PagePermission[] = [
   { pageId: 'home', pageName: 'Home', path: '/', roles: ['user', 'approver', 'admin'] },
   { pageId: 'data-studio', pageName: 'Data Studio', path: '/upload', roles: ['user', 'approver', 'admin'] },
   { pageId: 'templates', pageName: 'Templates', path: '/templates', roles: ['user', 'approver', 'admin'] },
+  { pageId: 'datasets', pageName: 'Datasets', path: '/datasets', roles: ['user', 'approver', 'admin'] },
   { pageId: 'actions', pageName: 'Actions', path: '/actions', roles: ['admin'] },
   { pageId: 'documentation', pageName: 'Documentation', path: '/docs', roles: ['user', 'approver', 'admin'] },
   { pageId: 'approvals', pageName: 'Approvals', path: '/approvals', roles: ['approver', 'admin'] },

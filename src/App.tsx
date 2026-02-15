@@ -15,6 +15,7 @@ import DataUpload from "./pages/DataUpload";
 import Documentation from "./pages/Documentation";
 import Admin from "./pages/Admin";
 import TemplateLibrary from "./pages/TemplateLibrary";
+import DatasetLibrary from "./pages/DatasetLibrary";
 import Approvals from "./pages/Approvals";
 import ActionsConfigPage from "./pages/ActionsConfig";
 import Login from "./pages/Login";
@@ -129,6 +130,16 @@ const AppRoutes = () => {
           <ProtectedRoute path="/templates">
             <AppSidebar>
               <TemplateLibrary />
+            </AppSidebar>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/datasets"
+        element={
+          <ProtectedRoute path="/datasets">
+            <AppSidebar>
+              <DatasetLibrary />
             </AppSidebar>
           </ProtectedRoute>
         }
