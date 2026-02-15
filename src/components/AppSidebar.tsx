@@ -90,7 +90,7 @@ export function AppSidebar({ children }: AppSidebarProps) {
           "p-4 border-b flex items-center gap-3",
           collapsed ? "justify-center" : ""
         )}>
-          <div className="p-2 rounded-xl gradient-primary shrink-0">
+          <div className="p-2 rounded-xl gradient-primary shrink-0" data-tour="sidebar-logo">
             <Database className="w-5 h-5 text-primary-foreground" />
           </div>
           {!collapsed && (
@@ -129,6 +129,7 @@ export function AppSidebar({ children }: AppSidebarProps) {
                 <NavLink
                   to={item.url}
                   end={item.url === "/"}
+                  data-tour={`nav-${item.id}`}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     "text-muted-foreground hover:text-foreground hover:bg-muted",
@@ -167,7 +168,7 @@ export function AppSidebar({ children }: AppSidebarProps) {
           {currentUser && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className={cn(
+                <button data-tour="user-menu" className={cn(
                   "w-full flex items-center gap-2 px-2 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors",
                   collapsed && "justify-center px-0"
                 )}>
