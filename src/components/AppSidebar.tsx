@@ -34,6 +34,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 
 const allNavItems = [
@@ -204,25 +208,29 @@ export function AppSidebar({ children }: AppSidebarProps) {
                 {currentUser.roles.length > 1 && (
                   <>
                     <DropdownMenuSeparator />
-                    <div className="px-2 py-1.5 flex items-center justify-between gap-3">
-                      <span className="text-xs font-medium text-muted-foreground">Role</span>
-                      <div className="flex gap-1">
-                        {currentUser.roles.map((role) => (
-                          <button
-                            key={role}
-                            onClick={() => switchRole(role as UserRole)}
-                            className={cn(
-                              "px-2.5 py-1 rounded-full text-xs font-medium capitalize transition-colors",
-                              currentUser.activeRole === role
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                            )}
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="gap-2">
+                        <Shield className="w-4 h-4" />
+                        <span>Role</span>
+                        <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 capitalize">
+                          {currentUser.activeRole}
+                        </Badge>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent className="bg-popover border border-border shadow-lg z-50">
+                          <DropdownMenuRadioGroup
+                            value={currentUser.activeRole}
+                            onValueChange={(value) => switchRole(value as UserRole)}
                           >
-                            {role}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                            {currentUser.roles.map((role) => (
+                              <DropdownMenuRadioItem key={role} value={role} className="capitalize">
+                                {role}
+                              </DropdownMenuRadioItem>
+                            ))}
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
                   </>
                 )}
                 <DropdownMenuSeparator />
