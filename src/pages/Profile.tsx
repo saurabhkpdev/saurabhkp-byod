@@ -7,16 +7,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
 import { useThemeCustomizer } from "@/hooks/useThemeCustomizer";
-import { User, Palette, Moon, Sun, Monitor, Check } from "lucide-react";
+import { User, Palette, Moon, Sun, Monitor, Check, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useOnboardingTour } from "@/hooks/useOnboardingTour";
 
 export default function Profile() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { currentPalette, defaultPalettes, selectPalette, hslToHex } = useThemeCustomizer();
+  const { resetTour, hasCompletedTour, startTour } = useOnboardingTour();
   
   const [username, setUsername] = useState(currentUser?.username || "");
 
@@ -166,6 +168,29 @@ export default function Profile() {
                 ))}
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Onboarding Tour */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <RotateCcw className="w-5 h-5" />
+              Onboarding Tour
+            </CardTitle>
+            <CardDescription>Replay the guided tour to revisit key features</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              variant="outline"
+              onClick={() => {
+                resetTour();
+                startTour();
+              }}
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Restart Tour
+            </Button>
           </CardContent>
         </Card>
       </div>
