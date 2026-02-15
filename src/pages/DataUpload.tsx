@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDataStore } from '@/hooks/useDataStore';
 import { useUsageStats } from '@/hooks/useUsageStats';
 import { useAuditLog } from '@/hooks/useAuditLog';
+import { useDataVersions } from '@/hooks/useDataVersions';
 import { FileUpload } from '@/components/FileUpload';
 import { DataTable } from '@/components/DataTable';
 import { StatsPanel } from '@/components/StatsPanel';
@@ -12,10 +13,11 @@ import { TopBar } from '@/components/TopBar';
 import { UploadWizard } from '@/components/UploadWizard';
 import { DatabaseSelector } from '@/components/DatabaseSelector';
 import { Template } from '@/components/TemplateSelector';
+import { VersionHistory } from '@/components/VersionHistory';
 
 import { LeafletMapEditor } from '@/components/LeafletMapEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table2, BarChart3, PieChart, MapPin, ShieldCheck } from 'lucide-react';
+import { Table2, BarChart3, PieChart, MapPin, ShieldCheck, History } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface WizardData {
@@ -35,6 +37,7 @@ const DataUpload = () => {
   const [hasGeoData, setHasGeoData] = useState(false);
   const { recordUpload } = useUsageStats();
   const { logEvent } = useAuditLog();
+  const { versions, isLoading: versionsLoading, fetchVersions, saveVersion, restoreVersion, deleteVersion } = useDataVersions();
   
   // Log page view
   useEffect(() => {
@@ -53,6 +56,13 @@ const DataUpload = () => {
     bulkSetValue,
     bulkTransform,
   } = useDataStore();
+
+  // Fetch version history when data is loaded
+  useEffect(() => {
+    if (data?.fileName) {
+      fetchVersions(data.fileName);
+    }
+  }, [data?.fileName, fetchVersions]);
 
   const stats = data ? getStats() : [];
   const piiColumns = data?.columns.filter(c => c.isPII).map(c => c.name) || [];
@@ -167,7 +177,7 @@ const DataUpload = () => {
             /* Step 4: Data loaded - show tabs */
             <div className="space-y-8 animate-slide-up">
               <Tabs defaultValue="data" className="w-full">
-                <TabsList className={`grid w-full max-w-2xl mx-auto ${hasGeoData ? 'grid-cols-5' : 'grid-cols-4'}`}>
+                <TabsList className={`grid w-full max-w-3xl mx-auto`} style={{ gridTemplateColumns: `repeat(${hasGeoData ? 6 : 5}, minmax(0, 1fr))` }}>
                   <TabsTrigger value="data" className="flex items-center gap-2">
                     <Table2 className="w-4 h-4" />
                     Data
@@ -189,6 +199,10 @@ const DataUpload = () => {
                   <TabsTrigger value="quality" className="flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4" />
                     Validate
+                  </TabsTrigger>
+                  <TabsTrigger value="versions" className="flex items-center gap-2">
+                    <History className="w-4 h-4" />
+                    Versions
                   </TabsTrigger>
                 </TabsList>
 
@@ -236,6 +250,31 @@ const DataUpload = () => {
                       setSelectedTemplate(null);
                       setHasGeoData(false);
                       // Keep wizard complete so user doesn't need to redo consent
+                    }}
+                  />
+                </TabsContent>
+
+                <TabsContent value="versions" className="mt-6">
+                  <VersionHistory
+                    versions={versions}
+                    isLoading={versionsLoading}
+                    hasData={!!data}
+                    onSave={(summary) => {
+                      if (data) {
+                        saveVersion(data.fileName, data.columns, data.rows, summary);
+                      }
+                    }}
+                    onRestore={async (versionId) => {
+                      const snapshot = await restoreVersion(versionId);
+                      if (snapshot && data) {
+                        loadData(
+                          snapshot.rows as Record<string, unknown>[],
+                          data.fileName
+                        );
+                      }
+                    }}
+                    onDelete={(versionId) => {
+                      if (data) deleteVersion(versionId, data.fileName);
                     }}
                   />
                 </TabsContent>

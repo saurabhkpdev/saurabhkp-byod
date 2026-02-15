@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      data_versions: {
+        Row: {
+          change_summary: string | null
+          column_count: number
+          created_at: string
+          dataset_name: string
+          id: string
+          row_count: number
+          snapshot: Json
+          user_id: string
+          version_number: number
+        }
+        Insert: {
+          change_summary?: string | null
+          column_count?: number
+          created_at?: string
+          dataset_name: string
+          id?: string
+          row_count?: number
+          snapshot: Json
+          user_id: string
+          version_number?: number
+        }
+        Update: {
+          change_summary?: string | null
+          column_count?: number
+          created_at?: string
+          dataset_name?: string
+          id?: string
+          row_count?: number
+          snapshot?: Json
+          user_id?: string
+          version_number?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
