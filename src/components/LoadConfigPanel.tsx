@@ -10,10 +10,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Settings2, Plus, Pencil, Trash2, Database, Key, ShieldCheck, History, Tag } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Settings2, Plus, Pencil, Trash2, Database, Key, ShieldCheck, History, Tag, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLoadConfig, LoadStrategy, STRATEGY_LABELS, STRATEGY_DESCRIPTIONS, ValidationRule, LoadConfig } from '@/hooks/useLoadConfig';
 import { useTemplateStore } from '@/hooks/useTemplateStore';
+import { mockDatasets } from '@/hooks/useMockDatabase';
 
 // Built-in template IDs for reference
 const BUILT_IN_TEMPLATES = [
@@ -24,6 +26,8 @@ const BUILT_IN_TEMPLATES = [
   { id: 'geo-locations', name: 'Geographical Locations' },
   { id: 'geo-regions', name: 'Regional Boundaries' },
 ];
+
+const BUILT_IN_DATASETS = mockDatasets.map(d => ({ id: `dataset-${d.id}`, name: d.name }));
 
 interface ConfigEditorState {
   template_id: string;
@@ -52,15 +56,25 @@ const LoadConfigPanel = () => {
   const [editor, setEditor] = useState<ConfigEditorState>(emptyEditor);
   const [pkInput, setPkInput] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [configTab, setConfigTab] = useState<'templates' | 'datasets'>('templates');
 
   const allTemplates = [
     ...BUILT_IN_TEMPLATES,
     ...customTemplates.map(t => ({ id: t.id, name: t.name })),
   ];
 
-  // Templates that don't have a config yet
-  const availableTemplates = allTemplates.filter(
-    t => !configs.some(c => c.template_id === t.id) || editingId
+  const allDatasets = BUILT_IN_DATASETS;
+
+  // Configs filtered by type
+  const templateConfigs = configs.filter(c => !c.template_id.startsWith('dataset-'));
+  const datasetConfigs = configs.filter(c => c.template_id.startsWith('dataset-'));
+
+  // Items available for new config (depending on active tab)
+  const currentItems = configTab === 'templates' ? allTemplates : allDatasets;
+  const currentConfigs = configTab === 'templates' ? templateConfigs : datasetConfigs;
+
+  const availableItems = currentItems.filter(
+    t => !currentConfigs.some(c => c.template_id === t.id) || editingId
   );
 
   const handleEdit = (config: LoadConfig) => {
@@ -85,10 +99,10 @@ const LoadConfigPanel = () => {
     setDialogOpen(true);
   };
 
-  const handleTemplateSelect = (templateId: string) => {
-    const tmpl = allTemplates.find(t => t.id === templateId);
-    if (tmpl) {
-      setEditor(prev => ({ ...prev, template_id: tmpl.id, template_name: tmpl.name }));
+  const handleItemSelect = (itemId: string) => {
+    const item = currentItems.find(t => t.id === itemId);
+    if (item) {
+      setEditor(prev => ({ ...prev, template_id: item.id, template_name: item.name }));
     }
   };
 
@@ -137,10 +151,10 @@ const LoadConfigPanel = () => {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Settings2 className="h-5 w-5" />
-              Template Load Configuration
+              Load Configuration
             </CardTitle>
             <CardDescription>
-              Define how data should be loaded for each template — strategy, keys, validation, and versioning
+              Define how data should be loaded for each template or dataset — strategy, keys, validation, and versioning
             </CardDescription>
           </div>
           <Button onClick={handleNew} size="sm" className="gap-2">
@@ -150,75 +164,96 @@ const LoadConfigPanel = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <p className="text-muted-foreground text-center py-8">Loading configurations...</p>
-        ) : configs.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <Settings2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium">No load configurations yet</p>
-            <p className="text-sm">Add a configuration to control how data loads into each template</p>
-          </div>
-        ) : (
-          <ScrollArea className="h-[400px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Template</TableHead>
-                  <TableHead>Strategy</TableHead>
-                  <TableHead>Primary Keys</TableHead>
-                  <TableHead>Auto-Version</TableHead>
-                  <TableHead>User Override</TableHead>
-                  <TableHead className="w-[100px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {configs.map(config => (
-                  <TableRow key={config.id}>
-                    <TableCell className="font-medium">{config.template_name}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className={strategyBadgeColor[config.load_strategy]}>
-                        {STRATEGY_LABELS[config.load_strategy]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {config.primary_key_columns.length > 0 ? (
-                        <div className="flex flex-wrap gap-1">
-                          {config.primary_key_columns.map(col => (
-                            <Badge key={col} variant="outline" className="text-xs">
-                              <Key className="h-3 w-3 mr-1" />{col}
-                            </Badge>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={config.auto_version ? 'default' : 'secondary'} className="text-xs">
-                        {config.auto_version ? 'Yes' : 'No'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={config.allow_user_override ? 'default' : 'secondary'} className="text-xs">
-                        {config.allow_user_override ? 'Yes' : 'No'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(config)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(config)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        )}
+        <Tabs value={configTab} onValueChange={(v) => setConfigTab(v as 'templates' | 'datasets')} className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="templates" className="gap-2">
+              <FileSpreadsheet className="h-4 w-4" />
+              Templates
+            </TabsTrigger>
+            <TabsTrigger value="datasets" className="gap-2">
+              <Database className="h-4 w-4" />
+              Datasets
+            </TabsTrigger>
+          </TabsList>
+
+          {['templates', 'datasets'].map((tab) => {
+            const tabConfigs = tab === 'templates' ? templateConfigs : datasetConfigs;
+            const nameLabel = tab === 'templates' ? 'Template' : 'Dataset';
+            return (
+              <TabsContent key={tab} value={tab}>
+                {isLoading ? (
+                  <p className="text-muted-foreground text-center py-8">Loading configurations...</p>
+                ) : tabConfigs.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Settings2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium">No {nameLabel.toLowerCase()} configurations yet</p>
+                    <p className="text-sm">Add a configuration to control how data loads into each {nameLabel.toLowerCase()}</p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[400px]">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>{nameLabel}</TableHead>
+                          <TableHead>Strategy</TableHead>
+                          <TableHead>Primary Keys</TableHead>
+                          <TableHead>Auto-Version</TableHead>
+                          <TableHead>User Override</TableHead>
+                          <TableHead className="w-[100px]">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {tabConfigs.map(config => (
+                          <TableRow key={config.id}>
+                            <TableCell className="font-medium">{config.template_name}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary" className={strategyBadgeColor[config.load_strategy]}>
+                                {STRATEGY_LABELS[config.load_strategy]}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {config.primary_key_columns.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {config.primary_key_columns.map(col => (
+                                    <Badge key={col} variant="outline" className="text-xs">
+                                      <Key className="h-3 w-3 mr-1" />{col}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">—</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={config.auto_version ? 'default' : 'secondary'} className="text-xs">
+                                {config.auto_version ? 'Yes' : 'No'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={config.allow_user_override ? 'default' : 'secondary'} className="text-xs">
+                                {config.allow_user_override ? 'Yes' : 'No'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-1">
+                                <Button variant="ghost" size="icon" onClick={() => handleEdit(config)}>
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(config)}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </ScrollArea>
+                )}
+              </TabsContent>
+            );
+          })}
+        </Tabs>
 
         {/* Editor Dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -226,20 +261,23 @@ const LoadConfigPanel = () => {
             <DialogHeader>
               <DialogTitle>{editingId ? 'Edit' : 'New'} Load Configuration</DialogTitle>
               <DialogDescription>
-                Configure how data is loaded for a specific template
+                Configure how data is loaded for a specific {configTab === 'templates' ? 'template' : 'dataset'}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-5 py-2">
-              {/* Template Selection */}
+              {/* Item Selection */}
               <div className="space-y-2">
-                <Label className="flex items-center gap-2"><Tag className="h-4 w-4" />Template</Label>
-                <Select value={editor.template_id} onValueChange={handleTemplateSelect} disabled={!!editingId}>
+                <Label className="flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  {configTab === 'templates' ? 'Template' : 'Dataset'}
+                </Label>
+                <Select value={editor.template_id} onValueChange={handleItemSelect} disabled={!!editingId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a template" />
+                    <SelectValue placeholder={`Select a ${configTab === 'templates' ? 'template' : 'dataset'}`} />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableTemplates.map(t => (
+                    {availableItems.map(t => (
                       <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
                     ))}
                   </SelectContent>
