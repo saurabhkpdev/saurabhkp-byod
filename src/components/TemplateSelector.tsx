@@ -240,20 +240,6 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-1.5">Available formats:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {getAvailableFormats(template).map((format) => (
-                      <Badge 
-                        key={format.id} 
-                        variant="outline" 
-                        className="text-[10px] px-1.5 py-0 h-5 font-medium"
-                      >
-                        {format.label}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
                 
                 <SampleDownloadButton 
                   template={template}
