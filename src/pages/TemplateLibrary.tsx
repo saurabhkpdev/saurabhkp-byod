@@ -330,24 +330,6 @@ export default function TemplateLibrary() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground mb-1.5">
-                          Required columns:
-                        </p>
-                        <div className="flex flex-wrap gap-1">
-                          {template.requiredColumns.slice(0, 4).map((col) => (
-                            <Badge key={col} variant="secondary" className="text-xs">
-                              {col}
-                            </Badge>
-                          ))}
-                          {template.requiredColumns.length > 4 && (
-                            <Badge variant="secondary" className="text-xs">
-                              +{template.requiredColumns.length - 4}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      
                       <div className="flex gap-2 pt-2">
                         <Button
                           variant="ghost"
