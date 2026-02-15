@@ -2,18 +2,12 @@ import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
-import { useUsageStats } from '@/hooks/useUsageStats';
 import { useAuditLog } from '@/hooks/useAuditLog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Upload, BarChart3, Shield, Clock, Activity, Sparkles, Map, Database, Edit3, PieChart, ShieldCheck, ArrowRight, HelpCircle } from 'lucide-react';
+import { BarChart3, Shield, Sparkles, Map, Database, Edit3, PieChart, ShieldCheck, ArrowRight, HelpCircle } from 'lucide-react';
 const Index = () => {
-  const {
-    totalVisits,
-    totalUploads,
-    getLastVisitFormatted
-  } = useUsageStats();
   const {
     logEvent
   } = useAuditLog();
@@ -89,44 +83,6 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Stats Cards */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <Card className="glass border-primary/20">
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-4 rounded-xl bg-primary/10">
-                  <Activity className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-foreground">{totalVisits}</p>
-                  <p className="text-sm text-muted-foreground">Total Visits</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="glass border-success/20">
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-4 rounded-xl bg-success/10">
-                  <Upload className="w-8 h-8 text-success" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-foreground">{totalUploads}</p>
-                  <p className="text-sm text-muted-foreground">Files Uploaded</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="glass border-warning/20">
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-4 rounded-xl bg-warning/10">
-                  <Clock className="w-8 h-8 text-warning" />
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-foreground">{getLastVisitFormatted()}</p>
-                  <p className="text-sm text-muted-foreground">Last Visit</p>
-                </div>
-              </CardContent>
-            </Card>
-          </section>
 
           {/* Features Section */}
           <section className="mb-16">
