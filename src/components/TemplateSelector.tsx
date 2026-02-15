@@ -241,17 +241,6 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-1.5">Required columns:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {template.requiredColumns.map((col) => (
-                      <Badge key={col} variant="secondary" className="text-xs">
-                        {col}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1.5">Available formats:</p>
                   <div className="flex flex-wrap gap-1">
                     {getAvailableFormats(template).map((format) => (

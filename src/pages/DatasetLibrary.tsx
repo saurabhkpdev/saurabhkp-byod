@@ -149,18 +149,6 @@ export default function DatasetLibrary() {
                           <span>{dataset.data.length} records</span>
                           <span>{Object.keys(dataset.data[0] || {}).length} columns</span>
                         </div>
-                        <div className="flex flex-wrap gap-1 mt-3">
-                          {Object.keys(dataset.data[0] || {}).slice(0, 4).map((col) => (
-                            <Badge key={col} variant="secondary" className="text-xs">
-                              {col}
-                            </Badge>
-                          ))}
-                          {Object.keys(dataset.data[0] || {}).length > 4 && (
-                            <Badge variant="secondary" className="text-xs">
-                              +{Object.keys(dataset.data[0] || {}).length - 4}
-                            </Badge>
-                          )}
-                        </div>
                         <div className="mt-3 text-xs text-primary group-hover:underline text-right">
                           Open in Data Studio →
                         </div>
