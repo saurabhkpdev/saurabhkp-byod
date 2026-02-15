@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { useUsageStats } from '@/hooks/useUsageStats';
 import { useAuditLog } from '@/hooks/useAuditLog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Upload, BarChart3, Shield, Clock, Activity, Sparkles, Map, Database, Edit3, PieChart, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Upload, BarChart3, Shield, Clock, Activity, Sparkles, Map, Database, Edit3, PieChart, ShieldCheck, ArrowRight, HelpCircle } from 'lucide-react';
 const Index = () => {
   const {
     totalVisits,
@@ -16,9 +17,13 @@ const Index = () => {
   const {
     logEvent
   } = useAuditLog();
+  const { autoStartTour, startTour } = useOnboardingTour();
   useEffect(() => {
     logEvent('page_view', 'Visited Home page', 'Home');
   }, [logEvent]);
+  useEffect(() => {
+    return autoStartTour();
+  }, [autoStartTour]);
   const features = [{
     icon: Database,
     title: '10+ Sample Datasets',
@@ -64,7 +69,7 @@ const Index = () => {
               Your complete data studio for uploading, editing, visualizing, and validating data. 
               Work with sample datasets or bring your own data files.
             </p>
-            <div className="flex gap-4 justify-center flex-wrap">
+            <div className="flex gap-4 justify-center flex-wrap" data-tour="hero-cta">
               <Link to="/upload">
                 <Button size="lg" className="gap-2 text-lg px-8 py-6">
                   <Sparkles className="w-5 h-5" />
@@ -77,6 +82,10 @@ const Index = () => {
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
+              <Button size="lg" variant="ghost" className="gap-2 text-lg px-8 py-6" onClick={startTour}>
+                <HelpCircle className="w-5 h-5" />
+                Take a Tour
+              </Button>
             </div>
           </section>
 
