@@ -9,7 +9,8 @@ import {
   Save,
   X,
   Wand2,
-  MapPin
+  MapPin,
+  RotateCcw
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -58,9 +59,10 @@ interface ColumnDefinition {
 type SampleDataMode = 'auto' | 'upload';
 
 export default function TemplateLibrary() {
-  const { customTemplates, addTemplate, updateTemplate, deleteTemplate, isLoading } = useTemplateStore();
+  const { customTemplates, systemOverrides, addTemplate, updateTemplate, deleteTemplate, updateSystemTemplate, resetSystemTemplate, getSystemOverride, isLoading } = useTemplateStore();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<CustomTemplate | null>(null);
+  const [editingSystemTemplateId, setEditingSystemTemplateId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'system' | 'custom'>('all');
 
@@ -82,6 +84,13 @@ export default function TemplateLibrary() {
     setSampleDataMode('auto');
     setUploadedSampleData(null);
     setEditingTemplate(null);
+    setEditingSystemTemplateId(null);
+  };
+
+  const getEffectiveTemplate = (template: Template) => {
+    const override = getSystemOverride(template.id);
+    if (!override) return template;
+    return { ...template, ...override };
   };
 
   const openCreateDialog = () => {
@@ -89,19 +98,29 @@ export default function TemplateLibrary() {
     setShowCreateDialog(true);
   };
 
-  const openEditDialog = (template: CustomTemplate) => {
-    setFormName(template.name);
-    setFormDescription(template.description);
-    setFormCategory(template.category);
+  const openEditDialog = (template: CustomTemplate | (Template & { isCustom: false })) => {
+    const effective = !template.isCustom ? getEffectiveTemplate(template as Template) : template;
+    setFormName(effective.name);
+    setFormDescription(effective.description);
+    setFormCategory(effective.category);
     
+    const reqCols = effective.requiredColumns;
+    const optCols = 'optionalColumns' in effective && effective.optionalColumns ? effective.optionalColumns : (template as Template).optionalColumns || [];
     const allColumns: ColumnDefinition[] = [
-      ...template.requiredColumns.map(name => ({ name, type: 'string' as const, required: true })),
-      ...template.optionalColumns.map(name => ({ name, type: 'string' as const, required: false })),
+      ...reqCols.map(name => ({ name, type: 'string' as const, required: true })),
+      ...optCols.map(name => ({ name, type: 'string' as const, required: false })),
     ];
     setColumns(allColumns.length > 0 ? allColumns : [{ name: '', type: 'string', required: true }]);
-    setUploadedSampleData(template.sampleData);
-    setSampleDataMode('upload'); // Show existing data
-    setEditingTemplate(template);
+    setUploadedSampleData(effective.sampleData);
+    setSampleDataMode('upload');
+    
+    if (template.isCustom) {
+      setEditingTemplate(template as CustomTemplate);
+      setEditingSystemTemplateId(null);
+    } else {
+      setEditingTemplate(null);
+      setEditingSystemTemplateId(template.id);
+    }
     setShowCreateDialog(true);
   };
 
@@ -206,7 +225,10 @@ export default function TemplateLibrary() {
     };
 
     try {
-      if (editingTemplate) {
+      if (editingSystemTemplateId) {
+        updateSystemTemplate(editingSystemTemplateId, templateData);
+        toast.success('System template updated successfully');
+      } else if (editingTemplate) {
         updateTemplate(editingTemplate.id, templateData);
         toast.success('Template updated successfully');
       } else {
@@ -239,10 +261,15 @@ export default function TemplateLibrary() {
     toast.success('Sample CSV downloaded');
   };
 
-  // Combine system and custom templates for display
+  // Combine system and custom templates for display, applying overrides
   const allTemplates = [
-    ...systemTemplates.map(t => ({ ...t, isCustom: false as const })),
-    ...customTemplates,
+    ...systemTemplates.map(t => {
+      const override = getSystemOverride(t.id);
+      return override 
+        ? { ...t, ...override, isCustom: false as const, isOverridden: true }
+        : { ...t, isCustom: false as const, isOverridden: false };
+    }),
+    ...customTemplates.map(t => ({ ...t, isOverridden: false })),
   ];
 
   const displayedTemplates = allTemplates.filter(t => {
@@ -319,6 +346,8 @@ export default function TemplateLibrary() {
                         <div className="flex items-center gap-1">
                           {template.isCustom ? (
                             <Badge variant="secondary">Custom</Badge>
+                          ) : template.isOverridden ? (
+                            <Badge variant="secondary">Modified</Badge>
                           ) : (
                             <Badge variant="outline">System</Badge>
                           )}
@@ -340,24 +369,35 @@ export default function TemplateLibrary() {
                           <Download className="w-4 h-4 mr-1" />
                           Sample
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEditDialog(template as any)}
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
                         {template.isCustom && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => openEditDialog(template as CustomTemplate)}
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-destructive hover:text-destructive"
-                              onClick={() => setDeleteConfirmId(template.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => setDeleteConfirmId(template.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                        {!template.isCustom && template.isOverridden && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-muted-foreground hover:text-foreground"
+                            onClick={() => {
+                              resetSystemTemplate(template.id);
+                              toast.success('Template reset to default');
+                            }}
+                          >
+                            <RotateCcw className="w-4 h-4" />
+                          </Button>
                         )}
                       </div>
                     </CardContent>
@@ -374,7 +414,7 @@ export default function TemplateLibrary() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingTemplate ? 'Edit Template' : 'Create New Template'}
+              {editingSystemTemplateId ? 'Edit System Template' : editingTemplate ? 'Edit Template' : 'Create New Template'}
             </DialogTitle>
             <DialogDescription>
               Define the structure and sample data for your template

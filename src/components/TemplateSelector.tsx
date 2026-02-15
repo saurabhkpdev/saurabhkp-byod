@@ -120,13 +120,16 @@ export const systemTemplates: Template[] = [
 
 export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorProps) {
   const navigate = useNavigate();
-  const { customTemplates, isLoading } = useTemplateStore();
+  const { customTemplates, getSystemOverride, isLoading } = useTemplateStore();
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [filter, setFilter] = useState<'all' | 'general' | 'geographical'>('all');
 
-  // Combine system templates with custom templates
+  // Combine system templates (with overrides) with custom templates
   const allTemplates: Template[] = [
-    ...systemTemplates,
+    ...systemTemplates.map(t => {
+      const override = getSystemOverride(t.id);
+      return override ? { ...t, ...override } : t;
+    }),
     ...customTemplates.map((ct: CustomTemplate) => ({
       ...ct,
       icon: ct.category === 'geographical' ? MapPin : FileSpreadsheet,
