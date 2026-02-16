@@ -359,6 +359,11 @@ export default function TemplateLibrary() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {template.requiredColumns.length + (template.optionalColumns?.length || 0)} columns
+                        </Badge>
+                      </div>
                       <div className="flex gap-2 pt-2">
                         <Button
                           variant="ghost"
