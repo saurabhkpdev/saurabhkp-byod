@@ -50,16 +50,16 @@ const Index = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto px-6 py-12">
+        <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
           {/* Hero Section */}
-          <section className="text-center mb-16 animate-fade-in">
+          <section className="text-center mb-10 sm:mb-16 animate-fade-in">
             <Badge variant="outline" className="mb-4 px-4 py-1 text-sm">
               Bring Your Own Data
             </Badge>
-            <h1 className="text-5xl font-bold mb-6">
+            <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">
               Welcome to <span className="gradient-text">BYOD</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8">
               Your complete data studio for uploading, editing, visualizing, and validating data. 
               Work with sample datasets or bring your own data files.
             </p>
@@ -92,7 +92,7 @@ const Index = () => {
             <p className="text-center text-muted-foreground mb-10 max-w-xl mx-auto">
               A complete toolkit for data exploration, editing, and quality assurance
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {features.map(feature => {
               const Icon = feature.icon;
               return <Card key={feature.title} className="hover:shadow-lg transition-shadow hover:border-primary/30">
@@ -117,7 +117,7 @@ const Index = () => {
             <h2 className="text-3xl font-bold text-center mb-10">
               How It Works
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
               {[{
               step: 1,
               title: 'Select Data',
