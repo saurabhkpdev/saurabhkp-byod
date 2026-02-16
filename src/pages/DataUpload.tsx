@@ -191,13 +191,7 @@ const DataUpload = () => {
                   </p>
                 )}
               </div>
-              <div className="w-full max-w-xl mx-auto mb-6">
-                <LoadStrategyPicker
-                  config={getConfigForTemplate(selectedTemplate.id)}
-                  selectedStrategy={loadStrategy}
-                  onStrategyChange={setLoadStrategy}
-                />
-              </div>
+              
               <FileUpload 
                 onDataLoaded={(d, f) => handleDataLoaded(d, f, selectedTemplate.category === 'geographical')} 
                 template={selectedTemplate}
