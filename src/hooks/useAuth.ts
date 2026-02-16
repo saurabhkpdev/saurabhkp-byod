@@ -43,6 +43,7 @@ export const useAuth = create<AuthState>()((set, get) => ({
   logout: async () => {
     await supabase.auth.signOut();
     sessionStorage.removeItem('byod_wizard_consent');
+    localStorage.removeItem('datalens-audit-log');
     set({ currentUser: null, session: null });
   },
 

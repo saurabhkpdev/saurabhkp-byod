@@ -70,13 +70,23 @@ export const useAuditLog = () => {
     page?: string,
     metadata?: Record<string, unknown>
   ) => {
+    // Sanitize metadata to avoid storing sensitive values
+    const sanitizedMetadata = metadata ? Object.fromEntries(
+      Object.entries(metadata).map(([key, value]) => {
+        if (typeof value === 'string' && value.length > 200) {
+          return [key, '[TRUNCATED]'];
+        }
+        return [key, value];
+      })
+    ) : undefined;
+
     const newEvent: AuditEvent = {
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
       action,
       details,
       page,
-      metadata
+      metadata: sanitizedMetadata
     };
 
     setEvents((prev) => {
