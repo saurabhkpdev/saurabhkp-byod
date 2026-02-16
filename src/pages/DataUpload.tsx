@@ -168,6 +168,11 @@ const DataUpload = () => {
               <DatabaseSelector 
                 onSelectDataset={handleDatabaseSelect}
                 onSelectTemplate={handleTemplateSelect}
+                onBack={() => {
+                  setWizardComplete(false);
+                  setWizardData(null);
+                  sessionStorage.removeItem(CONSENT_SESSION_KEY);
+                }}
               />
             </div>
           ) : sourceMode === 'upload-file' && selectedTemplate && !data ? (

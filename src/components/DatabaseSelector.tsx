@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Search, Cloud } from 'lucide-react';
+import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Search, Cloud, ChevronLeft } from 'lucide-react';
 import { MockDataset, mockDatasets } from '@/hooks/useMockDatabase';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { Template, systemTemplates } from '@/components/TemplateSelector';
@@ -16,9 +16,10 @@ type SourceMode = 'upload' | 'existing' | 'google-drive';
 interface DatabaseSelectorProps {
   onSelectDataset: (data: Record<string, unknown>[], fileName: string, hasGeoData: boolean) => void;
   onSelectTemplate: (template: Template) => void;
+  onBack?: () => void;
 }
 
-export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: DatabaseSelectorProps) => {
+export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: DatabaseSelectorProps) => {
   const navigate = useNavigate();
   const [sourceMode, setSourceMode] = useState<SourceMode>('upload');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'geographical'>('all');
@@ -78,6 +79,12 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate }: Database
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-8">
+      {onBack && (
+        <Button variant="ghost" onClick={onBack} className="gap-2 text-muted-foreground hover:text-foreground">
+          <ChevronLeft className="w-4 h-4" />
+          Back to Questionnaire
+        </Button>
+      )}
       <div className="text-center">
         <h2 className="text-3xl font-bold mb-3">
           <span className="gradient-text">Choose Your Data Source</span>
