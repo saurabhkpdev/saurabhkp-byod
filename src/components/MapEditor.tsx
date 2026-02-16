@@ -60,11 +60,10 @@ export const MapEditor = ({ columns, rows, onUpdateCoordinates }: MapEditorProps
       if (typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng)) {
         const el = document.createElement('div');
         el.className = 'custom-marker';
-        el.innerHTML = `
-          <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xs font-bold shadow-lg border-2 border-white cursor-pointer hover:scale-110 transition-transform">
-            ${index + 1}
-          </div>
-        `;
+        const markerDiv = document.createElement('div');
+        markerDiv.className = 'w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xs font-bold shadow-lg border-2 border-white cursor-pointer hover:scale-110 transition-transform';
+        markerDiv.textContent = String(index + 1);
+        el.appendChild(markerDiv);
 
         const marker = new mapboxgl.Marker({
           element: el,
