@@ -329,7 +329,7 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                     {template.category === 'unstructured' && (
                       <Badge variant="outline" className="text-xs gap-1">
                         <Sparkles className="w-3 h-3" />
-                        AI Extraction
+                        Unstructured
                       </Badge>
                     )}
                     {template.isCustom && (
@@ -348,11 +348,20 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {template.isUnstructured ? (
-                  <p className="text-xs text-muted-foreground italic">
-                    Accepts: PDF, DOCX, images, text — no sample needed
-                  </p>
-                ) : (
+                <div className="flex flex-wrap gap-1">
+                  <span className="text-[10px] uppercase tracking-wide text-muted-foreground mr-1 self-center">
+                    Formats:
+                  </span>
+                  {(template.supportedFormats ?? (template.isUnstructured 
+                    ? ['PDF', 'DOCX', 'Image', 'TXT'] 
+                    : getAvailableFormats().map(f => f.toUpperCase()))
+                  ).map((fmt) => (
+                    <Badge key={fmt} variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
+                      {fmt}
+                    </Badge>
+                  ))}
+                </div>
+                {!template.isUnstructured && (
                   <SampleDownloadButton 
                     template={template}
                     variant="ghost"
