@@ -135,7 +135,7 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
   const navigate = useNavigate();
   const { customTemplates, getSystemOverride, isLoading } = useTemplateStore();
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
-  const [filter, setFilter] = useState<'all' | 'general' | 'geographical'>('all');
+  const [filter, setFilter] = useState<'all' | 'general' | 'geographical' | 'unstructured'>('all');
 
   // Combine system templates (with overrides) with custom templates
   const allTemplates: Template[] = [
@@ -208,6 +208,14 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
           Geographical
         </Button>
         <Button
+          variant={filter === 'unstructured' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setFilter('unstructured')}
+        >
+          <Sparkles className="w-4 h-4 mr-2" />
+          Unstructured (AI)
+        </Button>
+        <Button
           variant="outline"
           size="sm"
           onClick={() => navigate('/templates')}
@@ -256,13 +264,14 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                
-                <SampleDownloadButton 
-                  template={template}
-                  variant="ghost"
-                  size="sm"
-                  className="w-full text-muted-foreground hover:text-foreground"
-                />
+                {!template.isUnstructured && (
+                  <SampleDownloadButton 
+                    template={template}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-muted-foreground hover:text-foreground"
+                  />
+                )}
               </CardContent>
             </Card>
           );
