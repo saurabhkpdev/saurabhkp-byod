@@ -36,6 +36,7 @@ export interface Template {
   category: 'general' | 'geographical' | 'unstructured';
   isCustom?: boolean;
   isUnstructured?: boolean;
+  supportedFormats?: string[];
 }
 
 interface TemplateSelectorProps {
