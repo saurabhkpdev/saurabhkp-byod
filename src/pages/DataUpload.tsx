@@ -193,11 +193,18 @@ const DataUpload = () => {
                 )}
               </div>
               
-              <FileUpload 
-                onDataLoaded={(d, f) => handleDataLoaded(d, f, selectedTemplate.category === 'geographical')} 
-                template={selectedTemplate}
-                onBack={handleBackToSourceSelect}
-              />
+              {selectedTemplate.isUnstructured ? (
+                <UnstructuredUpload
+                  onDataLoaded={(d, f) => handleDataLoaded(d, f, false)}
+                  onBack={handleBackToSourceSelect}
+                />
+              ) : (
+                <FileUpload 
+                  onDataLoaded={(d, f) => handleDataLoaded(d, f, selectedTemplate.category === 'geographical')} 
+                  template={selectedTemplate}
+                  onBack={handleBackToSourceSelect}
+                />
+              )}
             </div>
           ) : data ? (
             /* Step 4: Data loaded - show tabs */
