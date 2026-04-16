@@ -13,7 +13,13 @@ import {
   Check,
   ArrowRight,
   Plus,
-  Sparkles
+  Sparkles,
+  FileText,
+  Receipt,
+  ScrollText,
+  UserSquare,
+  FileSignature,
+  HeartPulse
 } from 'lucide-react';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { SampleDownloadButton } from './SampleDownloadButton';
@@ -30,6 +36,7 @@ export interface Template {
   category: 'general' | 'geographical' | 'unstructured';
   isCustom?: boolean;
   isUnstructured?: boolean;
+  supportedFormats?: string[];
 }
 
 interface TemplateSelectorProps {
@@ -119,12 +126,73 @@ export const systemTemplates: Template[] = [
     ],
   },
   {
-    id: 'document-intelligence',
-    name: 'Document Intelligence',
-    description: 'Extract structured data from PDFs, Word docs, images, and text files using AI',
-    icon: Sparkles,
+    id: 'lease-extraction',
+    name: 'Lease Agreement Extraction',
+    description: 'Extract lease terms, parties, dates, and rent details from lease contracts',
+    icon: FileSignature,
     category: 'unstructured',
     isUnstructured: true,
+    supportedFormats: ['PDF', 'DOCX', 'Image'],
+    requiredColumns: [],
+    optionalColumns: [],
+    sampleData: [],
+  },
+  {
+    id: 'invoice-extraction',
+    name: 'Invoice Extraction',
+    description: 'Pull invoice number, vendor, line items, totals, and due dates from invoices',
+    icon: Receipt,
+    category: 'unstructured',
+    isUnstructured: true,
+    supportedFormats: ['PDF', 'Image', 'DOCX'],
+    requiredColumns: [],
+    optionalColumns: [],
+    sampleData: [],
+  },
+  {
+    id: 'contract-extraction',
+    name: 'Contract Analysis',
+    description: 'Extract parties, effective dates, obligations, and termination clauses',
+    icon: ScrollText,
+    category: 'unstructured',
+    isUnstructured: true,
+    supportedFormats: ['PDF', 'DOCX', 'TXT'],
+    requiredColumns: [],
+    optionalColumns: [],
+    sampleData: [],
+  },
+  {
+    id: 'resume-parser',
+    name: 'Resume Parser',
+    description: 'Parse candidate names, contact info, skills, education, and work history',
+    icon: UserSquare,
+    category: 'unstructured',
+    isUnstructured: true,
+    supportedFormats: ['PDF', 'DOCX', 'TXT'],
+    requiredColumns: [],
+    optionalColumns: [],
+    sampleData: [],
+  },
+  {
+    id: 'medical-records',
+    name: 'Medical Records Extraction',
+    description: 'Structure patient info, diagnoses, prescriptions, and visit notes from records',
+    icon: HeartPulse,
+    category: 'unstructured',
+    isUnstructured: true,
+    supportedFormats: ['PDF', 'Image', 'DOCX'],
+    requiredColumns: [],
+    optionalColumns: [],
+    sampleData: [],
+  },
+  {
+    id: 'document-intelligence',
+    name: 'General Document Extraction',
+    description: 'Extract structured data from any document — flexible AI parsing for custom needs',
+    icon: FileText,
+    category: 'unstructured',
+    isUnstructured: true,
+    supportedFormats: ['PDF', 'DOCX', 'Image', 'TXT', 'MD'],
     requiredColumns: [],
     optionalColumns: [],
     sampleData: [],
@@ -261,7 +329,7 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                     {template.category === 'unstructured' && (
                       <Badge variant="outline" className="text-xs gap-1">
                         <Sparkles className="w-3 h-3" />
-                        AI Extraction
+                        Unstructured
                       </Badge>
                     )}
                     {template.isCustom && (
@@ -280,11 +348,20 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {template.isUnstructured ? (
-                  <p className="text-xs text-muted-foreground italic">
-                    Accepts: PDF, DOCX, images, text — no sample needed
-                  </p>
-                ) : (
+                <div className="flex flex-wrap gap-1">
+                  <span className="text-[10px] uppercase tracking-wide text-muted-foreground mr-1 self-center">
+                    Formats:
+                  </span>
+                  {(template.supportedFormats ?? (template.isUnstructured 
+                    ? ['PDF', 'DOCX', 'Image', 'TXT'] 
+                    : getAvailableFormats(template).map(f => f.label))
+                  ).map((fmt) => (
+                    <Badge key={fmt} variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
+                      {fmt}
+                    </Badge>
+                  ))}
+                </div>
+                {!template.isUnstructured && (
                   <SampleDownloadButton 
                     template={template}
                     variant="ghost"
