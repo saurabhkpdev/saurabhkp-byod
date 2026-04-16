@@ -12,7 +12,8 @@ import {
   Building2,
   Check,
   ArrowRight,
-  Plus
+  Plus,
+  Sparkles
 } from 'lucide-react';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { SampleDownloadButton } from './SampleDownloadButton';
@@ -26,8 +27,9 @@ export interface Template {
   requiredColumns: string[];
   optionalColumns?: string[];
   sampleData: Record<string, unknown>[];
-  category: 'general' | 'geographical';
+  category: 'general' | 'geographical' | 'unstructured';
   isCustom?: boolean;
+  isUnstructured?: boolean;
 }
 
 interface TemplateSelectorProps {
