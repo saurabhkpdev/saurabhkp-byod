@@ -6,6 +6,7 @@ import { useAuditLog } from '@/hooks/useAuditLog';
 import { useDataVersions } from '@/hooks/useDataVersions';
 import { useLoadConfig, LoadStrategy } from '@/hooks/useLoadConfig';
 import { FileUpload } from '@/components/FileUpload';
+import { UnstructuredUpload } from '@/components/UnstructuredUpload';
 import { DataTable } from '@/components/DataTable';
 import { StatsPanel } from '@/components/StatsPanel';
 import { DataVisualization } from '@/components/DataVisualization';
@@ -192,11 +193,18 @@ const DataUpload = () => {
                 )}
               </div>
               
-              <FileUpload 
-                onDataLoaded={(d, f) => handleDataLoaded(d, f, selectedTemplate.category === 'geographical')} 
-                template={selectedTemplate}
-                onBack={handleBackToSourceSelect}
-              />
+              {selectedTemplate.isUnstructured ? (
+                <UnstructuredUpload
+                  onDataLoaded={(d, f) => handleDataLoaded(d, f, false)}
+                  onBack={handleBackToSourceSelect}
+                />
+              ) : (
+                <FileUpload 
+                  onDataLoaded={(d, f) => handleDataLoaded(d, f, selectedTemplate.category === 'geographical')} 
+                  template={selectedTemplate}
+                  onBack={handleBackToSourceSelect}
+                />
+              )}
             </div>
           ) : data ? (
             /* Step 4: Data loaded - show tabs */
