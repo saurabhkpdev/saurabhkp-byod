@@ -354,7 +354,7 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                   </span>
                   {(template.supportedFormats ?? (template.isUnstructured 
                     ? ['PDF', 'DOCX', 'Image', 'TXT'] 
-                    : getAvailableFormats().map(f => f.toUpperCase()))
+                    : getAvailableFormats(template).map(f => f.label))
                   ).map((fmt) => (
                     <Badge key={fmt} variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
                       {fmt}
