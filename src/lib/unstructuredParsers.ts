@@ -1,14 +1,11 @@
 // Client-side helpers to convert unstructured files into either text or image data URLs
 // before sending to the AI extraction edge function.
-import * as pdfjsLib from 'pdfjs-dist';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
 import mammoth from 'mammoth';
 
-// Wire up pdf.js worker (use the bundled module worker)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfWorker;
 
 export const UNSTRUCTURED_EXTENSIONS = [
   '.pdf', '.docx', '.txt', '.md', '.png', '.jpg', '.jpeg', '.webp',
