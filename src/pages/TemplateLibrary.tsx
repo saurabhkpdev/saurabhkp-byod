@@ -345,13 +345,19 @@ export default function TemplateLibrary() {
                             <FileSpreadsheet className="w-5 h-5 text-primary" />
                           )}
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-wrap justify-end">
+                          {template.category === 'geographical' && (
+                            <Badge variant="outline" className="text-xs">Geo</Badge>
+                          )}
+                          {template.category === 'unstructured' && (
+                            <Badge variant="outline" className="text-xs">Unstructured</Badge>
+                          )}
                           {template.isCustom ? (
-                            <Badge variant="secondary">Custom</Badge>
+                            <Badge variant="secondary" className="text-xs">Custom</Badge>
                           ) : template.isOverridden ? (
-                            <Badge variant="secondary">Modified</Badge>
+                            <Badge variant="secondary" className="text-xs">Modified</Badge>
                           ) : (
-                            <Badge variant="outline">System</Badge>
+                            <Badge variant="outline" className="text-xs">System</Badge>
                           )}
                         </div>
                       </div>
@@ -361,10 +367,16 @@ export default function TemplateLibrary() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {template.requiredColumns.length + (template.optionalColumns?.length || 0)} columns
-                        </Badge>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {template.category === 'unstructured' ? (
+                          ['PDF', 'DOCX', 'Image', 'TXT'].map((fmt) => (
+                            <Badge key={fmt} variant="secondary" className="text-[10px] px-1.5 py-0">{fmt}</Badge>
+                          ))
+                        ) : (
+                          <Badge variant="secondary" className="text-xs">
+                            {template.requiredColumns.length + (template.optionalColumns?.length || 0)} columns
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex gap-2 pt-2">
                         <Button
