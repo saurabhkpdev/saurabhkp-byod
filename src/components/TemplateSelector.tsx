@@ -358,7 +358,19 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                     </Badge>
                   ))}
                 </div>
-                {!template.isUnstructured && (
+                {template.isUnstructured ? (
+                  UNSTRUCTURED_SAMPLES[template.id] && (
+                    <a
+                      href={UNSTRUCTURED_SAMPLES[template.id].file}
+                      download={UNSTRUCTURED_SAMPLES[template.id].label}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-center gap-2 w-full text-xs text-muted-foreground hover:text-foreground py-1.5 rounded-md hover:bg-muted transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Download sample document
+                    </a>
+                  )
+                ) : (
                   <SampleDownloadButton 
                     template={template}
                     variant="ghost"
