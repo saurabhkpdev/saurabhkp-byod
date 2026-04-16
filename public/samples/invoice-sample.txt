@@ -1,0 +1,38 @@
+INVOICE
+
+Invoice Number: INV-2024-00892
+Issue Date: 2024-02-14
+Due Date: 2024-03-15
+
+FROM:
+TechSupply Co.
+789 Industrial Blvd
+Austin, TX 78701
+support@techsupply.example
+Tax ID: 84-1234567
+
+BILL TO:
+Globex Corporation
+500 Corporate Way
+Chicago, IL 60601
+accounts@globex.example
+
+LINE ITEMS:
+-------------------------------------------------------------
+Description                  Qty    Unit Price    Amount
+-------------------------------------------------------------
+Wireless Keyboard K500       10     $89.99       $899.90
+USB-C Docking Station        5      $179.00      $895.00
+27" 4K Monitor               3      $449.99      $1,349.97
+Premium Support (1 yr)       1      $299.00      $299.00
+-------------------------------------------------------------
+
+Subtotal:           $3,443.87
+Tax (8.25%):        $284.12
+Shipping:           $45.00
+TOTAL DUE:          $3,772.99
+
+Payment Terms: Net 30
+Payment Methods: ACH, Wire, Check
+
+Remit to: TechSupply Co., Account #987654321, Routing #021000021
