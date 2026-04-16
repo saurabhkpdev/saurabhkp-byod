@@ -213,7 +213,7 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
           onClick={() => setFilter('unstructured')}
         >
           <Sparkles className="w-4 h-4 mr-2" />
-          Unstructured (AI)
+          Document Intelligence
         </Button>
         <Button
           variant="outline"
