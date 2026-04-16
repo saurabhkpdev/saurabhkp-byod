@@ -13,7 +13,13 @@ import {
   Check,
   ArrowRight,
   Plus,
-  Sparkles
+  Sparkles,
+  FileText,
+  Receipt,
+  ScrollText,
+  UserSquare,
+  FileSignature,
+  HeartPulse
 } from 'lucide-react';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { SampleDownloadButton } from './SampleDownloadButton';
