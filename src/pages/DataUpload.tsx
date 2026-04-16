@@ -6,6 +6,7 @@ import { useAuditLog } from '@/hooks/useAuditLog';
 import { useDataVersions } from '@/hooks/useDataVersions';
 import { useLoadConfig, LoadStrategy } from '@/hooks/useLoadConfig';
 import { FileUpload } from '@/components/FileUpload';
+import { UnstructuredUpload } from '@/components/UnstructuredUpload';
 import { DataTable } from '@/components/DataTable';
 import { StatsPanel } from '@/components/StatsPanel';
 import { DataVisualization } from '@/components/DataVisualization';
