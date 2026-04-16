@@ -187,6 +187,15 @@ export const systemTemplates: Template[] = [
   },
 ];
 
+// Map unstructured template IDs to downloadable sample files in /public/samples/
+const UNSTRUCTURED_SAMPLES: Record<string, { file: string; label: string }> = {
+  'lease-extraction': { file: '/samples/lease-agreement-sample.txt', label: 'lease-agreement-sample.txt' },
+  'invoice-extraction': { file: '/samples/invoice-sample.txt', label: 'invoice-sample.txt' },
+  'contract-extraction': { file: '/samples/contract-sample.txt', label: 'contract-sample.txt' },
+  'resume-parser': { file: '/samples/resume-sample.txt', label: 'resume-sample.txt' },
+  'medical-records': { file: '/samples/medical-record-sample.txt', label: 'medical-record-sample.txt' },
+};
+
 export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorProps) {
   const navigate = useNavigate();
   const { customTemplates, getSystemOverride, isLoading } = useTemplateStore();
