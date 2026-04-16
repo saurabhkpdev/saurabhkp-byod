@@ -1,7 +1,7 @@
 // Client-side helpers to convert unstructured files into either text or image data URLs
 // before sending to the AI extraction edge function.
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
-import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.min.js?url';
 import mammoth from 'mammoth';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
