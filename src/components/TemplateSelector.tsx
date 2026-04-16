@@ -18,7 +18,8 @@ import {
   ScrollText,
   UserSquare,
   FileSignature,
-  HeartPulse
+  HeartPulse,
+  Download
 } from 'lucide-react';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { SampleDownloadButton } from './SampleDownloadButton';
