@@ -14,7 +14,6 @@ import {
   ArrowRight,
   Plus,
   Sparkles,
-  FileText,
   Receipt,
   ScrollText,
   UserSquare,
