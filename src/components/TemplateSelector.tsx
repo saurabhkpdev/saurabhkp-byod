@@ -185,18 +185,6 @@ export const systemTemplates: Template[] = [
     optionalColumns: [],
     sampleData: [],
   },
-  {
-    id: 'document-intelligence',
-    name: 'General Document Extraction',
-    description: 'Extract structured data from any document — flexible AI parsing for custom needs',
-    icon: FileText,
-    category: 'unstructured',
-    isUnstructured: true,
-    supportedFormats: ['PDF', 'DOCX', 'Image', 'TXT', 'MD'],
-    requiredColumns: [],
-    optionalColumns: [],
-    sampleData: [],
-  },
 ];
 
 export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorProps) {
