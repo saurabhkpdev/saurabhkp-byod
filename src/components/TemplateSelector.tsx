@@ -118,6 +118,17 @@ export const systemTemplates: Template[] = [
       { facility_id: 'FAC-005', facility_name: 'Data Center', lat: 59.3293, lng: 18.0686, type: 'IT', capacity: 50, status: 'Operational', manager: 'Erik Lindqvist' },
     ],
   },
+  {
+    id: 'unstructured-ai',
+    name: 'Unstructured Data (AI)',
+    description: 'Upload PDFs, Word docs, images, or text — AI extracts structured rows automatically',
+    icon: Sparkles,
+    category: 'unstructured',
+    isUnstructured: true,
+    requiredColumns: [],
+    optionalColumns: [],
+    sampleData: [],
+  },
 ];
 
 export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorProps) {
