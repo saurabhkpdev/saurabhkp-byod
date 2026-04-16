@@ -1,0 +1,45 @@
+PATIENT MEDICAL RECORD
+(Sample / Synthetic Data — Not Real PHI)
+
+PATIENT INFORMATION
+Patient ID: MRN-00478291
+Name: Robert Martinez
+Date of Birth: 1978-09-22
+Sex: Male
+Address: 88 Pinewood Road, Denver, CO 80203
+Phone: (303) 555-0167
+Insurance: BlueCross PPO, Policy #BC-998877
+
+VISIT DETAILS
+Visit Date: 2024-03-08
+Provider: Dr. Emily Park, MD
+Department: Internal Medicine
+Visit Type: Follow-up
+
+VITALS
+- Blood Pressure: 138/86 mmHg
+- Heart Rate: 78 bpm
+- Temperature: 98.4 F
+- Weight: 192 lbs
+- Height: 5'10"
+- BMI: 27.5
+
+CHIEF COMPLAINT
+Patient reports persistent fatigue and intermittent headaches for the past 3 weeks.
+
+DIAGNOSES
+1. Essential hypertension (I10) — ongoing
+2. Vitamin D deficiency (E55.9) — newly identified
+3. Tension-type headache (G44.209)
+
+PRESCRIPTIONS
+- Lisinopril 10mg, once daily
+- Vitamin D3 2000 IU, once daily
+- Acetaminophen 500mg as needed for headache
+
+NOTES
+Recommend follow-up in 6 weeks. Patient counseled on dietary sodium reduction
+and regular aerobic exercise. Lab work ordered: CBC, CMP, lipid panel, TSH.
+
+NEXT APPOINTMENT
+2024-04-19 at 10:30 AM

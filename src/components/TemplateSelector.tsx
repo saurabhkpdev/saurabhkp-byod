@@ -18,7 +18,8 @@ import {
   ScrollText,
   UserSquare,
   FileSignature,
-  HeartPulse
+  HeartPulse,
+  Download
 } from 'lucide-react';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { SampleDownloadButton } from './SampleDownloadButton';
@@ -186,6 +187,15 @@ export const systemTemplates: Template[] = [
   },
 ];
 
+// Map unstructured template IDs to downloadable sample files in /public/samples/
+const UNSTRUCTURED_SAMPLES: Record<string, { file: string; label: string }> = {
+  'lease-extraction': { file: '/samples/lease-agreement-sample.txt', label: 'lease-agreement-sample.txt' },
+  'invoice-extraction': { file: '/samples/invoice-sample.txt', label: 'invoice-sample.txt' },
+  'contract-extraction': { file: '/samples/contract-sample.txt', label: 'contract-sample.txt' },
+  'resume-parser': { file: '/samples/resume-sample.txt', label: 'resume-sample.txt' },
+  'medical-records': { file: '/samples/medical-record-sample.txt', label: 'medical-record-sample.txt' },
+};
+
 export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorProps) {
   const navigate = useNavigate();
   const { customTemplates, getSystemOverride, isLoading } = useTemplateStore();
@@ -348,7 +358,19 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                     </Badge>
                   ))}
                 </div>
-                {!template.isUnstructured && (
+                {template.isUnstructured ? (
+                  UNSTRUCTURED_SAMPLES[template.id] && (
+                    <a
+                      href={UNSTRUCTURED_SAMPLES[template.id].file}
+                      download={UNSTRUCTURED_SAMPLES[template.id].label}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-center gap-2 w-full text-xs text-muted-foreground hover:text-foreground py-1.5 rounded-md hover:bg-muted transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Download sample document
+                    </a>
+                  )
+                ) : (
                   <SampleDownloadButton 
                     template={template}
                     variant="ghost"

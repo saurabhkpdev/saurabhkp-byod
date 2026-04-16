@@ -1,0 +1,39 @@
+JANE DOE
+Senior Software Engineer
+
+Email: jane.doe@example.com
+Phone: (650) 555-0188
+Location: San Jose, CA
+LinkedIn: linkedin.com/in/janedoe-example
+
+SUMMARY
+Full-stack engineer with 8+ years building scalable web applications.
+Expertise in React, Node.js, Python, and distributed systems on AWS.
+
+EXPERIENCE
+
+Senior Software Engineer | Stripe | June 2021 - Present
+- Led migration of payments service handling $2B/year to event-driven architecture
+- Mentored 4 junior engineers; reduced deployment time by 60%
+- Tech: TypeScript, Go, Kafka, PostgreSQL
+
+Software Engineer | Airbnb | August 2018 - May 2021
+- Built host onboarding flow used by 500K+ hosts
+- Improved page load times by 40% through code-splitting and CDN optimization
+
+Junior Developer | Shopify | July 2016 - July 2018
+- Developed merchant analytics dashboard in React + Ruby on Rails
+
+EDUCATION
+B.S. Computer Science, University of California, Berkeley
+Graduated: May 2016, GPA 3.8/4.0
+
+SKILLS
+Languages: TypeScript, Python, Go, Ruby, SQL
+Frameworks: React, Next.js, Node.js, Django, Rails
+Cloud: AWS (EC2, S3, Lambda, RDS), GCP, Docker, Kubernetes
+Tools: Git, Terraform, Datadog, PostgreSQL, Redis
+
+CERTIFICATIONS
+AWS Certified Solutions Architect (2022)
+Certified Kubernetes Administrator (2023)

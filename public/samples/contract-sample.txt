@@ -1,0 +1,41 @@
+SERVICES AGREEMENT
+
+This Services Agreement ("Agreement") is entered into as of January 10, 2024 ("Effective Date") by and between:
+
+PARTY A (Client):
+Initech Solutions, Inc.
+1100 Innovation Drive, Suite 400
+Boston, MA 02110
+
+PARTY B (Service Provider):
+BlueWave Consulting LLC
+250 Harbor Street
+Seattle, WA 98101
+
+1. SCOPE OF SERVICES
+Provider will deliver software development consulting services including architecture review, code audits, and performance optimization for Client's e-commerce platform.
+
+2. TERM
+This Agreement begins on February 1, 2024 and continues for 18 months, ending July 31, 2025, unless terminated earlier per Section 6.
+
+3. COMPENSATION
+- Hourly Rate: $185/hour
+- Estimated Monthly Hours: 80
+- Invoicing: Bi-weekly
+- Payment Terms: Net 15 days
+
+4. CONFIDENTIALITY
+Both parties agree to maintain confidentiality of proprietary information for a period of 5 years following termination.
+
+5. INTELLECTUAL PROPERTY
+All work product created under this Agreement is the sole property of Client.
+
+6. TERMINATION
+Either party may terminate this Agreement with 30 days written notice. Material breach allows immediate termination.
+
+7. GOVERNING LAW
+This Agreement is governed by the laws of the Commonwealth of Massachusetts.
+
+SIGNATURES:
+Client:   _________________________   Date: __________
+Provider: _________________________   Date: __________

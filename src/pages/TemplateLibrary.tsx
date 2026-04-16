@@ -251,7 +251,29 @@ export default function TemplateLibrary() {
     setDeleteConfirmId(null);
   };
 
+  const UNSTRUCTURED_SAMPLES: Record<string, string> = {
+    'lease-extraction': '/samples/lease-agreement-sample.txt',
+    'invoice-extraction': '/samples/invoice-sample.txt',
+    'contract-extraction': '/samples/contract-sample.txt',
+    'resume-parser': '/samples/resume-sample.txt',
+    'medical-records': '/samples/medical-record-sample.txt',
+  };
+
   const handleDownloadSample = (template: Template | CustomTemplate) => {
+    // Unstructured templates: download the prebuilt sample document
+    if ((template as Template).category === 'unstructured') {
+      const samplePath = UNSTRUCTURED_SAMPLES[template.id];
+      if (samplePath) {
+        const a = document.createElement('a');
+        a.href = samplePath;
+        a.download = samplePath.split('/').pop() || 'sample.txt';
+        a.click();
+        toast.success('Sample document downloaded');
+      } else {
+        toast.info('No sample available for this template');
+      }
+      return;
+    }
     const csv = generateSampleCSV(template as Template);
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
