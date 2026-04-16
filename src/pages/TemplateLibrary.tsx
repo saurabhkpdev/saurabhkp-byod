@@ -102,7 +102,9 @@ export default function TemplateLibrary() {
     const effective = !template.isCustom ? getEffectiveTemplate(template as Template) : template;
     setFormName(effective.name);
     setFormDescription(effective.description);
-    setFormCategory(effective.category);
+    if (effective.category !== 'unstructured') {
+      setFormCategory(effective.category);
+    }
     
     const reqCols = effective.requiredColumns;
     const optCols = 'optionalColumns' in effective && effective.optionalColumns ? effective.optionalColumns : (template as Template).optionalColumns || [];
