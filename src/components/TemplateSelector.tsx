@@ -119,9 +119,9 @@ export const systemTemplates: Template[] = [
     ],
   },
   {
-    id: 'unstructured-ai',
-    name: 'Unstructured Data (AI)',
-    description: 'Upload PDFs, Word docs, images, or text — AI extracts structured rows automatically',
+    id: 'document-intelligence',
+    name: 'Document Intelligence',
+    description: 'Extract structured data from PDFs, Word docs, images, and text files using AI',
     icon: Sparkles,
     category: 'unstructured',
     isUnstructured: true,
