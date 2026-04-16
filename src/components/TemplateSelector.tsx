@@ -119,9 +119,9 @@ export const systemTemplates: Template[] = [
     ],
   },
   {
-    id: 'unstructured-ai',
-    name: 'Unstructured Data (AI)',
-    description: 'Upload PDFs, Word docs, images, or text — AI extracts structured rows automatically',
+    id: 'document-intelligence',
+    name: 'Document Intelligence',
+    description: 'Extract structured data from PDFs, Word docs, images, and text files using AI',
     icon: Sparkles,
     category: 'unstructured',
     isUnstructured: true,
@@ -213,7 +213,7 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
           onClick={() => setFilter('unstructured')}
         >
           <Sparkles className="w-4 h-4 mr-2" />
-          Unstructured (AI)
+          Document Intelligence
         </Button>
         <Button
           variant="outline"
@@ -251,7 +251,19 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                       <FileSpreadsheet className={`w-5 h-5 ${isSelected ? '' : 'text-primary'}`} />
                     )}
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 flex-wrap justify-end">
+                    {template.category === 'geographical' && (
+                      <Badge variant="outline" className="text-xs gap-1">
+                        <MapPin className="w-3 h-3" />
+                        Geo
+                      </Badge>
+                    )}
+                    {template.category === 'unstructured' && (
+                      <Badge variant="outline" className="text-xs gap-1">
+                        <Sparkles className="w-3 h-3" />
+                        AI Extraction
+                      </Badge>
+                    )}
                     {template.isCustom && (
                       <Badge variant="secondary" className="text-xs">Custom</Badge>
                     )}
@@ -262,9 +274,17 @@ export function TemplateSelector({ onSelectTemplate, onBack }: TemplateSelectorP
                     )}
                   </div>
                 </div>
+                <div className="mt-3 space-y-1">
+                  <h3 className="font-semibold text-base leading-tight">{template.name}</h3>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{template.description}</p>
+                </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {!template.isUnstructured && (
+                {template.isUnstructured ? (
+                  <p className="text-xs text-muted-foreground italic">
+                    Accepts: PDF, DOCX, images, text — no sample needed
+                  </p>
+                ) : (
                   <SampleDownloadButton 
                     template={template}
                     variant="ghost"
