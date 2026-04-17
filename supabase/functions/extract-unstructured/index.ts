@@ -5,13 +5,26 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+interface ExtractionField {
+  name: string;
+  description: string;
+  type?: 'string' | 'number' | 'boolean' | 'date';
+}
+
 interface ExtractRequest {
-  // Either text content or an image (data URL)
   text?: string;
   imageDataUrl?: string;
   fileName?: string;
-  hint?: string; // optional user hint about what to extract
+  templateName?: string;
+  schema?: ExtractionField[];
 }
+
+const TYPE_TO_JSON: Record<string, string> = {
+  string: 'string',
+  number: 'number',
+  boolean: 'boolean',
+  date: 'string',
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -28,7 +41,7 @@ Deno.serve(async (req) => {
     }
 
     const body = (await req.json()) as ExtractRequest;
-    const { text, imageDataUrl, fileName, hint } = body;
+    const { text, imageDataUrl, fileName, templateName, schema } = body;
 
     if (!text && !imageDataUrl) {
       return new Response(
@@ -37,28 +50,77 @@ Deno.serve(async (req) => {
       );
     }
 
-    const systemPrompt = `You are a data extraction assistant. Your job is to look at unstructured input (a document, image, or text) and extract a structured tabular dataset.
+    const hasSchema = Array.isArray(schema) && schema.length > 0;
+
+    // Build dynamic JSON schema for the tool when fixed columns are provided
+    const rowProperties: Record<string, unknown> = {};
+    const requiredFields: string[] = [];
+    if (hasSchema) {
+      for (const f of schema!) {
+        rowProperties[f.name] = {
+          type: [TYPE_TO_JSON[f.type || 'string'] || 'string', 'null'],
+          description: f.description,
+        };
+        requiredFields.push(f.name);
+      }
+    }
+
+    const systemPrompt = hasSchema
+      ? `You are a precise data extraction assistant for "${templateName}" documents.
+
+You will be given a document (text or image). Extract the following fields EXACTLY as defined.
+
+Fields to extract:
+${schema!.map((f) => `- ${f.name} (${f.type || 'string'}): ${f.description}`).join('\n')}
 
 Rules:
-- Identify the most meaningful repeating entities or records and turn them into rows.
-- Pick clean, snake_case column names that describe each field.
-- All rows MUST share the same set of columns. Use null when a value is missing.
-- Prefer numbers/booleans/dates over strings when the value clearly represents one.
-- Do NOT invent data. Only extract what is present.
-- If the document has multiple tables, pick the most prominent one or merge if they are clearly the same entity.
-- If you cannot find any tabular data, return an empty rows array.`;
+- Return ONE row per distinct record/entity in the document. For most documents (a single invoice, lease, resume, medical visit) this means exactly ONE row.
+- Use the EXACT field names listed above. Do NOT add or rename fields.
+- Use null when a value is not present in the document. Do NOT guess or invent.
+- For date fields, use ISO format YYYY-MM-DD.
+- For number fields, return raw numbers without currency symbols or commas.`
+      : `You are a data extraction assistant. Extract a structured tabular dataset from the input.`;
 
     const userParts: Array<Record<string, unknown>> = [];
-    const userInstruction = `Extract structured rows from this ${fileName ? `file "${fileName}"` : "input"}.${hint ? ` Hint from user: ${hint}` : ""}`;
-    userParts.push({ type: "text", text: userInstruction });
+    userParts.push({
+      type: "text",
+      text: `Extract the predefined fields from this ${fileName ? `file "${fileName}"` : "document"}.`,
+    });
 
     if (imageDataUrl) {
       userParts.push({ type: "image_url", image_url: { url: imageDataUrl } });
     } else if (text) {
-      // Truncate very long text to keep token usage sane
       const trimmed = text.length > 60000 ? text.slice(0, 60000) + "\n...[truncated]" : text;
       userParts.push({ type: "text", text: `\n\nDocument content:\n${trimmed}` });
     }
+
+    const toolParameters = hasSchema
+      ? {
+          type: "object",
+          properties: {
+            rows: {
+              type: "array",
+              description: "One object per record. Most single-document extractions will have exactly one row.",
+              items: {
+                type: "object",
+                properties: rowProperties,
+                required: requiredFields,
+                additionalProperties: false,
+              },
+            },
+          },
+          required: ["rows"],
+          additionalProperties: false,
+        }
+      : {
+          type: "object",
+          properties: {
+            columns: { type: "array", items: { type: "string" } },
+            rows: { type: "array", items: { type: "object", additionalProperties: true } },
+          },
+          required: ["columns", "rows"],
+          additionalProperties: false,
+        };
 
     const aiResponse = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -79,27 +141,8 @@ Rules:
               type: "function",
               function: {
                 name: "return_dataset",
-                description: "Return the extracted dataset as columns + rows.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    columns: {
-                      type: "array",
-                      description: "Ordered list of column names.",
-                      items: { type: "string" },
-                    },
-                    rows: {
-                      type: "array",
-                      description: "Array of row objects keyed by column name.",
-                      items: {
-                        type: "object",
-                        additionalProperties: true,
-                      },
-                    },
-                  },
-                  required: ["columns", "rows"],
-                  additionalProperties: false,
-                },
+                description: "Return the extracted dataset.",
+                parameters: toolParameters,
               },
             },
           ],
@@ -138,7 +181,7 @@ Rules:
       );
     }
 
-    let parsed: { columns: string[]; rows: Record<string, unknown>[] };
+    let parsed: { columns?: string[]; rows: Record<string, unknown>[] };
     try {
       parsed = JSON.parse(toolCall.function.arguments);
     } catch (_e) {
@@ -148,8 +191,7 @@ Rules:
       );
     }
 
-    // Normalize: ensure every row has every column
-    const cols = parsed.columns || [];
+    const cols = hasSchema ? schema!.map((f) => f.name) : (parsed.columns || []);
     const normalizedRows = (parsed.rows || []).map((r) => {
       const out: Record<string, unknown> = {};
       for (const c of cols) {
