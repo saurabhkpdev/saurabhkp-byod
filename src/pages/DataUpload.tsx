@@ -197,6 +197,7 @@ const DataUpload = () => {
                 <UnstructuredUpload
                   onDataLoaded={(d, f) => handleDataLoaded(d, f, false)}
                   onBack={handleBackToSourceSelect}
+                  template={selectedTemplate}
                 />
               ) : (
                 <FileUpload 
