@@ -25,6 +25,12 @@ import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { SampleDownloadButton } from './SampleDownloadButton';
 import { getAvailableFormats } from '@/lib/sampleGenerators';
 
+export interface ExtractionField {
+  name: string;
+  description: string;
+  type?: 'string' | 'number' | 'boolean' | 'date';
+}
+
 export interface Template {
   id: string;
   name: string;
@@ -37,6 +43,7 @@ export interface Template {
   isCustom?: boolean;
   isUnstructured?: boolean;
   supportedFormats?: string[];
+  extractionSchema?: ExtractionField[];
 }
 
 interface TemplateSelectorProps {
