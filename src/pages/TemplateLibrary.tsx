@@ -10,7 +10,8 @@ import {
   X,
   Wand2,
   MapPin,
-  RotateCcw
+  RotateCcw,
+  Sparkles
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -356,12 +357,20 @@ export default function TemplateLibrary() {
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {displayedTemplates.map((template) => (
+                {displayedTemplates.map((template) => {
+                  const systemMatch = systemTemplates.find(s => s.id === template.id);
+                  const isUnstructured = template.category === 'unstructured' || systemMatch?.category === 'unstructured';
+                  const formats = isUnstructured
+                    ? (systemMatch?.supportedFormats || ['PDF', 'DOCX', 'TXT', 'Image'])
+                    : null;
+                  return (
                   <Card key={template.id} className="hover:border-primary/30 transition-colors">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className={`p-2.5 rounded-xl bg-primary/10`}>
-                          {template.category === 'geographical' ? (
+                          {isUnstructured ? (
+                            <Sparkles className="w-5 h-5 text-primary" />
+                          ) : template.category === 'geographical' ? (
                             <MapPin className="w-5 h-5 text-primary" />
                           ) : (
                             <FileSpreadsheet className="w-5 h-5 text-primary" />
@@ -369,10 +378,16 @@ export default function TemplateLibrary() {
                         </div>
                         <div className="flex items-center gap-1 flex-wrap justify-end">
                           {template.category === 'geographical' && (
-                            <Badge variant="outline" className="text-xs">Geo</Badge>
+                            <Badge variant="outline" className="text-xs gap-1">
+                              <MapPin className="w-3 h-3" />
+                              Geo
+                            </Badge>
                           )}
-                          {template.category === 'unstructured' && (
-                            <Badge variant="outline" className="text-xs">Unstructured</Badge>
+                          {isUnstructured && (
+                            <Badge variant="outline" className="text-xs gap-1">
+                              <Sparkles className="w-3 h-3" />
+                              Unstructured
+                            </Badge>
                           )}
                           {template.isCustom ? (
                             <Badge variant="secondary" className="text-xs">Custom</Badge>
@@ -390,8 +405,8 @@ export default function TemplateLibrary() {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex items-center gap-2 flex-wrap">
-                        {template.category === 'unstructured' ? (
-                          ['PDF', 'DOCX', 'Image', 'TXT'].map((fmt) => (
+                        {isUnstructured ? (
+                          formats!.map((fmt) => (
                             <Badge key={fmt} variant="secondary" className="text-[10px] px-1.5 py-0">{fmt}</Badge>
                           ))
                         ) : (
@@ -443,7 +458,8 @@ export default function TemplateLibrary() {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                  );
+                })}
               </div>
             )}
           </TabsContent>
