@@ -1,18 +1,21 @@
 import { useCallback, useState } from 'react';
-import { Upload, Sparkles, X, FileText, Image as ImageIcon, FileType } from 'lucide-react';
+import { Upload, Sparkles, X, FileText, Image as ImageIcon, FileType, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { UNSTRUCTURED_ACCEPT, prepareUnstructured, isUnstructuredFile } from '@/lib/unstructuredParsers';
+import type { Template } from '@/components/TemplateSelector';
+import { UNSTRUCTURED_SAMPLE_ROWS } from '@/lib/unstructuredSampleData';
 
 interface UnstructuredUploadProps {
   onDataLoaded: (data: Record<string, unknown>[], fileName: string) => void;
   onBack: () => void;
+  template?: Template;
 }
 
-export const UnstructuredUpload = ({ onDataLoaded, onBack }: UnstructuredUploadProps) => {
+export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: UnstructuredUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
