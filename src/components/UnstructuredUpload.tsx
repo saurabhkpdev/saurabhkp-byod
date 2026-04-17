@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react';
-import { Upload, Sparkles, X, FileText, Image as ImageIcon, FileType, CheckCircle2 } from 'lucide-react';
+import { Upload, Sparkles, X, FileText, Image as ImageIcon, FileType, CheckCircle2, Download, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { UNSTRUCTURED_ACCEPT, prepareUnstructured, isUnstructuredFile } from '@/lib/unstructuredParsers';
 import type { Template } from '@/components/TemplateSelector';
+import { UNSTRUCTURED_SAMPLE_DOCUMENTS, UNSTRUCTURED_SAMPLE_ROWS } from '@/lib/unstructuredSamples';
 
 interface UnstructuredUploadProps {
   onDataLoaded: (data: Record<string, unknown>[], fileName: string) => void;
@@ -20,6 +21,8 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
   const [error, setError] = useState<string | null>(null);
 
   const schema = template.extractionSchema || [];
+  const sampleRows = UNSTRUCTURED_SAMPLE_ROWS[template.id] || [];
+  const sampleDocument = UNSTRUCTURED_SAMPLE_DOCUMENTS[template.id];
 
   const handleFile = useCallback(async (file: File) => {
     setError(null);
@@ -64,6 +67,23 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
     }
   }, [onDataLoaded, schema, template.name]);
 
+  const handleSampleData = useCallback(() => {
+    if (sampleRows.length > 0) {
+      onDataLoaded(sampleRows, `${template.name} Sample Extracted Data`);
+    }
+  }, [onDataLoaded, sampleRows, template.name]);
+
+  const handleDownloadSampleDocument = useCallback(() => {
+    if (!sampleDocument) return;
+
+    const link = document.createElement('a');
+    link.href = sampleDocument.file;
+    link.download = sampleDocument.label;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, [sampleDocument]);
+
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
@@ -93,7 +113,6 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
         </Button>
       </div>
 
-      {/* Fixed schema preview */}
       {schema.length > 0 && (
         <div className="p-4 bg-card border border-border rounded-lg space-y-3">
           <div className="flex items-center gap-2">
@@ -163,6 +182,25 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
           <p className="text-sm text-destructive">{error}</p>
         </div>
       )}
+
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-sm text-muted-foreground">or use sample data</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        <div className="flex justify-center gap-4 flex-wrap">
+          <Button variant="outline" onClick={handleSampleData} disabled={sampleRows.length === 0}>
+            <Database className="w-4 h-4 mr-2" />
+            Load {template.name} Sample Data
+          </Button>
+          <Button variant="ghost" onClick={handleDownloadSampleDocument} disabled={!sampleDocument}>
+            <Download className="w-4 h-4 mr-2" />
+            Download Sample Document
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
