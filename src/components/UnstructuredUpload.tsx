@@ -1,18 +1,16 @@
 import { useCallback, useState } from 'react';
-import { Upload, Sparkles, X, FileText, Image as ImageIcon, FileType, Database } from 'lucide-react';
+import { Upload, Sparkles, X, FileText, Image as ImageIcon, FileType, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { UNSTRUCTURED_ACCEPT, prepareUnstructured, isUnstructuredFile } from '@/lib/unstructuredParsers';
 import type { Template } from '@/components/TemplateSelector';
-import { UNSTRUCTURED_SAMPLE_ROWS } from '@/lib/unstructuredSampleData';
 
 interface UnstructuredUploadProps {
   onDataLoaded: (data: Record<string, unknown>[], fileName: string) => void;
   onBack: () => void;
-  template?: Template;
+  template: Template;
 }
 
 export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: UnstructuredUploadProps) => {
@@ -20,7 +18,8 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  const [hint, setHint] = useState('');
+
+  const schema = template.extractionSchema || [];
 
   const handleFile = useCallback(async (file: File) => {
     setError(null);
@@ -36,11 +35,12 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
       setStatusMessage('Reading file...');
       const payload = await prepareUnstructured(file);
 
-      setStatusMessage('Extracting structured data with AI...');
+      setStatusMessage(`Extracting ${schema.length} fields with AI...`);
       const { data, error: fnError } = await supabase.functions.invoke('extract-unstructured', {
         body: {
           fileName: file.name,
-          hint: hint.trim() || undefined,
+          templateName: template.name,
+          schema,
           ...(payload.kind === 'text'
             ? { text: payload.text }
             : { imageDataUrl: payload.imageDataUrl }),
@@ -52,7 +52,7 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
 
       const rows: Record<string, unknown>[] = data?.rows || [];
       if (!Array.isArray(rows) || rows.length === 0) {
-        throw new Error('AI could not find any tabular data in this file.');
+        throw new Error('AI could not extract the required fields from this document.');
       }
 
       onDataLoaded(rows, file.name);
@@ -62,7 +62,7 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
       setIsLoading(false);
       setStatusMessage('');
     }
-  }, [onDataLoaded, hint]);
+  }, [onDataLoaded, schema, template.name]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -83,9 +83,9 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
           <Sparkles className="w-6 h-6 text-primary" />
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold">Unstructured Data (AI-powered)</h3>
+          <h3 className="font-semibold">{template.name}</h3>
           <p className="text-sm text-muted-foreground">
-            Upload a PDF, Word doc, image, or text file. AI will extract a structured table.
+            Upload a document — AI will extract the predefined fields below.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={onBack} disabled={isLoading}>
@@ -93,17 +93,24 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
         </Button>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="extraction-hint">Optional: tell the AI what to extract</Label>
-        <Textarea
-          id="extraction-hint"
-          placeholder="e.g. Extract every invoice line with quantity, unit price, and total"
-          value={hint}
-          onChange={(e) => setHint(e.target.value)}
-          disabled={isLoading}
-          rows={2}
-        />
-      </div>
+      {/* Fixed schema preview */}
+      {schema.length > 0 && (
+        <div className="p-4 bg-card border border-border rounded-lg space-y-3">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-primary" />
+            <h4 className="text-sm font-semibold">Fields that will be extracted</h4>
+            <Badge variant="secondary" className="text-xs">{schema.length}</Badge>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {schema.map((f) => (
+              <div key={f.name} className="flex items-start gap-2 text-xs">
+                <span className="font-mono font-medium text-foreground shrink-0">{f.name}</span>
+                <span className="text-muted-foreground truncate">— {f.description}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div
         onDrop={handleDrop}
@@ -136,10 +143,10 @@ export const UnstructuredUpload = ({ onDataLoaded, onBack, template }: Unstructu
           </div>
           <div>
             <p className="text-lg font-semibold text-foreground">
-              {isLoading ? statusMessage || 'Processing...' : 'Drop your file or click to browse'}
+              {isLoading ? statusMessage || 'Processing...' : 'Drop your document or click to browse'}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              AI will read the document and turn it into rows + columns
+              AI will extract the {schema.length} predefined fields into a structured table
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
