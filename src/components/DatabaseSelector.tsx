@@ -194,26 +194,28 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
             className="pl-9"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant={selectedCategory === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedCategory('all')}
-            className="gap-2"
-          >
-            <Table2 className="w-4 h-4" />
-            {sourceMode === 'upload' ? 'All Templates' : 'All Datasets'}
-          </Button>
-          <Button
-            variant={selectedCategory === 'geographical' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedCategory('geographical')}
-            className="gap-2"
-          >
-            <Globe className="w-4 h-4" />
-            Geographical
-          </Button>
-        </div>
+        {sourceMode !== 'unstructured' && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant={selectedCategory === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedCategory('all')}
+              className="gap-2"
+            >
+              <Table2 className="w-4 h-4" />
+              {sourceMode === 'upload' ? 'All Templates' : 'All Datasets'}
+            </Button>
+            <Button
+              variant={selectedCategory === 'geographical' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedCategory('geographical')}
+              className="gap-2"
+            >
+              <Globe className="w-4 h-4" />
+              Geographical
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Content based on selection */}
