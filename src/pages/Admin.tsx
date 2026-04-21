@@ -121,6 +121,10 @@ const Admin = () => {
                 <Users className="h-4 w-4" />
                 Users
               </TabsTrigger>
+              <TabsTrigger value="login-details" className="gap-2">
+                <MonitorSmartphone className="h-4 w-4" />
+                User Login Details
+              </TabsTrigger>
               <TabsTrigger value="roles" className="gap-2">
                 <ShieldCheck className="h-4 w-4" />
                 Roles
