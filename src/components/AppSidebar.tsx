@@ -192,7 +192,7 @@ export function AppSidebar({ children }: AppSidebarProps) {
                 {(isMobile || !collapsed) && (
                   <div className="flex-1 overflow-hidden text-left">
                     <p className="text-sm font-medium truncate">{currentUser.username}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{currentUser.activeRole}</p>
+                    <p className="text-xs text-muted-foreground">{formatRole(currentUser.activeRole)}</p>
                   </div>
                 )}
               </button>
