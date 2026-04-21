@@ -40,9 +40,25 @@ const UserManagement = () => {
       // Fetch all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, username, created_at, last_login_at, last_login_ip, last_login_user_agent');
+        .select('id, username, created_at');
 
       if (profilesError) throw profilesError;
+
+      // Fetch all roles (admin can see all via RLS)
+      const { data: roleRows, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      const usersWithRoles: UserWithRoles[] = (profiles || []).map((p: any) => ({
+        id: p.id,
+        username: p.username || 'Unknown',
+        created_at: p.created_at,
+        roles: (roleRows || [])
+          .filter((r: any) => r.user_id === p.id)
+          .map((r: any) => r.role as UserRole),
+      }));
 
       // Fetch all roles (admin can see all via RLS)
       const { data: roleRows, error: rolesError } = await supabase
