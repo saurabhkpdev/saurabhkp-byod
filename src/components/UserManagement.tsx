@@ -172,6 +172,7 @@ const UserManagement = () => {
                 <TableHead>Username</TableHead>
                 <TableHead>Roles</TableHead>
                 <TableHead>Joined</TableHead>
+                <TableHead>Last Login</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -201,6 +202,11 @@ const UserManagement = () => {
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {new Date(user.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {user.last_login_at
+                      ? new Date(user.last_login_at).toLocaleString()
+                      : <span className="italic">Never</span>}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => openEditDialog(user)}>
