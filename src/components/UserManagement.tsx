@@ -60,24 +60,6 @@ const UserManagement = () => {
           .map((r: any) => r.role as UserRole),
       }));
 
-      // Fetch all roles (admin can see all via RLS)
-      const { data: roleRows, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
-
-      if (rolesError) throw rolesError;
-
-      const usersWithRoles: UserWithRoles[] = (profiles || []).map((p: any) => ({
-        id: p.id,
-        username: p.username || 'Unknown',
-        created_at: p.created_at,
-        last_login_at: p.last_login_at ?? null,
-        last_login_ip: p.last_login_ip ?? null,
-        last_login_user_agent: p.last_login_user_agent ?? null,
-        roles: (roleRows || [])
-          .filter((r: any) => r.user_id === p.id)
-          .map((r: any) => r.role as UserRole),
-      }));
 
       setUsers(usersWithRoles);
     } catch (error: any) {
