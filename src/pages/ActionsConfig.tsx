@@ -8,12 +8,12 @@ const ActionsConfigPage = () => {
   return (
     <>
       <Helmet>
-        <title>Actions | BYOD</title>
+        <title>Data Flows | BYOD</title>
       </Helmet>
       <div className="flex-1 p-6 overflow-auto">
         <div className="max-w-6xl mx-auto space-y-6">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Actions</h1>
+            <h1 className="text-2xl font-bold text-foreground">Data Flows</h1>
             <p className="text-muted-foreground">
               Configure data load strategies and automated actions triggered by data events
             </p>
