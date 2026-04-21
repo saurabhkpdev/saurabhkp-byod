@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { ThemeCustomizer } from "@/components/ThemeCustomizer";
 import { DataSourceConfig } from "@/components/DataSourceConfig";
 import UserManagement from "@/components/UserManagement";
+import UserLoginDetails from "@/components/UserLoginDetails";
 import RoleManagement from "@/components/RoleManagement";
 import LanguageSettings from "@/components/LanguageSettings";
 import LoadConfigPanel from "@/components/LoadConfigPanel";
