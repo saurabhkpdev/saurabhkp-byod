@@ -35,7 +35,8 @@ const defaultPagePermissions: PagePermission[] = [
   { pageId: 'actions', pageName: 'Actions', path: '/actions', roles: ['sys_admin'] },
   { pageId: 'documentation', pageName: 'Documentation', path: '/docs', roles: ['user', 'approver', 'sys_admin', 'role_admin'] },
   { pageId: 'approvals', pageName: 'Approvals', path: '/approvals', roles: ['approver', 'sys_admin'] },
-  { pageId: 'admin', pageName: 'Admin', path: '/admin', roles: ['sys_admin', 'role_admin'] },
+  { pageId: 'access', pageName: 'Access', path: '/access', roles: ['role_admin'] },
+  { pageId: 'admin', pageName: 'Admin', path: '/admin', roles: ['sys_admin'] },
 ];
 
 export const useRoleStore = create<RoleState>()(

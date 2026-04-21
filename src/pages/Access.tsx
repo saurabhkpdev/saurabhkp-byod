@@ -1,0 +1,64 @@
+import { Helmet } from "react-helmet-async";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Users, MonitorSmartphone, ShieldCheck } from "lucide-react";
+import UserManagement from "@/components/UserManagement";
+import UserLoginDetails from "@/components/UserLoginDetails";
+import RoleManagement from "@/components/RoleManagement";
+
+const Access = () => {
+  return (
+    <>
+      <Helmet>
+        <title>Access - BYOD</title>
+        <meta
+          name="description"
+          content="Manage users, roles, and login details on the BYOD platform."
+        />
+      </Helmet>
+
+      <div className="min-h-screen bg-background">
+        <main className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold">
+              <span className="gradient-text">Access</span> Management
+            </h1>
+            <p className="text-muted-foreground">
+              Manage users, role assignments, and review user login activity
+            </p>
+          </div>
+
+          <Tabs defaultValue="users" className="space-y-6">
+            <TabsList className="flex-wrap h-auto gap-1">
+              <TabsTrigger value="users" className="gap-2">
+                <Users className="h-4 w-4" />
+                Users
+              </TabsTrigger>
+              <TabsTrigger value="roles" className="gap-2">
+                <ShieldCheck className="h-4 w-4" />
+                Roles
+              </TabsTrigger>
+              <TabsTrigger value="login-details" className="gap-2">
+                <MonitorSmartphone className="h-4 w-4" />
+                User Login Details
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="users">
+              <UserManagement />
+            </TabsContent>
+
+            <TabsContent value="roles">
+              <RoleManagement />
+            </TabsContent>
+
+            <TabsContent value="login-details">
+              <UserLoginDetails />
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
+    </>
+  );
+};
+
+export default Access;
