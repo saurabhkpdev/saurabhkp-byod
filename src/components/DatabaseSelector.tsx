@@ -108,11 +108,11 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
       </div>
 
       {/* Source Options - Toggle Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card
           className={`cursor-pointer border-2 transition-all ${
-            sourceMode === 'upload' 
-              ? 'border-primary/20 bg-primary/5' 
+            sourceMode === 'upload'
+              ? 'border-primary/20 bg-primary/5'
               : 'border-dashed hover:border-primary/50 hover:bg-muted/50'
           }`}
           onClick={() => setSourceMode('upload')}
@@ -124,17 +124,39 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
             <div className="flex-1">
               <h3 className="font-semibold text-lg">Upload New Data</h3>
               <p className="text-sm text-muted-foreground">
-                Select a template and upload your data file
+                Use a structured template (CSV, Excel, JSON)
               </p>
             </div>
             {sourceMode === 'upload' && <Badge variant="secondary">Selected</Badge>}
           </CardContent>
         </Card>
 
-        <Card 
+        <Card
           className={`cursor-pointer border-2 transition-all ${
-            sourceMode === 'existing' 
-              ? 'border-primary/20 bg-primary/5' 
+            sourceMode === 'unstructured'
+              ? 'border-primary/20 bg-primary/5'
+              : 'border-dashed hover:border-primary/50 hover:bg-muted/50'
+          }`}
+          onClick={() => setSourceMode('unstructured')}
+        >
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className={`p-4 rounded-xl ${sourceMode === 'unstructured' ? 'bg-primary/20' : 'bg-primary/10'}`}>
+              <Sparkles className="w-8 h-8 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg">Unstructured Documents</h3>
+              <p className="text-sm text-muted-foreground">
+                Extract data from PDFs, DOCX, and images using AI
+              </p>
+            </div>
+            {sourceMode === 'unstructured' && <Badge variant="secondary">Selected</Badge>}
+          </CardContent>
+        </Card>
+
+        <Card
+          className={`cursor-pointer border-2 transition-all ${
+            sourceMode === 'existing'
+              ? 'border-primary/20 bg-primary/5'
               : 'border-dashed hover:border-primary/50 hover:bg-muted/50'
           }`}
           onClick={() => setSourceMode('existing')}
@@ -160,7 +182,13 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder={sourceMode === 'upload' ? 'Search templates...' : 'Search datasets...'}
+            placeholder={
+              sourceMode === 'upload'
+                ? 'Search templates...'
+                : sourceMode === 'unstructured'
+                  ? 'Search document types...'
+                  : 'Search datasets...'
+            }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
