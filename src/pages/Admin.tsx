@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users, Globe, ShieldCheck, Settings2, Upload } from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users, Globe, ShieldCheck, Settings2, Upload, MonitorSmartphone } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { ThemeCustomizer } from "@/components/ThemeCustomizer";
 import { DataSourceConfig } from "@/components/DataSourceConfig";
 import UserManagement from "@/components/UserManagement";
+import UserLoginDetails from "@/components/UserLoginDetails";
 import RoleManagement from "@/components/RoleManagement";
 import LanguageSettings from "@/components/LanguageSettings";
 import LoadConfigPanel from "@/components/LoadConfigPanel";
@@ -119,6 +120,10 @@ const Admin = () => {
               <TabsTrigger value="users" className="gap-2">
                 <Users className="h-4 w-4" />
                 Users
+              </TabsTrigger>
+              <TabsTrigger value="login-details" className="gap-2">
+                <MonitorSmartphone className="h-4 w-4" />
+                User Login Details
               </TabsTrigger>
               <TabsTrigger value="roles" className="gap-2">
                 <ShieldCheck className="h-4 w-4" />
@@ -355,6 +360,11 @@ const Admin = () => {
             {/* Users Tab */}
             <TabsContent value="users">
               <UserManagement />
+            </TabsContent>
+
+            {/* User Login Details Tab */}
+            <TabsContent value="login-details">
+              <UserLoginDetails />
             </TabsContent>
 
             {/* Roles Tab */}

@@ -18,9 +18,6 @@ interface UserWithRoles {
   username: string;
   roles: UserRole[];
   created_at: string;
-  last_login_at: string | null;
-  last_login_ip: string | null;
-  last_login_user_agent: string | null;
 }
 
 const allRoles: { value: UserRole; label: string }[] = [
@@ -28,25 +25,6 @@ const allRoles: { value: UserRole; label: string }[] = [
   { value: 'approver', label: 'Approver' },
   { value: 'admin', label: 'Admin' },
 ];
-
-const summarizeUserAgent = (ua: string): string => {
-  const u = ua.toLowerCase();
-  let browser = 'Unknown browser';
-  if (u.includes('edg/')) browser = 'Edge';
-  else if (u.includes('chrome/') && !u.includes('chromium')) browser = 'Chrome';
-  else if (u.includes('firefox/')) browser = 'Firefox';
-  else if (u.includes('safari/') && !u.includes('chrome')) browser = 'Safari';
-  else if (u.includes('opr/') || u.includes('opera')) browser = 'Opera';
-
-  let os = 'Unknown OS';
-  if (u.includes('windows')) os = 'Windows';
-  else if (u.includes('mac os') || u.includes('macos')) os = 'macOS';
-  else if (u.includes('android')) os = 'Android';
-  else if (u.includes('iphone') || u.includes('ipad') || u.includes('ios')) os = 'iOS';
-  else if (u.includes('linux')) os = 'Linux';
-
-  return `${browser} · ${os}`;
-};
 
 const UserManagement = () => {
   const { currentUser } = useAuth();
@@ -62,7 +40,7 @@ const UserManagement = () => {
       // Fetch all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, username, created_at, last_login_at, last_login_ip, last_login_user_agent');
+        .select('id, username, created_at');
 
       if (profilesError) throw profilesError;
 
@@ -77,13 +55,11 @@ const UserManagement = () => {
         id: p.id,
         username: p.username || 'Unknown',
         created_at: p.created_at,
-        last_login_at: p.last_login_at ?? null,
-        last_login_ip: p.last_login_ip ?? null,
-        last_login_user_agent: p.last_login_user_agent ?? null,
         roles: (roleRows || [])
           .filter((r: any) => r.user_id === p.id)
           .map((r: any) => r.role as UserRole),
       }));
+
 
       setUsers(usersWithRoles);
     } catch (error: any) {
@@ -195,9 +171,6 @@ const UserManagement = () => {
                 <TableHead>Username</TableHead>
                 <TableHead>Roles</TableHead>
                 <TableHead>Joined</TableHead>
-                <TableHead>Last Login</TableHead>
-                <TableHead>IP Address</TableHead>
-                <TableHead>Device</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -227,23 +200,6 @@ const UserManagement = () => {
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {new Date(user.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {user.last_login_at
-                      ? new Date(user.last_login_at).toLocaleString()
-                      : <span className="italic">Never</span>}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground font-mono text-xs">
-                    {user.last_login_ip || <span className="italic font-sans">—</span>}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-xs">
-                    {user.last_login_user_agent ? (
-                      <span title={user.last_login_user_agent} className="block max-w-[220px] truncate">
-                        {summarizeUserAgent(user.last_login_user_agent)}
-                      </span>
-                    ) : (
-                      <span className="italic">—</span>
-                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => openEditDialog(user)}>
