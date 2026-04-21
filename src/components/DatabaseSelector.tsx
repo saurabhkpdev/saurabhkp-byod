@@ -333,6 +333,60 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
             ))}
           </div>
         </div>
+      ) : sourceMode === 'unstructured' ? (
+        /* Unstructured Templates Grid */
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Document Types</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {unstructuredTemplates.map((template) => (
+              <Card
+                key={template.id}
+                className="cursor-pointer hover:border-primary/50 hover:shadow-md transition-all group"
+                onClick={() => onSelectTemplate(template)}
+              >
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
+                    <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <Sparkles className="w-5 h-5 text-primary" />
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      Unstructured
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-base mt-2">{template.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                    {template.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {(template.supportedFormats ?? ['PDF', 'DOCX', 'TXT', 'Image']).map((fmt) => (
+                      <Badge
+                        key={fmt}
+                        variant="outline"
+                        className="text-[10px] px-1.5 py-0 h-5 font-medium"
+                      >
+                        {fmt}
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{template.extractionSchema?.length ?? 0} fields</span>
+                    <span className="text-primary group-hover:underline">
+                      Use template →
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            {unstructuredTemplates.length === 0 && (
+              <p className="col-span-full text-center text-sm text-muted-foreground py-8">
+                No document types match your search.
+              </p>
+            )}
+          </div>
+        </div>
       ) : null}
 
     </div>
