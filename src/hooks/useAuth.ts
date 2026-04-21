@@ -35,7 +35,9 @@ export const useAuth = create<AuthState>()((set, get) => ({
   switchRole: (role: UserRole) => {
     const { currentUser } = get();
     if (!currentUser) return false;
-    if (!currentUser.roles.includes(role)) return false;
+    // Super Admin is allowed to act as any role
+    const isSuperAdmin = currentUser.roles.includes('super_admin');
+    if (!isSuperAdmin && !currentUser.roles.includes(role)) return false;
     set({ currentUser: { ...currentUser, activeRole: role } });
     return true;
   },

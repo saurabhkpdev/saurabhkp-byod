@@ -45,8 +45,9 @@ const ProtectedRoute = ({ children, path }: { children: React.ReactNode; path: s
     return <Navigate to="/login" replace />;
   }
 
-  // Check role-based access using server-provided role
-  if (!canAccessPage(currentUser.activeRole, path)) {
+  // Super Admin can access every page regardless of active role
+  const isSuperAdmin = currentUser.roles.includes('super_admin');
+  if (!isSuperAdmin && !canAccessPage(currentUser.activeRole, path)) {
     return <Navigate to="/" replace />;
   }
 

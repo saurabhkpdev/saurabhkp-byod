@@ -78,10 +78,14 @@ export function AppSidebar({ children }: AppSidebarProps) {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
 
+  const isSuperAdmin = !!currentUser?.roles.includes('super_admin');
   const userRole = currentUser?.activeRole || 'user';
-  const visiblePages = getVisiblePages(userRole);
+  // Super Admin sees the full nav regardless of which role they're acting as
+  const visiblePages = isSuperAdmin
+    ? allNavItems.map((n) => ({ pageId: n.id }))
+    : getVisiblePages(userRole);
   const navItems = allNavItems.filter(item => 
-    visiblePages.some(page => page.pageId === item.id)
+    visiblePages.some((page: any) => page.pageId === item.id)
   );
 
   const pendingCount = getPendingRequests().length;
@@ -210,7 +214,7 @@ export function AppSidebar({ children }: AppSidebarProps) {
                 {theme === 'dark' ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
                 {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
               </DropdownMenuItem>
-              {currentUser.roles.length > 1 && (
+              {(currentUser.roles.length > 1 || isSuperAdmin) && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuSub>
@@ -227,7 +231,10 @@ export function AppSidebar({ children }: AppSidebarProps) {
                           value={currentUser.activeRole}
                           onValueChange={(value) => switchRole(value as UserRole)}
                         >
-                          {currentUser.roles.map((role) => (
+                          {(isSuperAdmin
+                            ? (['super_admin','sys_admin','role_admin','approver','user'] as UserRole[])
+                            : currentUser.roles
+                          ).map((role) => (
                             <DropdownMenuRadioItem key={role} value={role}>
                               {formatRole(role)}
                             </DropdownMenuRadioItem>
