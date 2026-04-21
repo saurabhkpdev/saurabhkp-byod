@@ -11,7 +11,7 @@ import { Template, systemTemplates } from '@/components/TemplateSelector';
 import { SampleDownloadButton } from '@/components/SampleDownloadButton';
 import { getAvailableFormats } from '@/lib/sampleGenerators';
 
-type SourceMode = 'upload' | 'existing';
+type SourceMode = 'upload' | 'existing' | 'unstructured';
 
 interface DatabaseSelectorProps {
   onSelectDataset: (data: Record<string, unknown>[], fileName: string, hasGeoData: boolean) => void;
@@ -36,21 +36,34 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
     })),
   ], [customTemplates]);
 
-  // Filter templates by category and search
+  // Structured templates (exclude unstructured) — filtered by category and search
   const filteredTemplates = useMemo(() => {
-    let templates = selectedCategory === 'all'
-      ? allTemplates
-      : allTemplates.filter(t => t.category === 'geographical');
-    
+    let templates = allTemplates.filter(t => t.category !== 'unstructured');
+    if (selectedCategory === 'geographical') {
+      templates = templates.filter(t => t.category === 'geographical');
+    }
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      templates = templates.filter(t => 
-        t.name.toLowerCase().includes(query) || 
+      templates = templates.filter(t =>
+        t.name.toLowerCase().includes(query) ||
         t.description.toLowerCase().includes(query)
       );
     }
     return templates;
   }, [allTemplates, selectedCategory, searchQuery]);
+
+  // Unstructured templates — filtered by search only
+  const unstructuredTemplates = useMemo(() => {
+    let templates = allTemplates.filter(t => t.category === 'unstructured' || t.isUnstructured);
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      templates = templates.filter(t =>
+        t.name.toLowerCase().includes(query) ||
+        t.description.toLowerCase().includes(query)
+      );
+    }
+    return templates;
+  }, [allTemplates, searchQuery]);
 
   // Filter datasets by category and search
   const filteredDatasets = useMemo(() => {
