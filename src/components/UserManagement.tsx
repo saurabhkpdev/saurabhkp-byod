@@ -41,7 +41,7 @@ const UserManagement = () => {
       // Fetch all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, username, created_at');
+        .select('id, username, created_at, last_login_at');
 
       if (profilesError) throw profilesError;
 
@@ -56,6 +56,7 @@ const UserManagement = () => {
         id: p.id,
         username: p.username || 'Unknown',
         created_at: p.created_at,
+        last_login_at: p.last_login_at ?? null,
         roles: (roleRows || [])
           .filter((r: any) => r.user_id === p.id)
           .map((r: any) => r.role as UserRole),
