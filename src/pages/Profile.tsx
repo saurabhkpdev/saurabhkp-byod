@@ -86,14 +86,14 @@ export default function Profile() {
             </div>
             <div className="space-y-2">
               <Label>Roles</Label>
-              <div className="px-3 py-2 rounded-md bg-muted text-sm capitalize">
-                {currentUser.roles.join(', ')}
+              <div className="px-3 py-2 rounded-md bg-muted text-sm">
+                {currentUser.roles.map((r) => r.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())).join(', ')}
               </div>
             </div>
             <div className="space-y-2">
               <Label>Active Role</Label>
-              <div className="px-3 py-2 rounded-md bg-muted text-sm capitalize">
-                {currentUser.activeRole}
+              <div className="px-3 py-2 rounded-md bg-muted text-sm">
+                {currentUser.activeRole.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
               </div>
             </div>
             <Button onClick={handleSaveProfile}>Save Changes</Button>
