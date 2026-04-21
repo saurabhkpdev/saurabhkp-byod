@@ -4,14 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Search, ChevronLeft } from 'lucide-react';
+import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Search, ChevronLeft, Sparkles } from 'lucide-react';
 import { MockDataset, mockDatasets } from '@/hooks/useMockDatabase';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { Template, systemTemplates } from '@/components/TemplateSelector';
 import { SampleDownloadButton } from '@/components/SampleDownloadButton';
 import { getAvailableFormats } from '@/lib/sampleGenerators';
 
-type SourceMode = 'upload' | 'existing';
+type SourceMode = 'upload' | 'existing' | 'unstructured';
 
 interface DatabaseSelectorProps {
   onSelectDataset: (data: Record<string, unknown>[], fileName: string, hasGeoData: boolean) => void;
@@ -36,21 +36,34 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
     })),
   ], [customTemplates]);
 
-  // Filter templates by category and search
+  // Structured templates (exclude unstructured) — filtered by category and search
   const filteredTemplates = useMemo(() => {
-    let templates = selectedCategory === 'all'
-      ? allTemplates
-      : allTemplates.filter(t => t.category === 'geographical');
-    
+    let templates = allTemplates.filter(t => t.category !== 'unstructured');
+    if (selectedCategory === 'geographical') {
+      templates = templates.filter(t => t.category === 'geographical');
+    }
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      templates = templates.filter(t => 
-        t.name.toLowerCase().includes(query) || 
+      templates = templates.filter(t =>
+        t.name.toLowerCase().includes(query) ||
         t.description.toLowerCase().includes(query)
       );
     }
     return templates;
   }, [allTemplates, selectedCategory, searchQuery]);
+
+  // Unstructured templates — filtered by search only
+  const unstructuredTemplates = useMemo(() => {
+    let templates = allTemplates.filter(t => t.category === 'unstructured' || t.isUnstructured);
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      templates = templates.filter(t =>
+        t.name.toLowerCase().includes(query) ||
+        t.description.toLowerCase().includes(query)
+      );
+    }
+    return templates;
+  }, [allTemplates, searchQuery]);
 
   // Filter datasets by category and search
   const filteredDatasets = useMemo(() => {
@@ -95,11 +108,11 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
       </div>
 
       {/* Source Options - Toggle Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card
           className={`cursor-pointer border-2 transition-all ${
-            sourceMode === 'upload' 
-              ? 'border-primary/20 bg-primary/5' 
+            sourceMode === 'upload'
+              ? 'border-primary/20 bg-primary/5'
               : 'border-dashed hover:border-primary/50 hover:bg-muted/50'
           }`}
           onClick={() => setSourceMode('upload')}
@@ -111,17 +124,39 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
             <div className="flex-1">
               <h3 className="font-semibold text-lg">Upload New Data</h3>
               <p className="text-sm text-muted-foreground">
-                Select a template and upload your data file
+                Use a structured template (CSV, Excel, JSON)
               </p>
             </div>
             {sourceMode === 'upload' && <Badge variant="secondary">Selected</Badge>}
           </CardContent>
         </Card>
 
-        <Card 
+        <Card
           className={`cursor-pointer border-2 transition-all ${
-            sourceMode === 'existing' 
-              ? 'border-primary/20 bg-primary/5' 
+            sourceMode === 'unstructured'
+              ? 'border-primary/20 bg-primary/5'
+              : 'border-dashed hover:border-primary/50 hover:bg-muted/50'
+          }`}
+          onClick={() => setSourceMode('unstructured')}
+        >
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className={`p-4 rounded-xl ${sourceMode === 'unstructured' ? 'bg-primary/20' : 'bg-primary/10'}`}>
+              <Sparkles className="w-8 h-8 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg">Unstructured Documents</h3>
+              <p className="text-sm text-muted-foreground">
+                Extract data from PDFs, DOCX, and images using AI
+              </p>
+            </div>
+            {sourceMode === 'unstructured' && <Badge variant="secondary">Selected</Badge>}
+          </CardContent>
+        </Card>
+
+        <Card
+          className={`cursor-pointer border-2 transition-all ${
+            sourceMode === 'existing'
+              ? 'border-primary/20 bg-primary/5'
               : 'border-dashed hover:border-primary/50 hover:bg-muted/50'
           }`}
           onClick={() => setSourceMode('existing')}
@@ -147,32 +182,40 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder={sourceMode === 'upload' ? 'Search templates...' : 'Search datasets...'}
+            placeholder={
+              sourceMode === 'upload'
+                ? 'Search templates...'
+                : sourceMode === 'unstructured'
+                  ? 'Search document types...'
+                  : 'Search datasets...'
+            }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant={selectedCategory === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedCategory('all')}
-            className="gap-2"
-          >
-            <Table2 className="w-4 h-4" />
-            {sourceMode === 'upload' ? 'All Templates' : 'All Datasets'}
-          </Button>
-          <Button
-            variant={selectedCategory === 'geographical' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedCategory('geographical')}
-            className="gap-2"
-          >
-            <Globe className="w-4 h-4" />
-            Geographical
-          </Button>
-        </div>
+        {sourceMode !== 'unstructured' && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant={selectedCategory === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedCategory('all')}
+              className="gap-2"
+            >
+              <Table2 className="w-4 h-4" />
+              {sourceMode === 'upload' ? 'All Templates' : 'All Datasets'}
+            </Button>
+            <Button
+              variant={selectedCategory === 'geographical' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedCategory('geographical')}
+              className="gap-2"
+            >
+              <Globe className="w-4 h-4" />
+              Geographical
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Content based on selection */}
@@ -288,6 +331,60 @@ export const DatabaseSelector = ({ onSelectDataset, onSelectTemplate, onBack }: 
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      ) : sourceMode === 'unstructured' ? (
+        /* Unstructured Templates Grid */
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Document Types</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {unstructuredTemplates.map((template) => (
+              <Card
+                key={template.id}
+                className="cursor-pointer hover:border-primary/50 hover:shadow-md transition-all group"
+                onClick={() => onSelectTemplate(template)}
+              >
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
+                    <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <Sparkles className="w-5 h-5 text-primary" />
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      Unstructured
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-base mt-2">{template.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                    {template.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {(template.supportedFormats ?? ['PDF', 'DOCX', 'TXT', 'Image']).map((fmt) => (
+                      <Badge
+                        key={fmt}
+                        variant="outline"
+                        className="text-[10px] px-1.5 py-0 h-5 font-medium"
+                      >
+                        {fmt}
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{template.extractionSchema?.length ?? 0} fields</span>
+                    <span className="text-primary group-hover:underline">
+                      Use template →
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            {unstructuredTemplates.length === 0 && (
+              <p className="col-span-full text-center text-sm text-muted-foreground py-8">
+                No document types match your search.
+              </p>
+            )}
           </div>
         </div>
       ) : null}
