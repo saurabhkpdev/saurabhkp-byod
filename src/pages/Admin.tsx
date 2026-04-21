@@ -362,6 +362,11 @@ const Admin = () => {
               <UserManagement />
             </TabsContent>
 
+            {/* User Login Details Tab */}
+            <TabsContent value="login-details">
+              <UserLoginDetails />
+            </TabsContent>
+
             {/* Roles Tab */}
             <TabsContent value="roles">
               <RoleManagement />
