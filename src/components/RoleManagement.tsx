@@ -99,7 +99,7 @@ const RoleManagement = () => {
                       <Checkbox
                         checked={page.roles.includes(role.id)}
                         onCheckedChange={() => handleRoleToggle(page.pageId, role.id, page.roles)}
-                        disabled={page.pageId === 'admin' && role.id === 'role_admin'} // Role Admin always retains admin panel access for user mgmt
+                        disabled={page.pageId === 'access' && role.id === 'super_admin'} // Super Admin always retains Access
                       />
                     </TableCell>
                   ))}
