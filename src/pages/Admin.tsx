@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Globe, Settings2, Upload } from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Globe, Upload } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import { ThemeCustomizer } from "@/components/ThemeCustomizer";
 import { DataSourceConfig } from "@/components/DataSourceConfig";
 import LanguageSettings from "@/components/LanguageSettings";
-import LoadConfigPanel from "@/components/LoadConfigPanel";
 import { useUsageStats } from "@/hooks/useUsageStats";
 
 
@@ -117,10 +116,6 @@ const Admin = () => {
               <TabsTrigger value="languages" className="gap-2">
                 <Globe className="h-4 w-4" />
                 Languages
-              </TabsTrigger>
-              <TabsTrigger value="loadconfig" className="gap-2">
-                <Settings2 className="h-4 w-4" />
-                Load Settings
               </TabsTrigger>
             </TabsList>
 
@@ -345,11 +340,6 @@ const Admin = () => {
             {/* Languages Tab */}
             <TabsContent value="languages">
               <LanguageSettings />
-            </TabsContent>
-
-            {/* Load Settings Tab */}
-            <TabsContent value="loadconfig">
-              <LoadConfigPanel />
             </TabsContent>
 
           </Tabs>
