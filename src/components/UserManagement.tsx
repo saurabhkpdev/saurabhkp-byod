@@ -19,6 +19,8 @@ interface UserWithRoles {
   roles: UserRole[];
   created_at: string;
   last_login_at: string | null;
+  last_login_ip: string | null;
+  last_login_user_agent: string | null;
 }
 
 const allRoles: { value: UserRole; label: string }[] = [
