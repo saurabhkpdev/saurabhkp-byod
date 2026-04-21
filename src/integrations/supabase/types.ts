@@ -55,6 +55,8 @@ export type Database = {
           created_at: string
           id: string
           last_login_at: string | null
+          last_login_ip: string | null
+          last_login_user_agent: string | null
           updated_at: string
           username: string | null
         }
@@ -62,6 +64,8 @@ export type Database = {
           created_at?: string
           id: string
           last_login_at?: string | null
+          last_login_ip?: string | null
+          last_login_user_agent?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -69,6 +73,8 @@ export type Database = {
           created_at?: string
           id?: string
           last_login_at?: string | null
+          last_login_ip?: string | null
+          last_login_user_agent?: string | null
           updated_at?: string
           username?: string | null
         }
