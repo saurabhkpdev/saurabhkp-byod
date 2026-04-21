@@ -18,6 +18,7 @@ import RoleManagement from "@/components/RoleManagement";
 import LanguageSettings from "@/components/LanguageSettings";
 import LoadConfigPanel from "@/components/LoadConfigPanel";
 import { useUsageStats } from "@/hooks/useUsageStats";
+import { useAuth } from "@/hooks/useAuth";
 
 
 const Admin = () => {
@@ -28,6 +29,9 @@ const Admin = () => {
   } = useAuditLog();
   const stats = getStats();
   const { totalVisits, totalUploads, getLastVisitFormatted } = useUsageStats();
+  const { currentUser } = useAuth();
+  const isRoleAdmin = !!currentUser?.roles.includes('role_admin');
+  const isSysAdmin = !!currentUser?.roles.includes('sys_admin');
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     if (isToday(date)) {
