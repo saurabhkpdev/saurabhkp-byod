@@ -89,12 +89,11 @@ export const useAuth = create<AuthState>()((set, get) => ({
 
       set({ currentUser: appUser, loading: false });
 
-      // Stamp last login (fire-and-forget) — only on first profile fetch this session
+      // Stamp last login + IP + user agent via edge function (server captures IP).
+      // Fire-and-forget; only on the first profile fetch this session.
       if (isFirstFetchThisSession) {
-        supabase
-          .from('profiles')
-          .update({ last_login_at: new Date().toISOString() })
-          .eq('id', supabaseUser.id)
+        supabase.functions
+          .invoke('record-login', { body: {} })
           .then(({ error }) => {
             if (error) console.warn('Failed to record last login:', error.message);
           });
