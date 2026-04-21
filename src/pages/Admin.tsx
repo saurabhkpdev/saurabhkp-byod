@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Users, Globe, ShieldCheck, Settings2, Upload, MonitorSmartphone } from "lucide-react";
+import { Activity, BarChart3, Calendar, Clock, FileUp, Eye, Trash2, RefreshCw, Palette, Database, Globe, Settings2, Upload } from "lucide-react";
 import { useAuditLog, actionLabels, actionColors, AuditAction } from "@/hooks/useAuditLog";
 import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -12,13 +12,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { ThemeCustomizer } from "@/components/ThemeCustomizer";
 import { DataSourceConfig } from "@/components/DataSourceConfig";
-import UserManagement from "@/components/UserManagement";
-import UserLoginDetails from "@/components/UserLoginDetails";
-import RoleManagement from "@/components/RoleManagement";
 import LanguageSettings from "@/components/LanguageSettings";
 import LoadConfigPanel from "@/components/LoadConfigPanel";
 import { useUsageStats } from "@/hooks/useUsageStats";
-import { useAuth } from "@/hooks/useAuth";
 
 
 const Admin = () => {
@@ -29,9 +25,6 @@ const Admin = () => {
   } = useAuditLog();
   const stats = getStats();
   const { totalVisits, totalUploads, getLastVisitFormatted } = useUsageStats();
-  const { currentUser } = useAuth();
-  const isRoleAdmin = !!currentUser?.roles.includes('role_admin');
-  const isSysAdmin = !!currentUser?.roles.includes('sys_admin');
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     if (isToday(date)) {
