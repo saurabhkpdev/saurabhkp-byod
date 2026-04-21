@@ -18,9 +18,6 @@ interface UserWithRoles {
   username: string;
   roles: UserRole[];
   created_at: string;
-  last_login_at: string | null;
-  last_login_ip: string | null;
-  last_login_user_agent: string | null;
 }
 
 const allRoles: { value: UserRole; label: string }[] = [
@@ -28,25 +25,6 @@ const allRoles: { value: UserRole; label: string }[] = [
   { value: 'approver', label: 'Approver' },
   { value: 'admin', label: 'Admin' },
 ];
-
-const summarizeUserAgent = (ua: string): string => {
-  const u = ua.toLowerCase();
-  let browser = 'Unknown browser';
-  if (u.includes('edg/')) browser = 'Edge';
-  else if (u.includes('chrome/') && !u.includes('chromium')) browser = 'Chrome';
-  else if (u.includes('firefox/')) browser = 'Firefox';
-  else if (u.includes('safari/') && !u.includes('chrome')) browser = 'Safari';
-  else if (u.includes('opr/') || u.includes('opera')) browser = 'Opera';
-
-  let os = 'Unknown OS';
-  if (u.includes('windows')) os = 'Windows';
-  else if (u.includes('mac os') || u.includes('macos')) os = 'macOS';
-  else if (u.includes('android')) os = 'Android';
-  else if (u.includes('iphone') || u.includes('ipad') || u.includes('ios')) os = 'iOS';
-  else if (u.includes('linux')) os = 'Linux';
-
-  return `${browser} · ${os}`;
-};
 
 const UserManagement = () => {
   const { currentUser } = useAuth();
