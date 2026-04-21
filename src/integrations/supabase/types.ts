@@ -158,7 +158,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "approver" | "user"
+      app_role: "admin" | "approver" | "user" | "sys_admin" | "role_admin"
       load_strategy: "truncate_load" | "merge_upsert" | "append_only"
     }
     CompositeTypes: {
@@ -287,7 +287,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "approver", "user"],
+      app_role: ["admin", "approver", "user", "sys_admin", "role_admin"],
       load_strategy: ["truncate_load", "merge_upsert", "append_only"],
     },
   },

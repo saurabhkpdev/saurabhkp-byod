@@ -10,7 +10,8 @@ import { RotateCcw, Shield, UserCheck, User } from "lucide-react";
 const roles: { id: AppRole; label: string; description: string; icon: React.ElementType }[] = [
   { id: 'user', label: 'User', description: 'Regular users who can upload and view data', icon: User },
   { id: 'approver', label: 'Approver', description: 'Can approve or reject data submissions', icon: UserCheck },
-  { id: 'admin', label: 'Admin', description: 'Full access to all features and settings', icon: Shield },
+  { id: 'sys_admin', label: 'Sys Admin', description: 'Full platform access except user & role management', icon: Shield },
+  { id: 'role_admin', label: 'Role Admin', description: 'Manages users, roles, and login details', icon: Shield },
 ];
 
 const RoleManagement = () => {
@@ -97,7 +98,7 @@ const RoleManagement = () => {
                       <Checkbox
                         checked={page.roles.includes(role.id)}
                         onCheckedChange={() => handleRoleToggle(page.pageId, role.id, page.roles)}
-                        disabled={page.pageId === 'admin' && role.id === 'admin'} // Admin always has admin access
+                        disabled={page.pageId === 'admin' && role.id === 'role_admin'} // Role Admin always retains admin panel access for user mgmt
                       />
                     </TableCell>
                   ))}

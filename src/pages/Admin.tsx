@@ -18,6 +18,7 @@ import RoleManagement from "@/components/RoleManagement";
 import LanguageSettings from "@/components/LanguageSettings";
 import LoadConfigPanel from "@/components/LoadConfigPanel";
 import { useUsageStats } from "@/hooks/useUsageStats";
+import { useAuth } from "@/hooks/useAuth";
 
 
 const Admin = () => {
@@ -28,6 +29,9 @@ const Admin = () => {
   } = useAuditLog();
   const stats = getStats();
   const { totalVisits, totalUploads, getLastVisitFormatted } = useUsageStats();
+  const { currentUser } = useAuth();
+  const isRoleAdmin = !!currentUser?.roles.includes('role_admin');
+  const isSysAdmin = !!currentUser?.roles.includes('sys_admin');
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     if (isToday(date)) {
@@ -99,44 +103,56 @@ const Admin = () => {
             </div>
           </div>
 
-          <Tabs defaultValue="events" className="space-y-6">
+          <Tabs defaultValue={isSysAdmin ? "events" : "users"} className="space-y-6">
             <TabsList className="flex-wrap h-auto gap-1">
-              <TabsTrigger value="events" className="gap-2">
-                <Clock className="h-4 w-4" />
-                Event Log
-              </TabsTrigger>
-              <TabsTrigger value="analytics" className="gap-2">
-                <BarChart3 className="h-4 w-4" />
-                Analytics
-              </TabsTrigger>
-              <TabsTrigger value="customization" className="gap-2">
-                <Palette className="h-4 w-4" />
-                Customization
-              </TabsTrigger>
-              <TabsTrigger value="datasources" className="gap-2">
-                <Database className="h-4 w-4" />
-                Data Sources
-              </TabsTrigger>
-              <TabsTrigger value="users" className="gap-2">
-                <Users className="h-4 w-4" />
-                Users
-              </TabsTrigger>
-              <TabsTrigger value="login-details" className="gap-2">
-                <MonitorSmartphone className="h-4 w-4" />
-                User Login Details
-              </TabsTrigger>
-              <TabsTrigger value="roles" className="gap-2">
-                <ShieldCheck className="h-4 w-4" />
-                Roles
-              </TabsTrigger>
-              <TabsTrigger value="languages" className="gap-2">
-                <Globe className="h-4 w-4" />
-                Languages
-              </TabsTrigger>
-              <TabsTrigger value="loadconfig" className="gap-2">
-                <Settings2 className="h-4 w-4" />
-                Load Settings
-              </TabsTrigger>
+              {isSysAdmin && (
+                <>
+                  <TabsTrigger value="events" className="gap-2">
+                    <Clock className="h-4 w-4" />
+                    Event Log
+                  </TabsTrigger>
+                  <TabsTrigger value="analytics" className="gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Analytics
+                  </TabsTrigger>
+                  <TabsTrigger value="customization" className="gap-2">
+                    <Palette className="h-4 w-4" />
+                    Customization
+                  </TabsTrigger>
+                  <TabsTrigger value="datasources" className="gap-2">
+                    <Database className="h-4 w-4" />
+                    Data Sources
+                  </TabsTrigger>
+                </>
+              )}
+              {isRoleAdmin && (
+                <>
+                  <TabsTrigger value="users" className="gap-2">
+                    <Users className="h-4 w-4" />
+                    Users
+                  </TabsTrigger>
+                  <TabsTrigger value="login-details" className="gap-2">
+                    <MonitorSmartphone className="h-4 w-4" />
+                    User Login Details
+                  </TabsTrigger>
+                  <TabsTrigger value="roles" className="gap-2">
+                    <ShieldCheck className="h-4 w-4" />
+                    Roles
+                  </TabsTrigger>
+                </>
+              )}
+              {isSysAdmin && (
+                <>
+                  <TabsTrigger value="languages" className="gap-2">
+                    <Globe className="h-4 w-4" />
+                    Languages
+                  </TabsTrigger>
+                  <TabsTrigger value="loadconfig" className="gap-2">
+                    <Settings2 className="h-4 w-4" />
+                    Load Settings
+                  </TabsTrigger>
+                </>
+              )}
             </TabsList>
 
             {/* Event Log Tab */}
