@@ -96,56 +96,32 @@ const Admin = () => {
             </div>
           </div>
 
-          <Tabs defaultValue={isSysAdmin ? "events" : "users"} className="space-y-6">
+          <Tabs defaultValue="events" className="space-y-6">
             <TabsList className="flex-wrap h-auto gap-1">
-              {isSysAdmin && (
-                <>
-                  <TabsTrigger value="events" className="gap-2">
-                    <Clock className="h-4 w-4" />
-                    Event Log
-                  </TabsTrigger>
-                  <TabsTrigger value="analytics" className="gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    Analytics
-                  </TabsTrigger>
-                  <TabsTrigger value="customization" className="gap-2">
-                    <Palette className="h-4 w-4" />
-                    Customization
-                  </TabsTrigger>
-                  <TabsTrigger value="datasources" className="gap-2">
-                    <Database className="h-4 w-4" />
-                    Data Sources
-                  </TabsTrigger>
-                </>
-              )}
-              {isRoleAdmin && (
-                <>
-                  <TabsTrigger value="users" className="gap-2">
-                    <Users className="h-4 w-4" />
-                    Users
-                  </TabsTrigger>
-                  <TabsTrigger value="login-details" className="gap-2">
-                    <MonitorSmartphone className="h-4 w-4" />
-                    User Login Details
-                  </TabsTrigger>
-                  <TabsTrigger value="roles" className="gap-2">
-                    <ShieldCheck className="h-4 w-4" />
-                    Roles
-                  </TabsTrigger>
-                </>
-              )}
-              {isSysAdmin && (
-                <>
-                  <TabsTrigger value="languages" className="gap-2">
-                    <Globe className="h-4 w-4" />
-                    Languages
-                  </TabsTrigger>
-                  <TabsTrigger value="loadconfig" className="gap-2">
-                    <Settings2 className="h-4 w-4" />
-                    Load Settings
-                  </TabsTrigger>
-                </>
-              )}
+              <TabsTrigger value="events" className="gap-2">
+                <Clock className="h-4 w-4" />
+                Event Log
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Analytics
+              </TabsTrigger>
+              <TabsTrigger value="customization" className="gap-2">
+                <Palette className="h-4 w-4" />
+                Customization
+              </TabsTrigger>
+              <TabsTrigger value="datasources" className="gap-2">
+                <Database className="h-4 w-4" />
+                Data Sources
+              </TabsTrigger>
+              <TabsTrigger value="languages" className="gap-2">
+                <Globe className="h-4 w-4" />
+                Languages
+              </TabsTrigger>
+              <TabsTrigger value="loadconfig" className="gap-2">
+                <Settings2 className="h-4 w-4" />
+                Load Settings
+              </TabsTrigger>
             </TabsList>
 
             {/* Event Log Tab */}
