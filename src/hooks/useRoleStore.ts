@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type AppRole = 'user' | 'approver' | 'sys_admin' | 'role_admin';
+export type AppRole = 'user' | 'approver' | 'sys_admin' | 'role_admin' | 'super_admin';
 
 export interface PagePermission {
   pageId: string;
@@ -28,15 +28,15 @@ interface RoleState {
 }
 
 const defaultPagePermissions: PagePermission[] = [
-  { pageId: 'home', pageName: 'Home', path: '/', roles: ['user', 'approver', 'sys_admin', 'role_admin'] },
-  { pageId: 'data-studio', pageName: 'Data Studio', path: '/upload', roles: ['user', 'approver', 'sys_admin'] },
-  { pageId: 'templates', pageName: 'Templates', path: '/templates', roles: ['user', 'approver', 'sys_admin'] },
-  { pageId: 'datasets', pageName: 'Datasets', path: '/datasets', roles: ['user', 'approver', 'sys_admin'] },
-  { pageId: 'actions', pageName: 'Actions', path: '/actions', roles: ['sys_admin'] },
-  { pageId: 'documentation', pageName: 'Documentation', path: '/docs', roles: ['user', 'approver', 'sys_admin', 'role_admin'] },
-  { pageId: 'approvals', pageName: 'Approvals', path: '/approvals', roles: ['approver', 'sys_admin'] },
-  { pageId: 'access', pageName: 'Access', path: '/access', roles: ['role_admin'] },
-  { pageId: 'admin', pageName: 'Admin', path: '/admin', roles: ['sys_admin'] },
+  { pageId: 'home', pageName: 'Home', path: '/', roles: ['user', 'approver', 'sys_admin', 'role_admin', 'super_admin'] },
+  { pageId: 'data-studio', pageName: 'Data Studio', path: '/upload', roles: ['user', 'approver', 'sys_admin', 'super_admin'] },
+  { pageId: 'templates', pageName: 'Templates', path: '/templates', roles: ['user', 'approver', 'sys_admin', 'super_admin'] },
+  { pageId: 'datasets', pageName: 'Datasets', path: '/datasets', roles: ['user', 'approver', 'sys_admin', 'super_admin'] },
+  { pageId: 'actions', pageName: 'Actions', path: '/actions', roles: ['sys_admin', 'super_admin'] },
+  { pageId: 'documentation', pageName: 'Documentation', path: '/docs', roles: ['user', 'approver', 'sys_admin', 'role_admin', 'super_admin'] },
+  { pageId: 'approvals', pageName: 'Approvals', path: '/approvals', roles: ['approver', 'sys_admin', 'super_admin'] },
+  { pageId: 'access', pageName: 'Access', path: '/access', roles: ['role_admin', 'super_admin'] },
+  { pageId: 'admin', pageName: 'Admin', path: '/admin', roles: ['sys_admin', 'super_admin'] },
 ];
 
 export const useRoleStore = create<RoleState>()(

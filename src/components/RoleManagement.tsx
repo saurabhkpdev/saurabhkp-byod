@@ -12,6 +12,7 @@ const roles: { id: AppRole; label: string; description: string; icon: React.Elem
   { id: 'approver', label: 'Approver', description: 'Can approve or reject data submissions', icon: UserCheck },
   { id: 'sys_admin', label: 'Sys Admin', description: 'Full platform access except user & role management', icon: Shield },
   { id: 'role_admin', label: 'Role Admin', description: 'Manages users, roles, and login details', icon: Shield },
+  { id: 'super_admin', label: 'Super Admin', description: 'Combines Sys Admin and Role Admin: full platform + user/role management', icon: Shield },
 ];
 
 const RoleManagement = () => {
@@ -98,7 +99,7 @@ const RoleManagement = () => {
                       <Checkbox
                         checked={page.roles.includes(role.id)}
                         onCheckedChange={() => handleRoleToggle(page.pageId, role.id, page.roles)}
-                        disabled={page.pageId === 'admin' && role.id === 'role_admin'} // Role Admin always retains admin panel access for user mgmt
+                        disabled={page.pageId === 'access' && role.id === 'super_admin'} // Super Admin always retains Access
                       />
                     </TableCell>
                   ))}

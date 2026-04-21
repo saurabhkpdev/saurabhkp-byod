@@ -25,6 +25,7 @@ const allRoles: { value: UserRole; label: string }[] = [
   { value: 'approver', label: 'Approver' },
   { value: 'sys_admin', label: 'Sys Admin' },
   { value: 'role_admin', label: 'Role Admin' },
+  { value: 'super_admin', label: 'Super Admin' },
 ];
 
 const UserManagement = () => {
@@ -127,7 +128,7 @@ const UserManagement = () => {
   };
 
   const getRoleIcon = (roles: UserRole[]) => {
-    if (roles.includes('sys_admin') || roles.includes('role_admin')) return <Shield className="h-4 w-4 text-primary" />;
+    if (roles.includes('super_admin') || roles.includes('sys_admin') || roles.includes('role_admin')) return <Shield className="h-4 w-4 text-primary" />;
     if (roles.includes('approver')) return <UserCheck className="h-4 w-4 text-green-600" />;
     return <UserIcon className="h-4 w-4 text-muted-foreground" />;
   };
@@ -192,9 +193,9 @@ const UserManagement = () => {
                       {(user.roles.length > 0 ? user.roles : ['user']).map((role) => (
                         <Badge
                           key={role}
-                          variant={role === "sys_admin" || role === "role_admin" ? "default" : role === "approver" ? "outline" : "secondary"}
+                          variant={role === "super_admin" || role === "sys_admin" || role === "role_admin" ? "default" : role === "approver" ? "outline" : "secondary"}
                         >
-                          {role === 'sys_admin' ? 'sys admin' : role === 'role_admin' ? 'role admin' : role}
+                          {role === 'super_admin' ? 'super admin' : role === 'sys_admin' ? 'sys admin' : role === 'role_admin' ? 'role admin' : role}
                         </Badge>
                       ))}
                     </div>
