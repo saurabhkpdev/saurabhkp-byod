@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Search, ChevronLeft } from 'lucide-react';
+import { Database, MapPin, Table2, Upload, Globe, FileText, Plus, Search, ChevronLeft, Sparkles } from 'lucide-react';
 import { MockDataset, mockDatasets } from '@/hooks/useMockDatabase';
 import { useTemplateStore, CustomTemplate } from '@/hooks/useTemplateStore';
 import { Template, systemTemplates } from '@/components/TemplateSelector';
