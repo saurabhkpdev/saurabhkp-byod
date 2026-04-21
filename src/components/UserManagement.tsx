@@ -23,7 +23,8 @@ interface UserWithRoles {
 const allRoles: { value: UserRole; label: string }[] = [
   { value: 'user', label: 'User' },
   { value: 'approver', label: 'Approver' },
-  { value: 'admin', label: 'Admin' },
+  { value: 'sys_admin', label: 'Sys Admin' },
+  { value: 'role_admin', label: 'Role Admin' },
 ];
 
 const UserManagement = () => {
@@ -126,7 +127,7 @@ const UserManagement = () => {
   };
 
   const getRoleIcon = (roles: UserRole[]) => {
-    if (roles.includes('admin')) return <Shield className="h-4 w-4 text-primary" />;
+    if (roles.includes('sys_admin') || roles.includes('role_admin')) return <Shield className="h-4 w-4 text-primary" />;
     if (roles.includes('approver')) return <UserCheck className="h-4 w-4 text-green-600" />;
     return <UserIcon className="h-4 w-4 text-muted-foreground" />;
   };
@@ -191,9 +192,9 @@ const UserManagement = () => {
                       {(user.roles.length > 0 ? user.roles : ['user']).map((role) => (
                         <Badge
                           key={role}
-                          variant={role === "admin" ? "default" : role === "approver" ? "outline" : "secondary"}
+                          variant={role === "sys_admin" || role === "role_admin" ? "default" : role === "approver" ? "outline" : "secondary"}
                         >
-                          {role}
+                          {role === 'sys_admin' ? 'sys admin' : role === 'role_admin' ? 'role admin' : role}
                         </Badge>
                       ))}
                     </div>
