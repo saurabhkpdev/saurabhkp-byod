@@ -14,6 +14,7 @@ import Index from "./pages/Index";
 import DataUpload from "./pages/DataUpload";
 import Documentation from "./pages/Documentation";
 import Admin from "./pages/Admin";
+import Access from "./pages/Access";
 import TemplateLibrary from "./pages/TemplateLibrary";
 import DatasetLibrary from "./pages/DatasetLibrary";
 import Approvals from "./pages/Approvals";
@@ -180,6 +181,16 @@ const AppRoutes = () => {
           <ProtectedRoute path="/admin">
             <AppSidebar>
               <Admin />
+            </AppSidebar>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/access"
+        element={
+          <ProtectedRoute path="/access">
+            <AppSidebar>
+              <Access />
             </AppSidebar>
           </ProtectedRoute>
         }

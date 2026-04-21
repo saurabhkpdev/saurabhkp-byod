@@ -15,7 +15,8 @@ import {
   Moon,
   Sun,
   Menu,
-  X
+  X,
+  KeyRound
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
@@ -50,6 +51,7 @@ const allNavItems = [
   { id: 'actions', title: "Actions", url: "/actions", icon: Settings },
   { id: 'documentation', title: "Documentation", url: "/docs", icon: BookOpen },
   { id: 'approvals', title: "Approvals", url: "/approvals", icon: ClipboardCheck },
+  { id: 'access', title: "Access", url: "/access", icon: KeyRound },
   { id: 'admin', title: "Admin", url: "/admin", icon: Shield },
 ];
 
