@@ -82,11 +82,24 @@ export const useAuth = create<AuthState>()((set, get) => ({
 
       // Preserve activeRole if user already had one selected
       const { currentUser } = get();
+      const isFirstFetchThisSession = !currentUser || currentUser.id !== supabaseUser.id;
       if (currentUser?.id === supabaseUser.id && roles.includes(currentUser.activeRole)) {
         appUser.activeRole = currentUser.activeRole;
       }
 
       set({ currentUser: appUser, loading: false });
+
+      // Stamp last login (fire-and-forget) — only on first profile fetch this session
+      if (isFirstFetchThisSession) {
+        supabase
+          .from('profiles')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('id', supabaseUser.id)
+          .then(({ error }) => {
+            if (error) console.warn('Failed to record last login:', error.message);
+          });
+      }
+
       return appUser;
     } catch (error) {
       console.error('Error fetching user profile:', error);
