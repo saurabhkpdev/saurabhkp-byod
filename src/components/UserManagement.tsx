@@ -177,6 +177,8 @@ const UserManagement = () => {
                 <TableHead>Roles</TableHead>
                 <TableHead>Joined</TableHead>
                 <TableHead>Last Login</TableHead>
+                <TableHead>IP Address</TableHead>
+                <TableHead>Device</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -211,6 +213,18 @@ const UserManagement = () => {
                     {user.last_login_at
                       ? new Date(user.last_login_at).toLocaleString()
                       : <span className="italic">Never</span>}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground font-mono text-xs">
+                    {user.last_login_ip || <span className="italic font-sans">—</span>}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-xs">
+                    {user.last_login_user_agent ? (
+                      <span title={user.last_login_user_agent} className="block max-w-[220px] truncate">
+                        {summarizeUserAgent(user.last_login_user_agent)}
+                      </span>
+                    ) : (
+                      <span className="italic">—</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => openEditDialog(user)}>
