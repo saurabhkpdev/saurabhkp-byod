@@ -18,6 +18,7 @@ interface UserWithRoles {
   username: string;
   roles: UserRole[];
   created_at: string;
+  last_login_at: string | null;
 }
 
 const allRoles: { value: UserRole; label: string }[] = [
@@ -40,7 +41,7 @@ const UserManagement = () => {
       // Fetch all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, username, created_at');
+        .select('id, username, created_at, last_login_at');
 
       if (profilesError) throw profilesError;
 
@@ -55,6 +56,7 @@ const UserManagement = () => {
         id: p.id,
         username: p.username || 'Unknown',
         created_at: p.created_at,
+        last_login_at: p.last_login_at ?? null,
         roles: (roleRows || [])
           .filter((r: any) => r.user_id === p.id)
           .map((r: any) => r.role as UserRole),
@@ -170,6 +172,7 @@ const UserManagement = () => {
                 <TableHead>Username</TableHead>
                 <TableHead>Roles</TableHead>
                 <TableHead>Joined</TableHead>
+                <TableHead>Last Login</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -199,6 +202,11 @@ const UserManagement = () => {
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {new Date(user.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {user.last_login_at
+                      ? new Date(user.last_login_at).toLocaleString()
+                      : <span className="italic">Never</span>}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => openEditDialog(user)}>
