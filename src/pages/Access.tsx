@@ -1,9 +1,10 @@
 import { Helmet } from "react-helmet-async";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, MonitorSmartphone, ShieldCheck } from "lucide-react";
+import { Users, MonitorSmartphone, ShieldCheck, Users2 } from "lucide-react";
 import UserManagement from "@/components/UserManagement";
 import UserLoginDetails from "@/components/UserLoginDetails";
 import RoleManagement from "@/components/RoleManagement";
+import GroupManagement from "@/components/GroupManagement";
 
 const Access = () => {
   return (
@@ -12,7 +13,7 @@ const Access = () => {
         <title>Access - BYOD</title>
         <meta
           name="description"
-          content="Manage users, roles, and login details on the BYOD platform."
+          content="Manage users, roles, groups, and login details on the BYOD platform."
         />
       </Helmet>
 
@@ -23,7 +24,7 @@ const Access = () => {
               <span className="gradient-text">Access</span> Management
             </h1>
             <p className="text-muted-foreground">
-              Manage users, role assignments, and review user login activity
+              Manage users, role assignments, groups, and review user login activity
             </p>
           </div>
 
@@ -36,6 +37,10 @@ const Access = () => {
               <TabsTrigger value="roles" className="gap-2">
                 <ShieldCheck className="h-4 w-4" />
                 Roles
+              </TabsTrigger>
+              <TabsTrigger value="groups" className="gap-2">
+                <Users2 className="h-4 w-4" />
+                Groups
               </TabsTrigger>
               <TabsTrigger value="login-details" className="gap-2">
                 <MonitorSmartphone className="h-4 w-4" />
@@ -51,6 +56,10 @@ const Access = () => {
               <RoleManagement />
             </TabsContent>
 
+            <TabsContent value="groups">
+              <GroupManagement />
+            </TabsContent>
+
             <TabsContent value="login-details">
               <UserLoginDetails />
             </TabsContent>
@@ -62,3 +71,4 @@ const Access = () => {
 };
 
 export default Access;
+
