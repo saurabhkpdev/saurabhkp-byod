@@ -55,6 +55,15 @@ const allNavItems = [
   { id: 'admin', title: "Admin", url: "/admin", icon: Shield },
 ];
 
+const roleLabels: Record<UserRole, string> = {
+  user: 'User',
+  approver: 'Approver',
+  sys_admin: 'Sys Admin',
+  role_admin: 'Role Admin',
+  super_admin: 'Super Admin',
+};
+const formatRole = (role: UserRole) => roleLabels[role] ?? role.replace(/_/g, ' ');
+
 interface AppSidebarProps {
   children: React.ReactNode;
 }
@@ -208,8 +217,8 @@ export function AppSidebar({ children }: AppSidebarProps) {
                     <DropdownMenuSubTrigger className="gap-2">
                       <Shield className="w-4 h-4" />
                       <span>Role</span>
-                      <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 capitalize">
-                        {currentUser.activeRole}
+                      <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0">
+                        {formatRole(currentUser.activeRole)}
                       </Badge>
                     </DropdownMenuSubTrigger>
                     <DropdownMenuPortal>
@@ -219,8 +228,8 @@ export function AppSidebar({ children }: AppSidebarProps) {
                           onValueChange={(value) => switchRole(value as UserRole)}
                         >
                           {currentUser.roles.map((role) => (
-                            <DropdownMenuRadioItem key={role} value={role} className="capitalize">
-                              {role}
+                            <DropdownMenuRadioItem key={role} value={role}>
+                              {formatRole(role)}
                             </DropdownMenuRadioItem>
                           ))}
                         </DropdownMenuRadioGroup>
