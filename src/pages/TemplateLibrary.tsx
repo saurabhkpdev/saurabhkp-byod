@@ -464,9 +464,13 @@ export default function TemplateLibrary() {
                             variant="ghost"
                             size="sm"
                             className="text-muted-foreground hover:text-foreground"
-                            onClick={() => {
-                              resetSystemTemplate(template.id);
-                              toast.success('Template reset to default');
+                            onClick={async () => {
+                              try {
+                                await resetSystemTemplate(template.id);
+                                toast.success('Template reset to default');
+                              } catch (e: any) {
+                                toast.error(e?.message ?? 'Failed to reset');
+                              }
                             }}
                           >
                             <RotateCcw className="w-4 h-4" />
