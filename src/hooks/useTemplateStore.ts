@@ -252,7 +252,7 @@ export function useTemplateStore() {
         category: template.category,
         required_columns: template.requiredColumns,
         optional_columns: template.optionalColumns,
-        sample_data: template.sampleData,
+        sample_data: template.sampleData as any,
       })
       .select('*')
       .single();
