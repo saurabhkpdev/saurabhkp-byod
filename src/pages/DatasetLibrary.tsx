@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Database, MapPin, Globe, Table2, Search, Upload } from 'lucide-react';
+import { Database, MapPin, Globe, Table2, Search, Upload, Users2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TopBar } from '@/components/TopBar';
 import { mockDatasets, MockDataset } from '@/hooks/useMockDatabase';
 import { useLoadConfig, STRATEGY_LABELS } from '@/hooks/useLoadConfig';
+import { useDataVersions } from '@/hooks/useDataVersions';
+import { ShareToGroupsDialog } from '@/components/ShareToGroupsDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { format } from 'date-fns';
 
 export default function DatasetLibrary() {
   const navigate = useNavigate();
