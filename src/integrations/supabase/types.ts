@@ -220,6 +220,42 @@ export type Database = {
         }
         Relationships: []
       }
+      quality_rule_sets: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          name: string
+          owner_id: string
+          rules: Json
+          scope: string
+          scope_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          name: string
+          owner_id: string
+          rules?: Json
+          scope: string
+          scope_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          rules?: Json
+          scope?: string
+          scope_key?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       system_template_overrides: {
         Row: {
           category: string | null
