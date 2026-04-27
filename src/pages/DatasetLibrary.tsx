@@ -16,12 +16,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 
-export default function DatasetLibrary() {
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'geographical' | 'general'>('all');
-  const { getConfigForTemplate } = useLoadConfig();
-
 interface MyDatasetRow {
   id: string;
   dataset_name: string;
