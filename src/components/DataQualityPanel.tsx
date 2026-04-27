@@ -13,6 +13,7 @@ import {
   RefreshCw, ArrowRight, Database, FileCheck, Loader2, SendHorizonal
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { CustomRulesPanel } from './CustomRulesPanel';
 
 interface DataQualityPanelProps {
   columns: DataColumn[];
@@ -308,6 +309,9 @@ export const DataQualityPanel = ({ columns, rows, fileName, onProcessData }: Dat
 
   return (
     <div className="space-y-6">
+      {/* Custom Rule Sets */}
+      <CustomRulesPanel columns={columns} rows={rows} datasetName={fileName} />
+
       {/* Validation Action */}
       {!hasValidated && (
         <Card className="glass border-primary/20">
