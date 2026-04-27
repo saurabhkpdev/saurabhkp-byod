@@ -65,7 +65,7 @@ export function useDataVersions() {
 
     const snapshot: VersionSnapshot = { columns, rows };
 
-    const { error } = await supabase.from('data_versions').insert({
+    const { data: inserted, error } = await supabase.from('data_versions').insert({
       user_id: userId,
       dataset_name: datasetName,
       version_number: nextVersion,
@@ -73,15 +73,74 @@ export function useDataVersions() {
       row_count: rows.length,
       column_count: columns.length,
       change_summary: changeSummary ?? `Version ${nextVersion}`,
-    } as any);
+    } as any).select('id').single();
 
     if (error) {
       toast.error('Failed to save version', { description: error.message });
     } else {
+      // Auto-share with all groups the user belongs to
+      try {
+        const { data: groupRows } = await supabase
+          .from('group_members')
+          .select('group_id')
+          .eq('user_id', userId);
+        const myGroupIds = (groupRows ?? []).map((g: any) => g.group_id as string);
+        if (myGroupIds.length > 0 && inserted) {
+          await supabase.from('dataset_group_shares').insert(
+            myGroupIds.map((gid) => ({
+              dataset_version_id: inserted.id,
+              group_id: gid,
+              shared_by: userId,
+            })),
+          );
+        }
+      } catch (e) {
+        console.warn('Auto-share failed:', e);
+      }
       toast.success(`Saved as version ${nextVersion}`);
       await fetchVersions(datasetName);
     }
   }, [fetchVersions]);
+
+  const getDatasetShares = useCallback(async (datasetVersionId: string): Promise<string[]> => {
+    const { data } = await supabase
+      .from('dataset_group_shares')
+      .select('group_id')
+      .eq('dataset_version_id', datasetVersionId);
+    return (data ?? []).map((r: any) => r.group_id as string);
+  }, []);
+
+  const setDatasetShares = useCallback(async (datasetVersionId: string, groupIds: string[]) => {
+    const { data: session } = await supabase.auth.getSession();
+    const userId = session?.session?.user?.id;
+    if (!userId) throw new Error('Not signed in');
+
+    const { data: existing } = await supabase
+      .from('dataset_group_shares')
+      .select('group_id')
+      .eq('dataset_version_id', datasetVersionId);
+    const existingIds = new Set((existing ?? []).map((r: any) => r.group_id as string));
+    const target = new Set(groupIds);
+    const toAdd = [...target].filter((id) => !existingIds.has(id));
+    const toRemove = [...existingIds].filter((id) => !target.has(id));
+
+    if (toAdd.length > 0) {
+      await supabase.from('dataset_group_shares').insert(
+        toAdd.map((gid) => ({
+          dataset_version_id: datasetVersionId,
+          group_id: gid,
+          shared_by: userId,
+        })),
+      );
+    }
+    if (toRemove.length > 0) {
+      await supabase
+        .from('dataset_group_shares')
+        .delete()
+        .eq('dataset_version_id', datasetVersionId)
+        .in('group_id', toRemove);
+    }
+  }, []);
 
   const restoreVersion = useCallback(async (versionId: string): Promise<VersionSnapshot | null> => {
     const { data, error } = await supabase
