@@ -54,7 +54,7 @@ export default function DatasetLibrary() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">
-              <span className="gradient-text">Dataset Library</span>
+              <span className="gradient-text">Dataset</span> Library
             </h1>
             <p className="text-muted-foreground mt-1">
               Browse and manage existing datasets

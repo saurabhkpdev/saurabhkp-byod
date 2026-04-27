@@ -61,9 +61,10 @@ const Admin = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              
-              <h1 className="text-3xl font-bold">Platform <span className="gradient-text">Activity</span></h1>
-              <p className="text-muted-foreground">Monitor and audit all user actions on the platform</p>
+              <h1 className="text-3xl font-bold">
+                <span className="gradient-text">Platform</span> Activity
+              </h1>
+              <p className="text-muted-foreground mt-1">Monitor and audit all user actions on the platform</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handleRefresh} className="gap-2">
