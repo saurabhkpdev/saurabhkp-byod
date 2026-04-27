@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      custom_templates: {
+        Row: {
+          category: string
+          client_id: string | null
+          created_at: string
+          description: string
+          id: string
+          name: string
+          optional_columns: string[]
+          owner_id: string
+          required_columns: string[]
+          sample_data: Json
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          client_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          name: string
+          optional_columns?: string[]
+          owner_id: string
+          required_columns?: string[]
+          sample_data?: Json
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          client_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          optional_columns?: string[]
+          owner_id?: string
+          required_columns?: string[]
+          sample_data?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       data_versions: {
         Row: {
           change_summary: string | null
@@ -49,6 +91,45 @@ export type Database = {
           version_number?: number
         }
         Relationships: []
+      }
+      dataset_group_shares: {
+        Row: {
+          dataset_version_id: string
+          group_id: string
+          id: string
+          shared_at: string
+          shared_by: string
+        }
+        Insert: {
+          dataset_version_id: string
+          group_id: string
+          id?: string
+          shared_at?: string
+          shared_by: string
+        }
+        Update: {
+          dataset_version_id?: string
+          group_id?: string
+          id?: string
+          shared_at?: string
+          shared_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dataset_group_shares_dataset_version_id_fkey"
+            columns: ["dataset_version_id"]
+            isOneToOne: false
+            referencedRelation: "data_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dataset_group_shares_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       group_members: {
         Row: {
@@ -139,6 +220,87 @@ export type Database = {
         }
         Relationships: []
       }
+      system_template_overrides: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string | null
+          optional_columns: string[] | null
+          required_columns: string[] | null
+          sample_data: Json | null
+          system_template_id: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string | null
+          optional_columns?: string[] | null
+          required_columns?: string[] | null
+          sample_data?: Json | null
+          system_template_id: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string | null
+          optional_columns?: string[] | null
+          required_columns?: string[] | null
+          sample_data?: Json | null
+          system_template_id?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: []
+      }
+      template_group_shares: {
+        Row: {
+          group_id: string
+          id: string
+          shared_at: string
+          shared_by: string
+          template_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          shared_at?: string
+          shared_by: string
+          template_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          shared_at?: string
+          shared_by?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_group_shares_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_group_shares_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "custom_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       template_load_configs: {
         Row: {
           allow_user_override: boolean
@@ -213,6 +375,11 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      user_in_group: {
+        Args: { _group_id: string; _user_id: string }
         Returns: boolean
       }
     }

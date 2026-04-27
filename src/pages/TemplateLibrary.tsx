@@ -11,7 +11,8 @@ import {
   Wand2,
   MapPin,
   RotateCcw,
-  Sparkles
+  Sparkles,
+  Users2
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,6 +49,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TopBar } from '@/components/TopBar';
 import { useTemplateStore, generateSampleDataFromColumns, CustomTemplate } from '@/hooks/useTemplateStore';
 import { systemTemplates, generateSampleCSV, Template } from '@/components/TemplateSelector';
+import { ShareToGroupsDialog } from '@/components/ShareToGroupsDialog';
 import { toast } from 'sonner';
 import Papa from 'papaparse';
 
@@ -60,12 +62,13 @@ interface ColumnDefinition {
 type SampleDataMode = 'auto' | 'upload';
 
 export default function TemplateLibrary() {
-  const { customTemplates, systemOverrides, addTemplate, updateTemplate, deleteTemplate, updateSystemTemplate, resetSystemTemplate, getSystemOverride, isLoading } = useTemplateStore();
+  const { customTemplates, systemOverrides, addTemplate, updateTemplate, deleteTemplate, updateSystemTemplate, resetSystemTemplate, getSystemOverride, setTemplateGroupShares, isLoading } = useTemplateStore();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<CustomTemplate | null>(null);
   const [editingSystemTemplateId, setEditingSystemTemplateId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'system' | 'custom'>('all');
+  const [shareTarget, setShareTarget] = useState<CustomTemplate | null>(null);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -194,7 +197,7 @@ export default function TemplateLibrary() {
     return 'string';
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Validation
     if (!formName.trim()) {
       toast.error('Template name is required');
@@ -210,7 +213,6 @@ export default function TemplateLibrary() {
     const requiredColumns = validColumns.filter(c => c.required).map(c => c.name.trim());
     const optionalColumns = validColumns.filter(c => !c.required).map(c => c.name.trim());
 
-    // Generate or use uploaded sample data
     let sampleData: Record<string, unknown>[];
     if (sampleDataMode === 'upload' && uploadedSampleData) {
       sampleData = uploadedSampleData;
@@ -229,25 +231,27 @@ export default function TemplateLibrary() {
 
     try {
       if (editingSystemTemplateId) {
-        updateSystemTemplate(editingSystemTemplateId, templateData);
+        await updateSystemTemplate(editingSystemTemplateId, templateData);
         toast.success('System template updated successfully');
       } else if (editingTemplate) {
-        updateTemplate(editingTemplate.id, templateData);
+        await updateTemplate(editingTemplate.id, templateData);
         toast.success('Template updated successfully');
       } else {
-        addTemplate(templateData);
-        toast.success('Template created successfully');
+        await addTemplate(templateData);
+        toast.success('Template created and shared with your groups');
       }
       setShowCreateDialog(false);
       resetForm();
-    } catch {
-      toast.error('Failed to save template');
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Failed to save template');
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (deleteTemplate(id)) {
+  const handleDelete = async (id: string) => {
+    if (await deleteTemplate(id)) {
       toast.success('Template deleted');
+    } else {
+      toast.error('Failed to delete template');
     }
     setDeleteConfirmId(null);
   };
@@ -433,23 +437,40 @@ export default function TemplateLibrary() {
                           <Edit2 className="w-4 h-4" />
                         </Button>
                         {template.isCustom && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => setDeleteConfirmId(template.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setShareTarget(template as CustomTemplate)}
+                              title="Share with groups"
+                            >
+                              <Users2 className="w-4 h-4" />
+                              {(template as CustomTemplate).sharedGroupIds && (template as CustomTemplate).sharedGroupIds!.length > 0 && (
+                                <span className="ml-1 text-[10px]">{(template as CustomTemplate).sharedGroupIds!.length}</span>
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => setDeleteConfirmId(template.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </>
                         )}
                         {!template.isCustom && template.isOverridden && (
                           <Button
                             variant="ghost"
                             size="sm"
                             className="text-muted-foreground hover:text-foreground"
-                            onClick={() => {
-                              resetSystemTemplate(template.id);
-                              toast.success('Template reset to default');
+                            onClick={async () => {
+                              try {
+                                await resetSystemTemplate(template.id);
+                                toast.success('Template reset to default');
+                              } catch (e: any) {
+                                toast.error(e?.message ?? 'Failed to reset');
+                              }
                             }}
                           >
                             <RotateCcw className="w-4 h-4" />
@@ -649,6 +670,17 @@ export default function TemplateLibrary() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {shareTarget && (
+        <ShareToGroupsDialog
+          open={!!shareTarget}
+          onOpenChange={(o) => !o && setShareTarget(null)}
+          resourceLabel="template"
+          resourceName={shareTarget.name}
+          initialGroupIds={shareTarget.sharedGroupIds ?? []}
+          onSave={(ids) => setTemplateGroupShares(shareTarget.id, ids)}
+        />
+      )}
     </div>
   );
 }
