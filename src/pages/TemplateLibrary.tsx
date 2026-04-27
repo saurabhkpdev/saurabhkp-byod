@@ -49,6 +49,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TopBar } from '@/components/TopBar';
 import { useTemplateStore, generateSampleDataFromColumns, CustomTemplate } from '@/hooks/useTemplateStore';
 import { systemTemplates, generateSampleCSV, Template } from '@/components/TemplateSelector';
+import { ShareToGroupsDialog } from '@/components/ShareToGroupsDialog';
 import { toast } from 'sonner';
 import Papa from 'papaparse';
 
