@@ -670,6 +670,17 @@ export default function TemplateLibrary() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {shareTarget && (
+        <ShareToGroupsDialog
+          open={!!shareTarget}
+          onOpenChange={(o) => !o && setShareTarget(null)}
+          resourceLabel="template"
+          resourceName={shareTarget.name}
+          initialGroupIds={shareTarget.sharedGroupIds ?? []}
+          onSave={(ids) => setTemplateGroupShares(shareTarget.id, ids)}
+        />
+      )}
     </div>
   );
 }
