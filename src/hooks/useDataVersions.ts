@@ -172,5 +172,5 @@ export function useDataVersions() {
     }
   }, [fetchVersions]);
 
-  return { versions, isLoading, fetchVersions, saveVersion, restoreVersion, deleteVersion };
+  return { versions, isLoading, fetchVersions, saveVersion, restoreVersion, deleteVersion, getDatasetShares, setDatasetShares };
 }
