@@ -22,6 +22,74 @@ export default function DatasetLibrary() {
   const [activeTab, setActiveTab] = useState<'all' | 'geographical' | 'general'>('all');
   const { getConfigForTemplate } = useLoadConfig();
 
+interface MyDatasetRow {
+  id: string;
+  dataset_name: string;
+  version_number: number;
+  row_count: number;
+  column_count: number;
+  created_at: string;
+  shared_group_ids: string[];
+}
+
+export default function DatasetLibrary() {
+  const navigate = useNavigate();
+  const currentUser = useAuth((s) => s.currentUser);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'all' | 'mine' | 'geographical' | 'general'>('all');
+  const { getConfigForTemplate } = useLoadConfig();
+  const { setDatasetShares } = useDataVersions();
+
+  const [myDatasets, setMyDatasets] = useState<MyDatasetRow[]>([]);
+  const [loadingMine, setLoadingMine] = useState(false);
+  const [shareTarget, setShareTarget] = useState<MyDatasetRow | null>(null);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    let cancelled = false;
+    (async () => {
+      setLoadingMine(true);
+      const { data, error } = await supabase
+        .from('data_versions')
+        .select('id, dataset_name, version_number, row_count, column_count, created_at')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+      if (cancelled) return;
+      if (error || !data) {
+        setMyDatasets([]);
+        setLoadingMine(false);
+        return;
+      }
+      // Latest version per dataset_name
+      const seen = new Set<string>();
+      const latest = data.filter((r: any) => {
+        if (seen.has(r.dataset_name)) return false;
+        seen.add(r.dataset_name);
+        return true;
+      });
+      const ids = latest.map((r: any) => r.id);
+      let shareMap: Record<string, string[]> = {};
+      if (ids.length > 0) {
+        const { data: shares } = await supabase
+          .from('dataset_group_shares')
+          .select('dataset_version_id, group_id')
+          .in('dataset_version_id', ids);
+        (shares ?? []).forEach((s: any) => {
+          shareMap[s.dataset_version_id] = shareMap[s.dataset_version_id] ?? [];
+          shareMap[s.dataset_version_id].push(s.group_id);
+        });
+      }
+      setMyDatasets(
+        latest.map((r: any) => ({
+          ...r,
+          shared_group_ids: shareMap[r.id] ?? [],
+        })),
+      );
+      setLoadingMine(false);
+    })();
+    return () => { cancelled = true; };
+  }, [currentUser?.id, shareTarget === null]);
+
   const filteredDatasets = useMemo(() => {
     let datasets = mockDatasets;
 
@@ -36,6 +104,12 @@ export default function DatasetLibrary() {
     }
     return datasets;
   }, [activeTab, searchQuery]);
+
+  const filteredMine = useMemo(() => {
+    if (!searchQuery.trim()) return myDatasets;
+    const q = searchQuery.toLowerCase();
+    return myDatasets.filter((d) => d.dataset_name.toLowerCase().includes(q));
+  }, [myDatasets, searchQuery]);
 
   const geoCount = mockDatasets.filter(d => d.hasGeoData).length;
   const generalCount = mockDatasets.length - geoCount;
