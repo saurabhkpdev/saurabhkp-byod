@@ -16,7 +16,7 @@ const Approvals = () => {
             <h1 className="text-3xl font-bold">
               <span className="gradient-text">Approvals</span>
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mt-1">
               Review and manage data upload and manipulation requests
             </p>
           </div>

@@ -23,7 +23,7 @@ const Access = () => {
             <h1 className="text-3xl font-bold">
               <span className="gradient-text">Access</span> Management
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mt-1">
               Manage users, role assignments, groups, and review user login activity
             </p>
           </div>
