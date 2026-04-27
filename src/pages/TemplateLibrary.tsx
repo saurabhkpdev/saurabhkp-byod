@@ -437,14 +437,27 @@ export default function TemplateLibrary() {
                           <Edit2 className="w-4 h-4" />
                         </Button>
                         {template.isCustom && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => setDeleteConfirmId(template.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setShareTarget(template as CustomTemplate)}
+                              title="Share with groups"
+                            >
+                              <Users2 className="w-4 h-4" />
+                              {(template as CustomTemplate).sharedGroupIds && (template as CustomTemplate).sharedGroupIds!.length > 0 && (
+                                <span className="ml-1 text-[10px]">{(template as CustomTemplate).sharedGroupIds!.length}</span>
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => setDeleteConfirmId(template.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </>
                         )}
                         {!template.isCustom && template.isOverridden && (
                           <Button
