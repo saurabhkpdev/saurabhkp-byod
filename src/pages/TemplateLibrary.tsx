@@ -62,12 +62,13 @@ interface ColumnDefinition {
 type SampleDataMode = 'auto' | 'upload';
 
 export default function TemplateLibrary() {
-  const { customTemplates, systemOverrides, addTemplate, updateTemplate, deleteTemplate, updateSystemTemplate, resetSystemTemplate, getSystemOverride, isLoading } = useTemplateStore();
+  const { customTemplates, systemOverrides, addTemplate, updateTemplate, deleteTemplate, updateSystemTemplate, resetSystemTemplate, getSystemOverride, setTemplateGroupShares, isLoading } = useTemplateStore();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<CustomTemplate | null>(null);
   const [editingSystemTemplateId, setEditingSystemTemplateId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'system' | 'custom'>('all');
+  const [shareTarget, setShareTarget] = useState<CustomTemplate | null>(null);
 
   // Form state
   const [formName, setFormName] = useState('');
