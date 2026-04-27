@@ -41,7 +41,7 @@ const ActionsConfigPage = () => {
               <LoadConfigPanel />
             </TabsContent>
           </Tabs>
-        </div>
+        </main>
       </div>
     </>
   );
