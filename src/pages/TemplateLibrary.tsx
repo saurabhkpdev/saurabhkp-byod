@@ -197,7 +197,7 @@ export default function TemplateLibrary() {
     return 'string';
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Validation
     if (!formName.trim()) {
       toast.error('Template name is required');
@@ -213,7 +213,6 @@ export default function TemplateLibrary() {
     const requiredColumns = validColumns.filter(c => c.required).map(c => c.name.trim());
     const optionalColumns = validColumns.filter(c => !c.required).map(c => c.name.trim());
 
-    // Generate or use uploaded sample data
     let sampleData: Record<string, unknown>[];
     if (sampleDataMode === 'upload' && uploadedSampleData) {
       sampleData = uploadedSampleData;
@@ -232,25 +231,27 @@ export default function TemplateLibrary() {
 
     try {
       if (editingSystemTemplateId) {
-        updateSystemTemplate(editingSystemTemplateId, templateData);
+        await updateSystemTemplate(editingSystemTemplateId, templateData);
         toast.success('System template updated successfully');
       } else if (editingTemplate) {
-        updateTemplate(editingTemplate.id, templateData);
+        await updateTemplate(editingTemplate.id, templateData);
         toast.success('Template updated successfully');
       } else {
-        addTemplate(templateData);
-        toast.success('Template created successfully');
+        await addTemplate(templateData);
+        toast.success('Template created and shared with your groups');
       }
       setShowCreateDialog(false);
       resetForm();
-    } catch {
-      toast.error('Failed to save template');
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Failed to save template');
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (deleteTemplate(id)) {
+  const handleDelete = async (id: string) => {
+    if (await deleteTemplate(id)) {
       toast.success('Template deleted');
+    } else {
+      toast.error('Failed to delete template');
     }
     setDeleteConfirmId(null);
   };
