@@ -10,11 +10,13 @@ const ActionsConfigPage = () => {
       <Helmet>
         <title>Data Flows | BYOD</title>
       </Helmet>
-      <div className="flex-1 p-6 overflow-auto">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Data Flows</h1>
-            <p className="text-muted-foreground">
+      <div className="min-h-screen bg-background">
+        <main className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold">
+              <span className="gradient-text">Data</span> Flows
+            </h1>
+            <p className="text-muted-foreground mt-1">
               Configure data load strategies and automated actions triggered by data events
             </p>
           </div>
