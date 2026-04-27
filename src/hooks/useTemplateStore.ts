@@ -332,7 +332,7 @@ export function useTemplateStore() {
     };
     const { error } = await supabase
       .from('system_template_overrides')
-      .upsert(payload, { onConflict: 'system_template_id' });
+      .upsert(payload as any, { onConflict: 'system_template_id' });
     if (error) throw error;
     await refresh();
     force((n) => n + 1);
