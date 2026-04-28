@@ -485,6 +485,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      user_can_see_rule_set: {
+        Args: { _rule_set_id: string; _user_id: string }
+        Returns: boolean
+      }
       user_in_group: {
         Args: { _group_id: string; _user_id: string }
         Returns: boolean
