@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Plus, Edit2, Trash2, ListChecks, ShieldAlert } from 'lucide-react';
-import { TopBar } from '@/components/TopBar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,14 +27,25 @@ export default function QualityRules() {
   const startEdit = (rs: RuleSet) => { setEditing(rs); setEditorOpen(true); };
 
   return (
-    <div className="flex-1">
-      <TopBar
-        title="Quality Rules"
-        description="Central inventory of data quality rule sets. Attach them to templates or datasets."
-        icon={<ListChecks className="w-6 h-6 text-primary-foreground" />}
-      />
+    <>
+      <Helmet>
+        <title>Quality Rules - BYOD</title>
+        <meta name="description" content="Central inventory of data quality rule sets to attach to templates and datasets." />
+      </Helmet>
 
-      <div className="p-6 space-y-4">
+      <div className="min-h-screen bg-background">
+        <main className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <ListChecks className="w-7 h-7 text-primary" />
+              <span className="gradient-text">Quality Rules</span>
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Central inventory of data quality rule sets. Attach them to templates or datasets.
+            </p>
+          </div>
+
+          <div className="space-y-4">
         {!isAdmin && (
           <Card className="border-yellow-500/40 bg-yellow-500/5">
             <CardContent className="py-4 flex items-center gap-2 text-sm">
