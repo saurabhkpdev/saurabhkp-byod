@@ -112,7 +112,7 @@ export function RuleSetEditor({
             </div>
           </div>
 
-          <ScrollArea className="max-h-[420px] pr-3">
+          <ScrollArea className="flex-1 min-h-0 pr-3">
             <div className="space-y-2">
               {rules.length === 0 && (
                 <Card><CardContent className="py-6 text-center text-sm text-muted-foreground">
