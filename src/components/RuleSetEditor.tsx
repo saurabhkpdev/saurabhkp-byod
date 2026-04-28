@@ -80,7 +80,7 @@ export function RuleSetEditor({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Quality Rule Set</DialogTitle>
           <DialogDescription>
@@ -88,7 +88,7 @@ export function RuleSetEditor({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3">
+        <div className="space-y-3 flex-1 min-h-0 flex flex-col">
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Name</Label>
@@ -112,7 +112,7 @@ export function RuleSetEditor({
             </div>
           </div>
 
-          <ScrollArea className="max-h-[420px] pr-3">
+          <ScrollArea className="flex-1 min-h-0 pr-3">
             <div className="space-y-2">
               {rules.length === 0 && (
                 <Card><CardContent className="py-6 text-center text-sm text-muted-foreground">
