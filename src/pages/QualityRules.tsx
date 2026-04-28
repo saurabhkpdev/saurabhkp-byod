@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Plus, Edit2, Trash2, ListChecks, ShieldAlert, Sparkles, Loader2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, ListChecks, ShieldAlert, Sparkles, Loader2, Wand2 } from 'lucide-react';
 import { DEFAULT_RULE_SETS } from '@/lib/defaultRuleSets';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -10,9 +10,19 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useQualityRules, RuleSet } from '@/hooks/useQualityRules';
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  useQualityRules, RuleSet,
+  getTemplateRuleAttachments, getDatasetRuleAttachments,
+  setTemplateRuleAttachments, setDatasetRuleAttachments,
+} from '@/hooks/useQualityRules';
 import { useAuth } from '@/hooks/useAuth';
 import { RuleSetEditor } from '@/components/RuleSetEditor';
+import { supabase } from '@/integrations/supabase/client';
 
 const ADMIN_ROLES = ['sys_admin', 'role_admin', 'super_admin'];
 
