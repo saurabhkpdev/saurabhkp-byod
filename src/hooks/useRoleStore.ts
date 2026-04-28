@@ -33,6 +33,7 @@ const defaultPagePermissions: PagePermission[] = [
   { pageId: 'templates', pageName: 'Templates', path: '/templates', roles: ['user', 'approver', 'sys_admin', 'super_admin'] },
   { pageId: 'datasets', pageName: 'Datasets', path: '/datasets', roles: ['user', 'approver', 'sys_admin', 'super_admin'] },
   { pageId: 'actions', pageName: 'Actions', path: '/actions', roles: ['sys_admin', 'super_admin'] },
+  { pageId: 'quality-rules', pageName: 'Quality Rules', path: '/quality-rules', roles: ['user', 'approver', 'sys_admin', 'role_admin', 'super_admin'] },
   { pageId: 'documentation', pageName: 'Documentation', path: '/docs', roles: ['user', 'approver', 'sys_admin', 'role_admin', 'super_admin'] },
   { pageId: 'approvals', pageName: 'Approvals', path: '/approvals', roles: ['approver', 'sys_admin', 'super_admin'] },
   { pageId: 'access', pageName: 'Access', path: '/access', roles: ['role_admin', 'super_admin'] },
