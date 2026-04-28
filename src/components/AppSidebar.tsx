@@ -16,7 +16,8 @@ import {
   Sun,
   Menu,
   X,
-  KeyRound
+  KeyRound,
+  ListChecks
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
