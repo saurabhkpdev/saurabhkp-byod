@@ -178,6 +178,16 @@ const AppRoutes = () => {
         }
       />
       <Route
+        path="/quality-rules"
+        element={
+          <ProtectedRoute path="/quality-rules">
+            <AppSidebar>
+              <QualityRules />
+            </AppSidebar>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin"
         element={
           <ProtectedRoute path="/admin">
