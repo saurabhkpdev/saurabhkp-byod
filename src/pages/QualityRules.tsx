@@ -22,11 +22,29 @@ export default function QualityRules() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<RuleSet | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<RuleSet | null>(null);
+  const [seeding, setSeeding] = useState(false);
 
   const isAdmin = !!currentUser?.roles.some((r) => ADMIN_ROLES.includes(r));
 
   const startCreate = () => { setEditing(null); setEditorOpen(true); };
   const startEdit = (rs: RuleSet) => { setEditing(rs); setEditorOpen(true); };
+
+  const seedDefaults = async () => {
+    setSeeding(true);
+    try {
+      let created = 0;
+      for (const def of DEFAULT_RULE_SETS) {
+        const exists = ruleSets.some((rs) => rs.name === def.name);
+        if (exists) continue;
+        const ok = await saveRuleSet({ name: def.name, description: def.description, rules: def.rules });
+        if (ok) created++;
+      }
+      if (created > 0) toast.success(`Seeded ${created} default rule set${created === 1 ? '' : 's'}`);
+      else toast.info('Default rule sets already exist');
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   return (
     <>
