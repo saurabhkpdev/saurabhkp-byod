@@ -12,6 +12,8 @@ import { mockDatasets, MockDataset } from '@/hooks/useMockDatabase';
 import { useLoadConfig, STRATEGY_LABELS } from '@/hooks/useLoadConfig';
 import { useDataVersions } from '@/hooks/useDataVersions';
 import { ShareToGroupsDialog } from '@/components/ShareToGroupsDialog';
+import { RuleSetAttachDialog } from '@/components/RuleSetAttachDialog';
+import { getDatasetRuleAttachments, setDatasetRuleAttachments } from '@/hooks/useQualityRules';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
