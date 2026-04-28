@@ -310,8 +310,8 @@ export const DataQualityPanel = ({ columns, rows, fileName, templateId, onProces
 
   return (
     <div className="space-y-6">
-      {/* Custom Rule Sets */}
-      <CustomRulesPanel columns={columns} rows={rows} datasetName={fileName} />
+      {/* Attached Quality Rules */}
+      <CustomRulesPanel columns={columns} rows={rows} datasetName={fileName} templateId={templateId} />
 
       {/* Validation Action */}
       {!hasValidated && (
