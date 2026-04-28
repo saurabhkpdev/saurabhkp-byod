@@ -39,6 +39,15 @@ export default function DatasetLibrary() {
   const [myDatasets, setMyDatasets] = useState<MyDatasetRow[]>([]);
   const [loadingMine, setLoadingMine] = useState(false);
   const [shareTarget, setShareTarget] = useState<MyDatasetRow | null>(null);
+  const [rulesTarget, setRulesTarget] = useState<MyDatasetRow | null>(null);
+  const [rulesInitialIds, setRulesInitialIds] = useState<string[]>([]);
+  const isAdmin = !!currentUser?.roles.some((r) => ['sys_admin', 'role_admin', 'super_admin'].includes(r));
+
+  const openAttachRules = async (d: MyDatasetRow) => {
+    const ids = await getDatasetRuleAttachments(d.dataset_name);
+    setRulesInitialIds(ids);
+    setRulesTarget(d);
+  };
 
   useEffect(() => {
     if (!currentUser) return;
