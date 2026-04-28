@@ -112,8 +112,10 @@ export default function QualityRules() {
                 </CardContent>
               </Card>
             ))}
+              </div>
+            )}
           </div>
-        )}
+        </main>
       </div>
 
       {editorOpen && (
@@ -152,6 +154,7 @@ export default function QualityRules() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }
+
