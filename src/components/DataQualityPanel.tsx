@@ -44,7 +44,7 @@ interface QualityMetrics {
   issues: QualityIssue[];
 }
 
-export const DataQualityPanel = ({ columns, rows, fileName, onProcessData }: DataQualityPanelProps) => {
+export const DataQualityPanel = ({ columns, rows, fileName, templateId, onProcessData }: DataQualityPanelProps) => {
   const [isValidating, setIsValidating] = useState(false);
   const [hasValidated, setHasValidated] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
