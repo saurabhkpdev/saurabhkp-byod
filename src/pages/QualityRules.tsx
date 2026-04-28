@@ -88,9 +88,27 @@ export default function QualityRules() {
 
         {!loading && ruleSets.length === 0 ? (
           <Card className="border-dashed">
-            <CardContent className="py-12 text-center text-sm text-muted-foreground">
-              No quality rule sets yet.
-              {isAdmin && <p className="mt-2">Click "New rule set" to define your first one.</p>}
+            <CardContent className="py-12 flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <ListChecks className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-1">No quality rules visible</h3>
+              <p className="text-sm text-muted-foreground max-w-md mb-6">
+                {isAdmin
+                  ? 'Get started by importing a curated set of defaults (identity, geo, sales) or define your own rule set from scratch.'
+                  : 'No rule sets are attached to templates or datasets you can access. Ask an admin to share or attach rule sets.'}
+              </p>
+              {isAdmin && (
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <Button onClick={seedDefaults} disabled={seeding}>
+                    {seeding ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />}
+                    Import default rule sets
+                  </Button>
+                  <Button variant="outline" onClick={startCreate}>
+                    <Plus className="w-4 h-4 mr-1" /> Create from scratch
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         ) : (
