@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Table, BarChart3, ShieldCheck, Map, Database, Rocket, BookOpen, Lightbulb, CheckCircle2, ArrowRight, FileSpreadsheet, Edit3, Lock, AlertTriangle, Send, Sparkles } from "lucide-react";
+import { Upload, Table, BarChart3, ShieldCheck, Map, Database, Rocket, BookOpen, Lightbulb, CheckCircle2, ArrowRight, FileSpreadsheet, Edit3, Lock, AlertTriangle, Send, Sparkles, Library, GitBranch, Users, Workflow, Zap, Shield, Bot, FileText, Calculator, Layers } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 const Documentation = () => {
