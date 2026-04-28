@@ -276,6 +276,7 @@ const DataUpload = () => {
                     columns={data.columns} 
                     rows={data.rows}
                     fileName={data.fileName}
+                    templateId={selectedTemplate?.isCustom ? selectedTemplate.id : null}
                     onProcessData={() => {
                       logEvent('data_submitted', `Submitted ${data.rows.length} rows from "${data.fileName}" for approval`, 'Data Studio', { fileName: data.fileName, rowCount: data.rows.length });
                       // Stay in data studio - clear current data to allow new upload
