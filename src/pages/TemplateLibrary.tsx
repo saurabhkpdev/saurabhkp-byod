@@ -51,6 +51,9 @@ import { TopBar } from '@/components/TopBar';
 import { useTemplateStore, generateSampleDataFromColumns, CustomTemplate } from '@/hooks/useTemplateStore';
 import { systemTemplates, generateSampleCSV, Template } from '@/components/TemplateSelector';
 import { ShareToGroupsDialog } from '@/components/ShareToGroupsDialog';
+import { RuleSetAttachDialog } from '@/components/RuleSetAttachDialog';
+import { getTemplateRuleAttachments, setTemplateRuleAttachments } from '@/hooks/useQualityRules';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Papa from 'papaparse';
 
