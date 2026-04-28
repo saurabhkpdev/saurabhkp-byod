@@ -245,9 +245,14 @@ export default function QualityRules() {
             {loading ? 'Loading…' : `${ruleSets.length} rule set${ruleSets.length === 1 ? '' : 's'}`}
           </p>
           {isAdmin && (
-            <Button onClick={startCreate}>
-              <Plus className="w-4 h-4 mr-1" /> New rule set
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={openSuggestions}>
+                <Wand2 className="w-4 h-4 mr-1" /> Suggest & attach
+              </Button>
+              <Button onClick={startCreate}>
+                <Plus className="w-4 h-4 mr-1" /> New rule set
+              </Button>
+            </div>
           )}
         </div>
 
