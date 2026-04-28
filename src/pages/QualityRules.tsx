@@ -26,6 +26,34 @@ import { supabase } from '@/integrations/supabase/client';
 
 const ADMIN_ROLES = ['sys_admin', 'role_admin', 'super_admin'];
 
+interface Suggestion {
+  key: string; // unique id template:<id> or dataset:<name>
+  kind: 'template' | 'dataset';
+  resourceId: string; // template uuid or dataset name
+  resourceLabel: string;
+  ruleSet: RuleSet;
+  reason: string;
+}
+
+// Match a default rule set to a resource by checking column names + resource label
+function matchScore(ruleSet: RuleSet, label: string, columns: string[]): string | null {
+  const lc = label.toLowerCase();
+  const cols = new Set(columns.map((c) => c.toLowerCase()));
+  const ruleCols = ruleSet.rules
+    .filter((r) => r.kind === 'column')
+    .map((r: any) => String(r.column).toLowerCase());
+
+  const hits = ruleCols.filter((c) => cols.has(c));
+  if (hits.length >= 2) return `matches columns: ${hits.slice(0, 4).join(', ')}`;
+
+  // Fallback: name keyword match
+  const nameKey = ruleSet.name.toLowerCase();
+  if (nameKey.includes('geo') && (cols.has('latitude') || cols.has('longitude') || lc.includes('geo') || lc.includes('location'))) return 'geo-related columns or name';
+  if (nameKey.includes('sales') && (lc.includes('sale') || lc.includes('order') || lc.includes('invoice') || lc.includes('transaction'))) return 'sales-related resource name';
+  if (nameKey.includes('identity') && (cols.has('email') || cols.has('id') || cols.has('name'))) return 'identity columns present';
+  return null;
+}
+
 export default function QualityRules() {
   const { ruleSets, loading, saveRuleSet, deleteRuleSet } = useQualityRules();
   const { currentUser } = useAuth();
