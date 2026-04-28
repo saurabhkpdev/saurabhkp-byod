@@ -16,7 +16,8 @@ import {
   Sun,
   Menu,
   X,
-  KeyRound
+  KeyRound,
+  ListChecks
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,7 @@ const allNavItems = [
   { id: 'templates', title: "Templates", url: "/templates", icon: FileSpreadsheet },
   { id: 'datasets', title: "Datasets", url: "/datasets", icon: Database },
   { id: 'actions', title: "Data Flows", url: "/actions", icon: Settings },
+  { id: 'quality-rules', title: "Quality Rules", url: "/quality-rules", icon: ListChecks },
   { id: 'documentation', title: "Documentation", url: "/docs", icon: BookOpen },
   { id: 'approvals', title: "Approvals", url: "/approvals", icon: ClipboardCheck },
   { id: 'access', title: "Access", url: "/access", icon: KeyRound },

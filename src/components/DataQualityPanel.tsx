@@ -19,6 +19,7 @@ interface DataQualityPanelProps {
   columns: DataColumn[];
   rows: DataRow[];
   fileName?: string;
+  templateId?: string | null;
   onProcessData: () => void;
 }
 
@@ -43,7 +44,7 @@ interface QualityMetrics {
   issues: QualityIssue[];
 }
 
-export const DataQualityPanel = ({ columns, rows, fileName, onProcessData }: DataQualityPanelProps) => {
+export const DataQualityPanel = ({ columns, rows, fileName, templateId, onProcessData }: DataQualityPanelProps) => {
   const [isValidating, setIsValidating] = useState(false);
   const [hasValidated, setHasValidated] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -309,8 +310,8 @@ export const DataQualityPanel = ({ columns, rows, fileName, onProcessData }: Dat
 
   return (
     <div className="space-y-6">
-      {/* Custom Rule Sets */}
-      <CustomRulesPanel columns={columns} rows={rows} datasetName={fileName} />
+      {/* Attached Quality Rules */}
+      <CustomRulesPanel columns={columns} rows={rows} datasetName={fileName} templateId={templateId} />
 
       {/* Validation Action */}
       {!hasValidated && (

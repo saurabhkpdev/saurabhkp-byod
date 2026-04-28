@@ -19,6 +19,7 @@ import TemplateLibrary from "./pages/TemplateLibrary";
 import DatasetLibrary from "./pages/DatasetLibrary";
 import Approvals from "./pages/Approvals";
 import ActionsConfigPage from "./pages/ActionsConfig";
+import QualityRules from "./pages/QualityRules";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
@@ -172,6 +173,16 @@ const AppRoutes = () => {
           <ProtectedRoute path="/actions">
             <AppSidebar>
               <ActionsConfigPage />
+            </AppSidebar>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/quality-rules"
+        element={
+          <ProtectedRoute path="/quality-rules">
+            <AppSidebar>
+              <QualityRules />
             </AppSidebar>
           </ProtectedRoute>
         }

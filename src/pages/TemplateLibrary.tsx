@@ -12,7 +12,8 @@ import {
   MapPin,
   RotateCcw,
   Sparkles,
-  Users2
+  Users2,
+  ListChecks
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,6 +51,9 @@ import { TopBar } from '@/components/TopBar';
 import { useTemplateStore, generateSampleDataFromColumns, CustomTemplate } from '@/hooks/useTemplateStore';
 import { systemTemplates, generateSampleCSV, Template } from '@/components/TemplateSelector';
 import { ShareToGroupsDialog } from '@/components/ShareToGroupsDialog';
+import { RuleSetAttachDialog } from '@/components/RuleSetAttachDialog';
+import { getTemplateRuleAttachments, setTemplateRuleAttachments } from '@/hooks/useQualityRules';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Papa from 'papaparse';
 
@@ -69,6 +73,16 @@ export default function TemplateLibrary() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'system' | 'custom'>('all');
   const [shareTarget, setShareTarget] = useState<CustomTemplate | null>(null);
+  const [rulesTarget, setRulesTarget] = useState<CustomTemplate | null>(null);
+  const [rulesInitialIds, setRulesInitialIds] = useState<string[]>([]);
+  const { currentUser } = useAuth();
+  const isAdmin = !!currentUser?.roles.some((r) => ['sys_admin', 'role_admin', 'super_admin'].includes(r));
+
+  const openAttachRules = async (tpl: CustomTemplate) => {
+    const ids = await getTemplateRuleAttachments(tpl.id);
+    setRulesInitialIds(ids);
+    setRulesTarget(tpl);
+  };
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -449,6 +463,16 @@ export default function TemplateLibrary() {
                                 <span className="ml-1 text-[10px]">{(template as CustomTemplate).sharedGroupIds!.length}</span>
                               )}
                             </Button>
+                            {isAdmin && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openAttachRules(template as CustomTemplate)}
+                                title="Attach quality rules"
+                              >
+                                <ListChecks className="w-4 h-4" />
+                              </Button>
+                            )}
                             <Button
                               variant="ghost"
                               size="sm"
@@ -681,6 +705,17 @@ export default function TemplateLibrary() {
           onSave={(ids) => setTemplateGroupShares(shareTarget.id, ids)}
         />
       )}
+
+      {rulesTarget && (
+        <RuleSetAttachDialog
+          open={!!rulesTarget}
+          onOpenChange={(o) => !o && setRulesTarget(null)}
+          resourceLabel={`template "${rulesTarget.name}"`}
+          initialIds={rulesInitialIds}
+          onSave={async (ids) => setTemplateRuleAttachments(rulesTarget.id, ids)}
+        />
+      )}
     </div>
   );
 }
+

@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Database, MapPin, Globe, Table2, Search, Upload, Users2, Loader2 } from 'lucide-react';
+import { Database, MapPin, Globe, Table2, Search, Upload, Users2, Loader2, ListChecks } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,8 @@ import { mockDatasets, MockDataset } from '@/hooks/useMockDatabase';
 import { useLoadConfig, STRATEGY_LABELS } from '@/hooks/useLoadConfig';
 import { useDataVersions } from '@/hooks/useDataVersions';
 import { ShareToGroupsDialog } from '@/components/ShareToGroupsDialog';
+import { RuleSetAttachDialog } from '@/components/RuleSetAttachDialog';
+import { getDatasetRuleAttachments, setDatasetRuleAttachments } from '@/hooks/useQualityRules';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
@@ -37,6 +39,15 @@ export default function DatasetLibrary() {
   const [myDatasets, setMyDatasets] = useState<MyDatasetRow[]>([]);
   const [loadingMine, setLoadingMine] = useState(false);
   const [shareTarget, setShareTarget] = useState<MyDatasetRow | null>(null);
+  const [rulesTarget, setRulesTarget] = useState<MyDatasetRow | null>(null);
+  const [rulesInitialIds, setRulesInitialIds] = useState<string[]>([]);
+  const isAdmin = !!currentUser?.roles.some((r) => ['sys_admin', 'role_admin', 'super_admin'].includes(r));
+
+  const openAttachRules = async (d: MyDatasetRow) => {
+    const ids = await getDatasetRuleAttachments(d.dataset_name);
+    setRulesInitialIds(ids);
+    setRulesTarget(d);
+  };
 
   useEffect(() => {
     if (!currentUser) return;
@@ -233,6 +244,18 @@ export default function DatasetLibrary() {
                             <Users2 className="w-4 h-4" />
                             Share
                           </Button>
+                          {isAdmin && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 gap-1"
+                              onClick={() => openAttachRules(d)}
+                              title="Attach quality rules"
+                            >
+                              <ListChecks className="w-4 h-4" />
+                              Rules
+                            </Button>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -313,6 +336,16 @@ export default function DatasetLibrary() {
           resourceName={shareTarget.dataset_name}
           initialGroupIds={shareTarget.shared_group_ids}
           onSave={(ids) => setDatasetShares(shareTarget.id, ids)}
+        />
+      )}
+
+      {rulesTarget && (
+        <RuleSetAttachDialog
+          open={!!rulesTarget}
+          onOpenChange={(o) => !o && setRulesTarget(null)}
+          resourceLabel={`dataset "${rulesTarget.dataset_name}"`}
+          initialIds={rulesInitialIds}
+          onSave={async (ids) => setDatasetRuleAttachments(rulesTarget.dataset_name, ids)}
         />
       )}
     </div>
