@@ -33,6 +33,11 @@ export default function QualityRules() {
   const [editing, setEditing] = useState<RuleSet | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<RuleSet | null>(null);
   const [seeding, setSeeding] = useState(false);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [suggestLoading, setSuggestLoading] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const isAdmin = !!currentUser?.roles.some((r) => ADMIN_ROLES.includes(r));
 
