@@ -65,13 +65,32 @@ const Documentation = () => {
       description: "Upload CSV, Excel, JSON, GeoJSON, XML, KML, or Shapefile via drag-and-drop or file browser. The system automatically detects column types and headers.",
       icon: FileSpreadsheet
     }, {
+      title: "Unstructured Documents",
+      description: "Ingest PDFs and other documents (contracts, invoices, resumes, leases, medical records). Lovable AI extracts structured fields you can edit and validate.",
+      icon: FileText
+    }, {
       title: "Sample Databases",
-      description: "Choose from 10 pre-built datasets including geographical data (landmarks, territories) and business data (employees, products, sales).",
+      description: "Choose from 10+ pre-built datasets including geographical data (landmarks, territories) and business data (employees, products, sales).",
       icon: Database
     }, {
-      title: "Upload Wizard",
-      description: "Complete a pre-upload questionnaire to capture region and consent information for compliant data handling.",
+      title: "Upload Wizard & Consent",
+      description: "Mandatory pre-upload questionnaire captures country, region, and legal consent for compliant data handling.",
       icon: Sparkles
+    }]
+  }, {
+    category: "Templates & Datasets",
+    items: [{
+      title: "Template Library",
+      description: "Browse system and custom templates with predefined columns, types, PII tags, and attached quality rule sets. Save your own templates from any dataset.",
+      icon: Library
+    }, {
+      title: "Dataset Library & Versioning",
+      description: "Centralized library of saved datasets with full version history. Roll back, compare, and reload any prior version.",
+      icon: GitBranch
+    }, {
+      title: "Groups & Sharing",
+      description: "Share custom templates and dataset versions with groups you belong to. New artifacts auto-share with all of your groups by default.",
+      icon: Users
     }]
   }, {
     category: "Data Editing",
@@ -80,58 +99,119 @@ const Documentation = () => {
       description: "Click any cell to edit its value. Changes are saved automatically and reflected across all views.",
       icon: Edit3
     }, {
+      title: "Bulk Text Operations",
+      description: "Apply trim, case changes, find-and-replace, and other transforms to entire columns in one action.",
+      icon: Layers
+    }, {
+      title: "Custom Formulas",
+      description: "Add computed columns with a safe expression evaluator — supports arithmetic, string, and conditional logic without injection risk.",
+      icon: Calculator
+    }, {
       title: "PII Tagging",
       description: "Mark columns containing sensitive personal data. Tagged columns are visually highlighted for easy identification.",
       icon: Lock
     }, {
       title: "Map-Based Editing",
-      description: "For geographical data, drag markers on the OpenStreetMap to update coordinates. Draw new points, polygons, and lines.",
+      description: "For geographical data, drag markers on OpenStreetMap to update coordinates. Draw new points, polygons, and lines.",
       icon: Map
     }]
   }, {
     category: "Analytics & Visualization",
     items: [{
       title: "Statistics Panel",
-      description: "View key metrics including row count, column count, data types distribution, and missing value percentage.",
+      description: "View key metrics including row count, column count, data type distribution, and missing value percentage.",
       icon: Table
     }, {
       title: "Dynamic Charts",
       description: "7 chart types that adapt to your data: Distribution, Categories (Pie), Correlation (Scatter), Trend, Grouped, Radar, and Boolean.",
       icon: BarChart3
+    }, {
+      title: "Genie AI Assistant",
+      description: "Ask questions about your dataset in natural language. Genie summarizes, explains columns, and suggests next steps.",
+      icon: Bot
     }]
   }, {
     category: "Data Quality",
     items: [{
-      title: "Validation Checks",
-      description: "Automated checks for missing values, duplicates, outliers, formatting issues, and invalid data patterns.",
+      title: "Quality Rules Inventory",
+      description: "Admins manage a central library of column and row rule sets. Attach any rule set to multiple templates and datasets.",
+      icon: ShieldCheck
+    }, {
+      title: "Attached Validation",
+      description: "The Validate tab runs only the rule sets attached to your dataset or its template — no noisy generic checks.",
       icon: AlertTriangle
     }, {
       title: "Quality Scores",
       description: "Get scores for Completeness, Consistency, Validity, and Uniqueness with an overall quality rating.",
       icon: CheckCircle2
     }]
+  }, {
+    category: "Workflow & Automation",
+    items: [{
+      title: "Approvals",
+      description: "Sensitive data manipulations route to a dedicated Approvals queue with full data preview before changes take effect.",
+      icon: Workflow
+    }, {
+      title: "Action Triggers",
+      description: "Admins configure webhooks, Airflow DAGs, Snowflake jobs, and email notifications to fire on data events.",
+      icon: Zap
+    }, {
+      title: "Loading Strategies",
+      description: "Admins set per-target load strategy (Truncate, Merge/Upsert, or Append) — applied automatically on processing.",
+      icon: Send
+    }]
+  }, {
+    category: "Security & Governance",
+    items: [{
+      title: "Role-Based Access",
+      description: "Multiple roles per user (Super Admin, Sys Admin, Role Admin, Approver, User) with per-page access enforced by RLS.",
+      icon: Shield
+    }, {
+      title: "Audit Log",
+      description: "Centralized, sanitized audit trail of page views, edits, approvals, and admin actions.",
+      icon: BookOpen
+    }, {
+      title: "Safe Expression Evaluator",
+      description: "Custom formulas and quality rule expressions run through a sandboxed evaluator to prevent code injection.",
+      icon: Lock
+    }]
   }];
   const faqs = [{
     question: "What file formats are supported?",
-    answer: "BYOD supports multiple file formats including CSV, TSV, Excel (.xlsx, .xls), JSON, GeoJSON, XML, KML, and Shapefile (.zip). The system automatically detects delimiters and header rows."
+    answer: "BYOD supports CSV, TSV, Excel (.xlsx, .xls), JSON, GeoJSON, XML, KML, and Shapefile (.zip) for structured data, plus PDFs and other unstructured documents (contracts, invoices, resumes, leases, medical records) which are parsed by AI into structured fields."
+  }, {
+    question: "How do templates and datasets work together?",
+    answer: "Templates define the expected schema, PII tags, and attached quality rules. When you upload data you can apply a template to validate against its rules. Saved datasets keep their own version history in the Dataset Library and can also have rule sets attached directly."
+  }, {
+    question: "How do I share my work with teammates?",
+    answer: "Sharing is group-based. Any custom template or dataset version you create is automatically shared with all groups you belong to. You can adjust this from the Share dialog. Admins manage groups and memberships from the Admin section."
+  }, {
+    question: "Where do I manage data quality rules?",
+    answer: "Admins manage all rule sets in the Quality Rules menu. Each rule set contains column-level checks (type, format, range) and row-level expressions. Rule sets can be attached to multiple templates and datasets, and the Validate tab runs only what's attached."
+  }, {
+    question: "What is the Approvals workflow?",
+    answer: "Sensitive operations — like bulk edits or data manipulations — can be routed to the Approvals queue. Approvers see a before/after preview and can approve or reject before changes are applied to the dataset."
+  }, {
+    question: "What are Action Triggers?",
+    answer: "Admins can configure automations (webhooks, Airflow DAGs, Snowflake jobs, email notifications) that fire automatically on data events such as upload, validation, or processing — useful for downstream pipelines."
+  }, {
+    question: "What load strategies are supported?",
+    answer: "Admins choose per-target loading strategy: Truncate (replace all rows), Merge/Upsert (insert or update by key), or Append (add new rows only). The strategy is applied automatically when data is processed — users don't pick it during upload."
+  }, {
+    question: "How does role-based access work?",
+    answer: "Each user can hold multiple roles (Super Admin, Sys Admin, Role Admin, Approver, User). Page access is enforced both client-side and at the database via Row Level Security, so users only see data they own or that's been shared with their groups."
   }, {
     question: "How do I edit geographical data?",
     answer: "If your dataset contains latitude and longitude columns, a Map tab will appear. You can drag markers to update coordinates, or use the drawing tools to create new points and polygons. BYOD uses OpenStreetMap, so no API key is required."
   }, {
     question: "What is PII tagging?",
-    answer: "PII (Personally Identifiable Information) tagging allows you to mark columns that contain sensitive personal data like names, emails, or phone numbers. This helps ensure proper data handling and compliance."
-  }, {
-    question: "How does data validation work?",
-    answer: "The validation system checks for common data quality issues including: missing values, duplicate rows, statistical outliers, negative values where unexpected, inconsistent text casing, whitespace issues, and invalid email formats."
+    answer: "PII (Personally Identifiable Information) tagging marks columns containing sensitive personal data like names, emails, or phone numbers. Tags travel with templates and help ensure proper handling and compliance."
   }, {
     question: "What does the quality score mean?",
     answer: "The overall quality score is calculated from four components: Completeness (no missing values), Consistency (uniform formatting), Validity (correct data formats), and Uniqueness (no duplicates). A score above 80% is considered good."
   }, {
-    question: "What sample datasets are available?",
-    answer: "BYOD includes 10 sample datasets: World Landmarks, Country Territories, Global Cities, Sales Data, Product Inventory, Employee Directory, Customer Feedback, Weather Stations, Financial Transactions, and Healthcare Records."
-  }, {
-    question: "What chart types are available?",
-    answer: "Based on your data, BYOD offers: Distribution (histogram), Categories (pie chart), Correlation (scatter plot), Trend (area chart), Grouped (bar chart by category), Radar (multi-metric comparison), and Boolean (true/false distribution)."
+    question: "What can the Genie AI assistant do?",
+    answer: "Genie answers natural-language questions about your loaded dataset — summarizing, explaining columns, spotting anomalies, and suggesting next steps. It's available from the chat bubble on any page."
   }];
   return <>
       <Helmet>
