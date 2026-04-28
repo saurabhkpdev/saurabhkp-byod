@@ -89,6 +89,128 @@ export default function QualityRules() {
     }
   };
 
+  const openSuggestions = async () => {
+    setSuggestOpen(true);
+    setSuggestLoading(true);
+    setSuggestions([]);
+    try {
+      // Ensure defaults exist in inventory; suggestion only attaches existing rule sets.
+      const available = ruleSets.filter((rs) =>
+        DEFAULT_RULE_SETS.some((d) => d.name === rs.name)
+      );
+      if (available.length === 0) {
+        toast.error('Import default rule sets first, then run suggestions.');
+        setSuggestOpen(false);
+        return;
+      }
+
+      // Fetch recent templates (own/shared visible by RLS) and datasets
+      const [{ data: templates }, { data: versions }] = await Promise.all([
+        supabase
+          .from('custom_templates')
+          .select('id,name,required_columns,optional_columns,updated_at')
+          .order('updated_at', { ascending: false })
+          .limit(10),
+        supabase
+          .from('data_versions')
+          .select('id,dataset_name,snapshot,created_at')
+          .order('created_at', { ascending: false })
+          .limit(50),
+      ]);
+
+      const found: Suggestion[] = [];
+
+      for (const t of templates ?? []) {
+        const cols = [...(t.required_columns ?? []), ...(t.optional_columns ?? [])];
+        const attached = new Set(await getTemplateRuleAttachments(t.id));
+        for (const rs of available) {
+          if (attached.has(rs.id)) continue;
+          const reason = matchScore(rs, t.name, cols);
+          if (reason) {
+            found.push({
+              key: `template:${t.id}:${rs.id}`,
+              kind: 'template', resourceId: t.id, resourceLabel: t.name,
+              ruleSet: rs, reason,
+            });
+          }
+        }
+      }
+
+      // Dedup datasets by name (latest version wins)
+      const seenDs = new Set<string>();
+      for (const v of versions ?? []) {
+        if (seenDs.has(v.dataset_name)) continue;
+        seenDs.add(v.dataset_name);
+        const snap: any = v.snapshot ?? {};
+        const cols: string[] = Array.isArray(snap.columns)
+          ? snap.columns.map((c: any) => c?.name ?? c).filter(Boolean)
+          : [];
+        const attached = new Set(await getDatasetRuleAttachments(v.dataset_name));
+        for (const rs of available) {
+          if (attached.has(rs.id)) continue;
+          const reason = matchScore(rs, v.dataset_name, cols);
+          if (reason) {
+            found.push({
+              key: `dataset:${v.dataset_name}:${rs.id}`,
+              kind: 'dataset', resourceId: v.dataset_name, resourceLabel: v.dataset_name,
+              ruleSet: rs, reason,
+            });
+          }
+        }
+        if (seenDs.size >= 10) break;
+      }
+
+      setSuggestions(found);
+      setSelected(new Set(found.map((s) => s.key)));
+    } finally {
+      setSuggestLoading(false);
+    }
+  };
+
+  const toggleSuggestion = (key: string) => {
+    setSelected((prev) => {
+      const n = new Set(prev);
+      if (n.has(key)) n.delete(key); else n.add(key);
+      return n;
+    });
+  };
+
+  const applySuggestions = async () => {
+    setApplying(true);
+    try {
+      // Group selections by resource
+      const tplGroups = new Map<string, Set<string>>();
+      const dsGroups = new Map<string, Set<string>>();
+      for (const s of suggestions) {
+        if (!selected.has(s.key)) continue;
+        const map = s.kind === 'template' ? tplGroups : dsGroups;
+        const set = map.get(s.resourceId) ?? new Set<string>();
+        set.add(s.ruleSet.id);
+        map.set(s.resourceId, set);
+      }
+
+      let attached = 0;
+      for (const [tplId, ids] of tplGroups) {
+        const current = await getTemplateRuleAttachments(tplId);
+        const next = Array.from(new Set([...current, ...ids]));
+        const ok = await setTemplateRuleAttachments(tplId, next);
+        if (ok) attached += ids.size;
+      }
+      for (const [dsName, ids] of dsGroups) {
+        const current = await getDatasetRuleAttachments(dsName);
+        const next = Array.from(new Set([...current, ...ids]));
+        const ok = await setDatasetRuleAttachments(dsName, next);
+        if (ok) attached += ids.size;
+      }
+
+      if (attached > 0) toast.success(`Attached ${attached} rule set${attached === 1 ? '' : 's'}`);
+      else toast.info('No attachments were made');
+      setSuggestOpen(false);
+    } finally {
+      setApplying(false);
+    }
+  };
+
   return (
     <>
       <Helmet>
