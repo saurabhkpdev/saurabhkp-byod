@@ -73,6 +73,16 @@ export default function TemplateLibrary() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'system' | 'custom'>('all');
   const [shareTarget, setShareTarget] = useState<CustomTemplate | null>(null);
+  const [rulesTarget, setRulesTarget] = useState<CustomTemplate | null>(null);
+  const [rulesInitialIds, setRulesInitialIds] = useState<string[]>([]);
+  const { currentUser } = useAuth();
+  const isAdmin = !!currentUser?.roles.some((r) => ['sys_admin', 'role_admin', 'super_admin'].includes(r));
+
+  const openAttachRules = async (tpl: CustomTemplate) => {
+    const ids = await getTemplateRuleAttachments(tpl.id);
+    setRulesInitialIds(ids);
+    setRulesTarget(tpl);
+  };
 
   // Form state
   const [formName, setFormName] = useState('');
