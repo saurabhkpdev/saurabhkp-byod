@@ -362,6 +362,64 @@ export default function QualityRules() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={suggestOpen} onOpenChange={setSuggestOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wand2 className="w-5 h-5" /> Suggested attachments
+            </DialogTitle>
+            <DialogDescription>
+              Default rule sets matched to your most recent templates and datasets where they are not yet attached.
+            </DialogDescription>
+          </DialogHeader>
+
+          {suggestLoading ? (
+            <div className="py-10 text-center"><Loader2 className="w-5 h-5 animate-spin mx-auto" /></div>
+          ) : suggestions.length === 0 ? (
+            <div className="py-10 text-center text-sm text-muted-foreground">
+              No new suggestions. Either nothing matches or all matches are already attached.
+            </div>
+          ) : (
+            <ScrollArea className="max-h-[420px] pr-3">
+              <div className="space-y-2">
+                {suggestions.map((s) => {
+                  const checked = selected.has(s.key);
+                  return (
+                    <label
+                      key={s.key}
+                      className="flex items-start gap-3 p-3 rounded-md border border-border hover:bg-muted/40 cursor-pointer"
+                    >
+                      <Checkbox checked={checked} onCheckedChange={() => toggleSuggestion(s.key)} className="mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge variant="secondary" className="text-[10px] uppercase">{s.kind}</Badge>
+                          <span className="text-sm font-medium truncate">{s.resourceLabel}</span>
+                          <span className="text-xs text-muted-foreground">←</span>
+                          <span className="text-sm">{s.ruleSet.name}</span>
+                          <Badge variant="outline" className="text-[10px]">{s.ruleSet.rules.length} rules</Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">{s.reason}</p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSuggestOpen(false)}>Cancel</Button>
+            <Button
+              onClick={applySuggestions}
+              disabled={applying || suggestLoading || selected.size === 0}
+            >
+              {applying ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Sparkles className="w-4 h-4 mr-1" />}
+              Attach {selected.size > 0 ? `(${selected.size})` : ''}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
