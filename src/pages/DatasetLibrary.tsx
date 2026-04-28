@@ -338,6 +338,16 @@ export default function DatasetLibrary() {
           onSave={(ids) => setDatasetShares(shareTarget.id, ids)}
         />
       )}
+
+      {rulesTarget && (
+        <RuleSetAttachDialog
+          open={!!rulesTarget}
+          onOpenChange={(o) => !o && setRulesTarget(null)}
+          resourceLabel={`dataset "${rulesTarget.dataset_name}"`}
+          initialIds={rulesInitialIds}
+          onSave={async (ids) => setDatasetRuleAttachments(rulesTarget.dataset_name, ids)}
+        />
+      )}
     </div>
   );
 }
