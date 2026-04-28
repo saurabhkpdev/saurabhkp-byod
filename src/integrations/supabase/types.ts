@@ -131,6 +131,38 @@ export type Database = {
           },
         ]
       }
+      dataset_quality_rules: {
+        Row: {
+          attached_at: string
+          attached_by: string
+          dataset_name: string
+          id: string
+          rule_set_id: string
+        }
+        Insert: {
+          attached_at?: string
+          attached_by: string
+          dataset_name: string
+          id?: string
+          rule_set_id: string
+        }
+        Update: {
+          attached_at?: string
+          attached_by?: string
+          dataset_name?: string
+          id?: string
+          rule_set_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dataset_quality_rules_rule_set_id_fkey"
+            columns: ["rule_set_id"]
+            isOneToOne: false
+            referencedRelation: "quality_rule_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_members: {
         Row: {
           added_at: string
@@ -378,6 +410,45 @@ export type Database = {
           validation_rules?: Json
         }
         Relationships: []
+      }
+      template_quality_rules: {
+        Row: {
+          attached_at: string
+          attached_by: string
+          id: string
+          rule_set_id: string
+          template_id: string
+        }
+        Insert: {
+          attached_at?: string
+          attached_by: string
+          id?: string
+          rule_set_id: string
+          template_id: string
+        }
+        Update: {
+          attached_at?: string
+          attached_by?: string
+          id?: string
+          rule_set_id?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_quality_rules_rule_set_id_fkey"
+            columns: ["rule_set_id"]
+            isOneToOne: false
+            referencedRelation: "quality_rule_sets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_quality_rules_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "custom_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
