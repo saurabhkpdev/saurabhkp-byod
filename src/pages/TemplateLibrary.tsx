@@ -463,6 +463,16 @@ export default function TemplateLibrary() {
                                 <span className="ml-1 text-[10px]">{(template as CustomTemplate).sharedGroupIds!.length}</span>
                               )}
                             </Button>
+                            {isAdmin && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openAttachRules(template as CustomTemplate)}
+                                title="Attach quality rules"
+                              >
+                                <ListChecks className="w-4 h-4" />
+                              </Button>
+                            )}
                             <Button
                               variant="ghost"
                               size="sm"
