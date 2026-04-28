@@ -19,6 +19,7 @@ interface DataQualityPanelProps {
   columns: DataColumn[];
   rows: DataRow[];
   fileName?: string;
+  templateId?: string | null;
   onProcessData: () => void;
 }
 
