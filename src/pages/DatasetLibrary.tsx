@@ -244,6 +244,18 @@ export default function DatasetLibrary() {
                             <Users2 className="w-4 h-4" />
                             Share
                           </Button>
+                          {isAdmin && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 gap-1"
+                              onClick={() => openAttachRules(d)}
+                              title="Attach quality rules"
+                            >
+                              <ListChecks className="w-4 h-4" />
+                              Rules
+                            </Button>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
