@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { useAuditLog } from '@/hooks/useAuditLog';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +12,8 @@ const Index = () => {
   const {
     logEvent
   } = useAuditLog();
+  const { currentUser } = useAuth();
+  const firstName = (currentUser?.username || '').trim().split(/\s+/)[0] || '';
   const { autoStartTour, startTour } = useOnboardingTour();
   useEffect(() => {
     logEvent('page_view', 'Visited Home page', 'Home');
@@ -57,7 +60,7 @@ const Index = () => {
               Bring Your Own Data
             </Badge>
             <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">
-              Welcome to <span className="gradient-text">BYOD</span>
+              Welcome{firstName ? ` ${firstName}` : ''} to <span className="gradient-text">BYOD</span>
             </h1>
             <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8">
               Your complete data studio for uploading, editing, visualizing, and validating data. 
