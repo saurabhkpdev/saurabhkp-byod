@@ -78,18 +78,16 @@ export function useQualityRules() {
 
 // ---------- Attachments ----------
 
-async function getAttachedRuleIds(table: 'template_quality_rules' | 'dataset_quality_rules', keyCol: string, key: string): Promise<string[]> {
-  const { data, error } = await supabase.from(table).select('rule_set_id').eq(keyCol, key);
+export async function getTemplateRuleAttachments(templateId: string): Promise<string[]> {
+  const { data, error } = await supabase.from('template_quality_rules').select('rule_set_id').eq('template_id', templateId);
   if (error) return [];
   return (data ?? []).map((r: any) => r.rule_set_id);
 }
 
-export async function getTemplateRuleAttachments(templateId: string) {
-  return getAttachedRuleIds('template_quality_rules', 'template_id', templateId);
-}
-
-export async function getDatasetRuleAttachments(datasetName: string) {
-  return getAttachedRuleIds('dataset_quality_rules', 'dataset_name', datasetName);
+export async function getDatasetRuleAttachments(datasetName: string): Promise<string[]> {
+  const { data, error } = await supabase.from('dataset_quality_rules').select('rule_set_id').eq('dataset_name', datasetName);
+  if (error) return [];
+  return (data ?? []).map((r: any) => r.rule_set_id);
 }
 
 export async function setTemplateRuleAttachments(templateId: string, ruleSetIds: string[]) {
