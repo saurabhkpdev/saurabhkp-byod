@@ -705,6 +705,17 @@ export default function TemplateLibrary() {
           onSave={(ids) => setTemplateGroupShares(shareTarget.id, ids)}
         />
       )}
+
+      {rulesTarget && (
+        <RuleSetAttachDialog
+          open={!!rulesTarget}
+          onOpenChange={(o) => !o && setRulesTarget(null)}
+          resourceLabel={`template "${rulesTarget.name}"`}
+          initialIds={rulesInitialIds}
+          onSave={async (ids) => setTemplateRuleAttachments(rulesTarget.id, ids)}
+        />
+      )}
     </div>
   );
 }
+
