@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, Shield, Sparkles, Map, Database, Edit3, PieChart, ShieldCheck, ArrowRight, HelpCircle } from 'lucide-react';
+import { BarChart3, Shield, Sparkles, Map, Database, Edit3, PieChart, ShieldCheck, ArrowRight, HelpCircle, Mail, Globe, MessageSquare } from 'lucide-react';
 const Index = () => {
   const {
     logEvent
