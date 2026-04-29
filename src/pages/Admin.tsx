@@ -52,8 +52,8 @@ const Admin = () => {
   const topPages = Object.entries(stats.pageCounts).sort(([, a], [, b]) => b - a).slice(0, 5);
   return <>
       <Helmet>
-        <title>Admin Dashboard - BYOD</title>
-        <meta name="description" content="Admin dashboard for auditing user activity on the BYOD platform." />
+        <title>Admin Dashboard - BYD</title>
+        <meta name="description" content="Admin dashboard for auditing user activity on the BYD platform." />
       </Helmet>
 
       <div className="min-h-screen bg-background">

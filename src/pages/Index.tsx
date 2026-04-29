@@ -48,8 +48,8 @@ const Index = () => {
   }];
   return <>
       <Helmet>
-        <title>BYOD - Bring Your Own Data</title>
-        <meta name="description" content="Upload, analyze, edit, and validate your data with BYOD. Interactive charts, map editing, PII protection, and quality validation." />
+        <title>BYD - Bring Your Data</title>
+        <meta name="description" content="Upload, analyze, edit, and validate your data with BYD. Interactive charts, map editing, PII protection, and quality validation." />
       </Helmet>
       
       <div className="min-h-screen bg-background">
@@ -57,14 +57,14 @@ const Index = () => {
           {/* Hero Section */}
           <section className="text-center mb-10 sm:mb-16 animate-fade-in">
             <Badge variant="outline" className="mb-4 px-4 py-1 text-sm">
-              Bring Your Own Data
+              Bring Your Data
             </Badge>
             <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">
-              Welcome <span className="gradient-text">{firstName || 'to BYOD'}</span>
+              Welcome <span className="gradient-text">{firstName || 'to BYD'}</span>
             </h1>
             <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8">
               Your complete data studio for uploading, editing, visualizing, and validating data. 
-              Work with sample datasets or bring your own data files.
+              Work with sample datasets or bring your data files.
             </p>
             <div className="flex gap-4 justify-center flex-wrap" data-tour="hero-cta">
               <Link to="/upload">
