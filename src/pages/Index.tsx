@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, Shield, Sparkles, Map, Database, Edit3, PieChart, ShieldCheck, ArrowRight, HelpCircle } from 'lucide-react';
+import { BarChart3, Shield, Sparkles, Map, Database, Edit3, PieChart, ShieldCheck, ArrowRight, HelpCircle, Mail, Globe, MessageSquare } from 'lucide-react';
 const Index = () => {
   const {
     logEvent
@@ -154,8 +154,54 @@ const Index = () => {
             </div>
           </section>
 
-          {/* CTA Section */}
-          
+          {/* Contact Section */}
+          <section className="mb-16" id="contact">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-8">
+                <Badge variant="outline" className="mb-3 px-4 py-1 text-sm">Get in touch</Badge>
+                <h2 className="text-3xl font-bold mb-3">Contact Us</h2>
+                <p className="text-muted-foreground max-w-xl mx-auto">
+                  Questions, feedback, or partnership ideas? We'd love to hear from you.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <Card className="hover:shadow-lg transition-shadow hover:border-primary/30">
+                  <CardContent className="p-6 text-center">
+                    <div className="inline-flex p-3 rounded-xl bg-primary/10 mb-3">
+                      <Mail className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="font-semibold mb-1">Email</h3>
+                    <a href="mailto:hello@bringyourdata.app" className="text-sm text-primary hover:underline break-all">
+                      hello@bringyourdata.app
+                    </a>
+                  </CardContent>
+                </Card>
+                <Card className="hover:shadow-lg transition-shadow hover:border-primary/30">
+                  <CardContent className="p-6 text-center">
+                    <div className="inline-flex p-3 rounded-xl bg-primary/10 mb-3">
+                      <MessageSquare className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="font-semibold mb-1">Support</h3>
+                    <a href="mailto:support@bringyourdata.app" className="text-sm text-primary hover:underline break-all">
+                      support@bringyourdata.app
+                    </a>
+                  </CardContent>
+                </Card>
+                <Card className="hover:shadow-lg transition-shadow hover:border-primary/30">
+                  <CardContent className="p-6 text-center">
+                    <div className="inline-flex p-3 rounded-xl bg-primary/10 mb-3">
+                      <Globe className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="font-semibold mb-1">Website</h3>
+                    <a href="https://bringyourdata.app" target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline break-all">
+                      bringyourdata.app
+                    </a>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </section>
+
         </main>
       </div>
     </>;
