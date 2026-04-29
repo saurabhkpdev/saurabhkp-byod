@@ -102,7 +102,7 @@ const Login = () => {
     return (
       <>
         <Helmet>
-          <title>Check Your Email - BYOD</title>
+          <title>Check Your Email - BYD</title>
         </Helmet>
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4">
           <Card className="w-full max-w-md shadow-xl">
@@ -136,8 +136,8 @@ const Login = () => {
   return (
     <>
       <Helmet>
-        <title>{isSignUp ? "Sign Up" : "Login"} - BYOD</title>
-        <meta name="description" content="Login to access BYOD platform" />
+        <title>{isSignUp ? "Sign Up" : "Login"} - BYD</title>
+        <meta name="description" content="Login to access BYD platform" />
       </Helmet>
 
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4">
@@ -146,7 +146,7 @@ const Login = () => {
             <div className="mx-auto w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-2">
               <LogIn className="w-6 h-6 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold">Welcome to BYOD</CardTitle>
+            <CardTitle className="text-2xl font-bold">Welcome to BYD</CardTitle>
             <CardDescription>
               {isSignUp
                 ? "Enter your email to create an account"

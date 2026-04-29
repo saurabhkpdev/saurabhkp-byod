@@ -127,8 +127,8 @@ export default function DatasetLibrary() {
   return (
     <div className="flex flex-col h-full">
       <Helmet>
-        <title>Datasets - BYOD</title>
-        <meta name="description" content="Browse and manage existing datasets in the BYOD platform." />
+        <title>Datasets - BYD</title>
+        <meta name="description" content="Browse and manage existing datasets in the BYD platform." />
       </Helmet>
 
       <TopBar />

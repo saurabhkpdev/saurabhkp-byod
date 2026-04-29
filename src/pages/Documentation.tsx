@@ -178,7 +178,7 @@ const Documentation = () => {
   }];
   const faqs = [{
     question: "What file formats are supported?",
-    answer: "BYOD supports CSV, TSV, Excel (.xlsx, .xls), JSON, GeoJSON, XML, KML, and Shapefile (.zip) for structured data, plus PDFs and other unstructured documents (contracts, invoices, resumes, leases, medical records) which are parsed by AI into structured fields."
+    answer: "BYD supports CSV, TSV, Excel (.xlsx, .xls), JSON, GeoJSON, XML, KML, and Shapefile (.zip) for structured data, plus PDFs and other unstructured documents (contracts, invoices, resumes, leases, medical records) which are parsed by AI into structured fields."
   }, {
     question: "How do templates and datasets work together?",
     answer: "Templates define the expected schema, PII tags, and attached quality rules. When you upload data you can apply a template to validate against its rules. Saved datasets keep their own version history in the Dataset Library and can also have rule sets attached directly."
@@ -202,7 +202,7 @@ const Documentation = () => {
     answer: "Each user can hold multiple roles (Super Admin, Sys Admin, Role Admin, Approver, User). Page access is enforced both client-side and at the database via Row Level Security, so users only see data they own or that's been shared with their groups."
   }, {
     question: "How do I edit geographical data?",
-    answer: "If your dataset contains latitude and longitude columns, a Map tab will appear. You can drag markers to update coordinates, or use the drawing tools to create new points and polygons. BYOD uses OpenStreetMap, so no API key is required."
+    answer: "If your dataset contains latitude and longitude columns, a Map tab will appear. You can drag markers to update coordinates, or use the drawing tools to create new points and polygons. BYD uses OpenStreetMap, so no API key is required."
   }, {
     question: "What is PII tagging?",
     answer: "PII (Personally Identifiable Information) tagging marks columns containing sensitive personal data like names, emails, or phone numbers. Tags travel with templates and help ensure proper handling and compliance."
@@ -215,8 +215,8 @@ const Documentation = () => {
   }];
   return <>
       <Helmet>
-        <title>Documentation - BYOD</title>
-        <meta name="description" content="Learn how to use BYOD Data Studio for data editing, visualization, and quality validation." />
+        <title>Documentation - BYD</title>
+        <meta name="description" content="Learn how to use BYD Data Studio for data editing, visualization, and quality validation." />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -224,9 +224,9 @@ const Documentation = () => {
           {/* Hero Section */}
           <div className="text-center mb-12">
             
-            <h1 className="text-4xl font-bold mb-4">Learn <span className="gradient-text">BYOD</span></h1>
+            <h1 className="text-4xl font-bold mb-4">Learn <span className="gradient-text">BYD</span></h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to know about uploading, editing, visualizing, and validating your data with Bring Your Own Data.
+              Everything you need to know about uploading, editing, visualizing, and validating your data with Bring Your Data.
             </p>
           </div>
 
@@ -255,7 +255,7 @@ const Documentation = () => {
                     Quick Start Guide
                   </CardTitle>
                   <CardDescription>
-                    Get up and running with BYOD in just a few steps
+                    Get up and running with BYD in just a few steps
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -333,7 +333,7 @@ const Documentation = () => {
                 <CardHeader>
                   <CardTitle>Frequently Asked Questions</CardTitle>
                   <CardDescription>
-                    Common questions about using BYOD
+                    Common questions about using BYD
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
