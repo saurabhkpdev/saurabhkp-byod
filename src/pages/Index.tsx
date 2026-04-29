@@ -48,7 +48,7 @@ const Index = () => {
   }];
   return <>
       <Helmet>
-        <title>Bring Your Data - Bring Your Data</title>
+        <title>Bring Your Data</title>
         <meta name="description" content="Upload, analyze, edit, and validate your data with Bring Your Data. Interactive charts, map editing, PII protection, and quality validation." />
       </Helmet>
       
