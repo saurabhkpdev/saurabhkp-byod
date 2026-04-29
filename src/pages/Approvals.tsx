@@ -5,7 +5,7 @@ const Approvals = () => {
   return (
     <>
       <Helmet>
-        <title>Approvals - BYD</title>
+        <title>Approvals - Bring Your Data</title>
         <meta name="description" content="Review and manage data upload and manipulation approval requests." />
       </Helmet>
 

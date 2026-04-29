@@ -10,10 +10,10 @@ const Access = () => {
   return (
     <>
       <Helmet>
-        <title>Access - BYD</title>
+        <title>Access - Bring Your Data</title>
         <meta
           name="description"
-          content="Manage users, roles, groups, and login details on the BYD platform."
+          content="Manage users, roles, groups, and login details on the Bring Your Data platform."
         />
       </Helmet>
 

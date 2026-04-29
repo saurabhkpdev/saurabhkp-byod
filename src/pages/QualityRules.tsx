@@ -214,7 +214,7 @@ export default function QualityRules() {
   return (
     <>
       <Helmet>
-        <title>Quality Rules - BYD</title>
+        <title>Quality Rules - Bring Your Data</title>
         <meta name="description" content="Central inventory of data quality rule sets to attach to templates and datasets." />
       </Helmet>
 
