@@ -55,7 +55,7 @@ const defaultSnowflakeConfig: SnowflakeConfig = {
 
 const defaultEmailConfig: EmailConfig = {
   recipients: [],
-  subject: "BYD Notification: {{event}}",
+  subject: "Bring Your Data Notification: {{event}}",
   bodyTemplate: "An event occurred: {{event}}\n\nTimestamp: {{timestamp}}",
 };
 
@@ -550,7 +550,7 @@ export function ActionsConfig() {
                         <Input
                           value={emailConfig.subject}
                           onChange={(e) => setEmailConfig({ ...emailConfig, subject: e.target.value })}
-                          placeholder="BYD Notification: {{event}}"
+                          placeholder="Bring Your Data Notification: {{event}}"
                         />
                       </div>
                       <div className="space-y-2">

@@ -32,7 +32,7 @@ export function useOnboardingTour() {
         {
           element: '[data-tour="sidebar-logo"]',
           popover: {
-            title: '👋 Welcome to BYD!',
+            title: '👋 Welcome to Bring Your Data!',
             description: 'Bring Your Data — your complete data studio for uploading, editing, visualizing, and validating data. Let us show you around!',
             side: 'right',
             align: 'start',
@@ -87,7 +87,7 @@ export function useOnboardingTour() {
           element: '[data-tour="hero-cta"]',
           popover: {
             title: '🚀 Get Started!',
-            description: 'Click "Open Data Studio" to begin uploading and working with your data. Enjoy BYD!',
+            description: 'Click "Open Data Studio" to begin uploading and working with your data. Enjoy Bring Your Data!',
             side: 'bottom',
             align: 'center',
           },

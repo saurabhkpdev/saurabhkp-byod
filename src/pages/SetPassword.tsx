@@ -51,7 +51,7 @@ const SetPassword = () => {
   return (
     <>
       <Helmet>
-        <title>Set Password - BYD</title>
+        <title>Set Password - Bring Your Data</title>
       </Helmet>
 
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4">

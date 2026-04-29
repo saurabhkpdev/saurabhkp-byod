@@ -118,7 +118,7 @@ export function AppSidebar({ children }: AppSidebarProps) {
         </div>
         {(isMobile || !collapsed) && (
           <div className="flex-1 overflow-hidden">
-            <h1 className="text-lg font-bold gradient-text">BYD</h1>
+            <h1 className="text-lg font-bold gradient-text">Bring Your Data</h1>
             <p className="text-[10px] text-muted-foreground truncate">Upload • Manipulate • Process</p>
           </div>
         )}
@@ -291,7 +291,7 @@ export function AppSidebar({ children }: AppSidebarProps) {
             <div className="p-1.5 rounded-lg gradient-primary shrink-0">
               <Database className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-sm truncate">{currentPage?.title || "BYD"}</span>
+            <span className="font-semibold text-sm truncate">{currentPage?.title || "Bring Your Data"}</span>
           </div>
         </header>
 

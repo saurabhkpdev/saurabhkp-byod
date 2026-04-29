@@ -8,7 +8,7 @@ const ActionsConfigPage = () => {
   return (
     <>
       <Helmet>
-        <title>Data Flows | BYD</title>
+        <title>Data Flows | Bring Your Data</title>
       </Helmet>
       <div className="min-h-screen bg-background">
         <main className="container mx-auto px-4 py-8 max-w-7xl">

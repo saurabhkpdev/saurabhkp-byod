@@ -127,8 +127,8 @@ export default function DatasetLibrary() {
   return (
     <div className="flex flex-col h-full">
       <Helmet>
-        <title>Datasets - BYD</title>
-        <meta name="description" content="Browse and manage existing datasets in the BYD platform." />
+        <title>Datasets - Bring Your Data</title>
+        <meta name="description" content="Browse and manage existing datasets in the Bring Your Data platform." />
       </Helmet>
 
       <TopBar />
