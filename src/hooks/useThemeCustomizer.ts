@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface ColorPalette {
   id: string;
@@ -70,10 +71,7 @@ const defaultPalettes: ColorPalette[] = [
 const STORAGE_KEY = 'theme-customizer';
 
 function hexToHSL(hex: string): string {
-  // Remove # if present
   hex = hex.replace('#', '');
-  
-  // Parse hex to RGB
   const r = parseInt(hex.substring(0, 2), 16) / 255;
   const g = parseInt(hex.substring(2, 4), 16) / 255;
   const b = parseInt(hex.substring(4, 6), 16) / 255;
@@ -87,17 +85,10 @@ function hexToHSL(hex: string): string {
   if (max !== min) {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    
     switch (max) {
-      case r:
-        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-        break;
-      case g:
-        h = ((b - r) / d + 2) / 6;
-        break;
-      case b:
-        h = ((r - g) / d + 4) / 6;
-        break;
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
     }
   }
 
@@ -107,7 +98,7 @@ function hexToHSL(hex: string): string {
 function hslToHex(hsl: string): string {
   const parts = hsl.match(/[\d.]+/g);
   if (!parts || parts.length < 3) return '#6366f1';
-  
+
   const h = parseFloat(parts[0]) / 360;
   const s = parseFloat(parts[1]) / 100;
   const l = parseFloat(parts[2]) / 100;
@@ -140,6 +131,38 @@ function hslToHex(hsl: string): string {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
+export function applyPaletteToDOM(palette: ColorPalette) {
+  const root = document.documentElement;
+  root.style.setProperty('--primary', palette.primary);
+  root.style.setProperty('--accent', palette.accent);
+  root.style.setProperty('--success', palette.success);
+  root.style.setProperty('--warning', palette.warning);
+  root.style.setProperty('--destructive', palette.destructive);
+  root.style.setProperty('--ring', palette.primary);
+  root.style.setProperty('--sidebar-primary', palette.primary);
+  root.style.setProperty('--sidebar-ring', palette.primary);
+  root.style.setProperty('--chart-1', palette.primary);
+  root.style.setProperty('--chart-2', palette.accent);
+  root.style.setProperty('--chart-3', palette.success);
+  root.style.setProperty('--chart-4', palette.warning);
+  root.style.setProperty('--chart-5', palette.destructive);
+}
+
+export { defaultPalettes };
+
+/** Persist current palette to the authenticated user's profile (best-effort). */
+async function persistPaletteToProfile(palette: ColorPalette) {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const userId = data?.session?.user?.id;
+    if (!userId) return;
+    await supabase.from('profiles').update({ color_palette: palette as any }).eq('id', userId);
+  } catch (e) {
+    // non-fatal: localStorage still holds it
+    console.warn('Failed to sync palette to profile', e);
+  }
+}
+
 export function useThemeCustomizer() {
   const [currentPalette, setCurrentPalette] = useState<ColorPalette>(defaultPalettes[0]);
   const [customPalettes, setCustomPalettes] = useState<ColorPalette[]>([]);
@@ -151,7 +174,7 @@ export function useThemeCustomizer() {
         const data = JSON.parse(saved);
         if (data.currentPalette) {
           setCurrentPalette(data.currentPalette);
-          applyPalette(data.currentPalette);
+          applyPaletteToDOM(data.currentPalette);
         }
         if (data.customPalettes) {
           setCustomPalettes(data.customPalettes);
@@ -169,27 +192,11 @@ export function useThemeCustomizer() {
     }));
   };
 
-  const applyPalette = (palette: ColorPalette) => {
-    const root = document.documentElement;
-    root.style.setProperty('--primary', palette.primary);
-    root.style.setProperty('--accent', palette.accent);
-    root.style.setProperty('--success', palette.success);
-    root.style.setProperty('--warning', palette.warning);
-    root.style.setProperty('--destructive', palette.destructive);
-    root.style.setProperty('--ring', palette.primary);
-    root.style.setProperty('--sidebar-primary', palette.primary);
-    root.style.setProperty('--sidebar-ring', palette.primary);
-    root.style.setProperty('--chart-1', palette.primary);
-    root.style.setProperty('--chart-2', palette.accent);
-    root.style.setProperty('--chart-3', palette.success);
-    root.style.setProperty('--chart-4', palette.warning);
-    root.style.setProperty('--chart-5', palette.destructive);
-  };
-
   const selectPalette = (palette: ColorPalette) => {
     setCurrentPalette(palette);
-    applyPalette(palette);
+    applyPaletteToDOM(palette);
     saveToStorage(palette, customPalettes);
+    persistPaletteToProfile(palette);
   };
 
   const createCustomPalette = (name: string, colors: { primary: string; accent: string }) => {

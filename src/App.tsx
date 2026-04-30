@@ -25,6 +25,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import SetPassword from "./pages/SetPassword";
 import { GenieChat } from "./components/GenieChat";
+import { UserThemeSync } from "./components/UserThemeSync";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -98,6 +99,7 @@ const AppRoutes = () => {
 
   return (
     <>
+    <UserThemeSync />
     <Routes>
       <Route
         path="/login"
