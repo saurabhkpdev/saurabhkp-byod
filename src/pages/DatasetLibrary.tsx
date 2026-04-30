@@ -14,6 +14,7 @@ import { useDataVersions } from '@/hooks/useDataVersions';
 import { ShareToGroupsDialog } from '@/components/ShareToGroupsDialog';
 import { RuleSetAttachDialog } from '@/components/RuleSetAttachDialog';
 import { getDatasetRuleAttachments, setDatasetRuleAttachments } from '@/hooks/useQualityRules';
+import { useDatasetRuleCounts } from '@/hooks/useRuleAttachmentCounts';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
@@ -115,6 +116,8 @@ export default function DatasetLibrary() {
     const q = searchQuery.toLowerCase();
     return myDatasets.filter((d) => d.dataset_name.toLowerCase().includes(q));
   }, [myDatasets, searchQuery]);
+
+  const datasetRuleCounts = useDatasetRuleCounts(myDatasets.map((d) => d.dataset_name));
 
   const geoCount = mockDatasets.filter(d => d.hasGeoData).length;
   const generalCount = mockDatasets.length - geoCount;
@@ -220,6 +223,12 @@ export default function DatasetLibrary() {
                               <Badge variant="secondary" className="text-xs gap-1">
                                 <Users2 className="w-3 h-3" />
                                 {d.shared_group_ids.length}
+                              </Badge>
+                            )}
+                            {(datasetRuleCounts[d.dataset_name] ?? 0) > 0 && (
+                              <Badge variant="outline" className="text-xs gap-1 border-primary/40 text-primary">
+                                <ListChecks className="w-3 h-3" />
+                                {datasetRuleCounts[d.dataset_name]}
                               </Badge>
                             )}
                           </div>
