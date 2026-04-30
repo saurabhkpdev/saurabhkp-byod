@@ -224,29 +224,35 @@ export type Database = {
       }
       profiles: {
         Row: {
+          color_palette: Json | null
           created_at: string
           id: string
           last_login_at: string | null
           last_login_ip: string | null
           last_login_user_agent: string | null
+          theme: string | null
           updated_at: string
           username: string | null
         }
         Insert: {
+          color_palette?: Json | null
           created_at?: string
           id: string
           last_login_at?: string | null
           last_login_ip?: string | null
           last_login_user_agent?: string | null
+          theme?: string | null
           updated_at?: string
           username?: string | null
         }
         Update: {
+          color_palette?: Json | null
           created_at?: string
           id?: string
           last_login_at?: string | null
           last_login_ip?: string | null
           last_login_user_agent?: string | null
+          theme?: string | null
           updated_at?: string
           username?: string | null
         }
