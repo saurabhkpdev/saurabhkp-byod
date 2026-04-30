@@ -39,7 +39,7 @@ export function UserThemeSync() {
       if (cancelled || error || !data) return;
 
       // Apply palette
-      const palette = data.color_palette as ColorPalette | null;
+      const palette = data.color_palette as unknown as ColorPalette | null;
       if (palette && palette.primary) {
         applyPaletteToDOM(palette);
         // Mirror to localStorage so useThemeCustomizer picks it up
