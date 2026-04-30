@@ -443,6 +443,30 @@ export default function TemplateLibrary() {
                           </Badge>
                         )}
                       </div>
+                      {isUnstructured && systemMatch?.extractionSchema && systemMatch.extractionSchema.length > 0 && (
+                        <div className="space-y-1.5">
+                          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+                            AI extracts {systemMatch.extractionSchema.length} fields
+                          </p>
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {systemMatch.extractionSchema.slice(0, 6).map((f) => (
+                              <Badge
+                                key={f.name}
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0 font-mono"
+                                title={f.description}
+                              >
+                                {f.name}
+                              </Badge>
+                            ))}
+                            {systemMatch.extractionSchema.length > 6 && (
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                +{systemMatch.extractionSchema.length - 6} more
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      )}
                       <div className="flex gap-2 pt-2">
                         <Button
                           variant="ghost"
