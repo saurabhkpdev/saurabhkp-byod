@@ -316,6 +316,9 @@ export default function TemplateLibrary() {
     ...customTemplates.map(t => ({ ...t, isOverridden: false })),
   ];
 
+  // Only custom templates are stored with UUIDs in template_quality_rules
+  const ruleCounts = useTemplateRuleCounts(customTemplates.map((t) => t.id));
+
   const displayedTemplates = allTemplates.filter(t => {
     if (activeTab === 'system') return !t.isCustom;
     if (activeTab === 'custom') return t.isCustom;
