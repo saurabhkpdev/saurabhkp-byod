@@ -53,6 +53,7 @@ import { systemTemplates, generateSampleCSV, Template } from '@/components/Templ
 import { ShareToGroupsDialog } from '@/components/ShareToGroupsDialog';
 import { RuleSetAttachDialog } from '@/components/RuleSetAttachDialog';
 import { getTemplateRuleAttachments, setTemplateRuleAttachments } from '@/hooks/useQualityRules';
+import { useTemplateRuleCounts } from '@/hooks/useRuleAttachmentCounts';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Papa from 'papaparse';
