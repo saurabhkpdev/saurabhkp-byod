@@ -418,6 +418,12 @@ export default function TemplateLibrary() {
                           ) : (
                             <Badge variant="outline" className="text-xs">System</Badge>
                           )}
+                          {template.isCustom && (ruleCounts[template.id] ?? 0) > 0 && (
+                            <Badge variant="outline" className="text-xs gap-1 border-primary/40 text-primary">
+                              <ListChecks className="w-3 h-3" />
+                              {ruleCounts[template.id]} {ruleCounts[template.id] === 1 ? 'rule' : 'rules'}
+                            </Badge>
+                          )}
                         </div>
                       </div>
                       <CardTitle className="text-lg mt-2">{template.name}</CardTitle>
