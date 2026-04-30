@@ -75,7 +75,13 @@ export function AppSidebar({ children }: AppSidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { currentUser, logout, switchRole } = useAuth();
   const { getVisiblePages } = useRoleStore();
-  const { getPendingRequests } = useApprovalStore();
+  const { getPendingRequests, fetchRequests, initialized } = useApprovalStore();
+
+  useEffect(() => {
+    if (currentUser && !initialized) {
+      fetchRequests();
+    }
+  }, [currentUser, initialized, fetchRequests]);
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, setTheme } = useTheme();
