@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      approval_requests: {
+        Row: {
+          changes: Json | null
+          column_count: number
+          created_at: string
+          data: Json | null
+          file_name: string
+          id: string
+          metadata: Json | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          row_count: number
+          status: string
+          submitted_at: string
+          submitted_by: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          changes?: Json | null
+          column_count?: number
+          created_at?: string
+          data?: Json | null
+          file_name: string
+          id?: string
+          metadata?: Json | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          row_count?: number
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          changes?: Json | null
+          column_count?: number
+          created_at?: string
+          data?: Json | null
+          file_name?: string
+          id?: string
+          metadata?: Json | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          row_count?: number
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       custom_templates: {
         Row: {
           category: string

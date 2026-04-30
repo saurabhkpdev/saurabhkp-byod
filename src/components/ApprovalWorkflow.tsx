@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,36 +28,42 @@ const typeConfig: Record<string, { label: string; icon: React.ElementType }> = {
 };
 
 const ApprovalWorkflow = () => {
-  const { requests, approveRequest, rejectRequest, deleteRequest, clearAllRequests } = useApprovalStore();
+  const { requests, fetchRequests, approveRequest, rejectRequest, deleteRequest, clearAllRequests } = useApprovalStore();
   const { currentUser } = useAuth();
   const [selectedRequest, setSelectedRequest] = useState<ApprovalRequest | null>(null);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [rejectingRequestId, setRejectingRequestId] = useState<string | null>(null);
 
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
+
   const pendingRequests = requests.filter((r) => r.status === "pending");
   const processedRequests = requests.filter((r) => r.status !== "pending");
 
-  const handleApprove = (id: string) => {
+  const handleApprove = async (id: string) => {
     if (!currentUser) return;
-    
-    const success = approveRequest(id, currentUser.username);
+
+    const success = await approveRequest(id, currentUser.username);
     if (success) {
       toast.success("Request approved", {
         description: "The changes will be committed to the database.",
       });
+    } else {
+      toast.error("Failed to approve request");
     }
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!currentUser || !rejectingRequestId) return;
-    
+
     if (!rejectReason.trim()) {
       toast.error("Please provide a reason for rejection");
       return;
     }
-    
-    const success = rejectRequest(rejectingRequestId, currentUser.username, rejectReason);
+
+    const success = await rejectRequest(rejectingRequestId, currentUser.username, rejectReason);
     if (success) {
       toast.success("Request rejected", {
         description: "The submitter will be notified.",
@@ -65,6 +71,8 @@ const ApprovalWorkflow = () => {
       setIsRejectDialogOpen(false);
       setRejectReason("");
       setRejectingRequestId(null);
+    } else {
+      toast.error("Failed to reject request");
     }
   };
 
@@ -74,9 +82,10 @@ const ApprovalWorkflow = () => {
     setIsRejectDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    deleteRequest(id);
-    toast.success("Request deleted");
+  const handleDelete = async (id: string) => {
+    const ok = await deleteRequest(id);
+    if (ok) toast.success("Request deleted");
+    else toast.error("Failed to delete request");
   };
 
   const renderRequestRow = (request: ApprovalRequest, showActions: boolean = true) => {
@@ -190,8 +199,8 @@ const ApprovalWorkflow = () => {
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() => {
-                        clearAllRequests();
+                      onClick={async () => {
+                        await clearAllRequests();
                         toast.success("All requests cleared");
                       }}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

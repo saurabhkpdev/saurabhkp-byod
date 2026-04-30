@@ -544,30 +544,33 @@ export const DataQualityPanel = ({ columns, rows, fileName, templateId, onProces
                         return;
                       }
                       setIsSubmitting(true);
-                      
-                      // Submit for approval
-                      const requestId = submitForApproval({
-                        type: 'data_upload',
-                        submittedBy: currentUser.username,
-                        fileName: fileName || 'Untitled',
-                        rowCount: rows.length,
-                        columnCount: columns.length,
-                        data: { columns, rows },
-                      });
-                      
-                      logEvent('approval_submitted', `Submitted data for approval: ${fileName || 'Untitled'} (${rows.length} rows)`, 'Data Studio', { 
-                        requestId,
-                        fileName,
-                        rowCount: rows.length 
-                      });
-                      
-                      setTimeout(() => {
-                        setIsSubmitting(false);
-                        toast.success('🎉 Submitted for approval!', {
-                          description: 'Your data will be reviewed before being committed to the database.',
+
+                      // Submit for approval (async, persisted to backend)
+                      (async () => {
+                        const requestId = await submitForApproval({
+                          type: 'data_upload',
+                          fileName: fileName || 'Untitled',
+                          rowCount: rows.length,
+                          columnCount: columns.length,
+                          data: { columns, rows },
                         });
-                        onProcessData();
-                      }, 800);
+
+                        logEvent('approval_submitted', `Submitted data for approval: ${fileName || 'Untitled'} (${rows.length} rows)`, 'Data Studio', {
+                          requestId,
+                          fileName,
+                          rowCount: rows.length,
+                        });
+
+                        setIsSubmitting(false);
+                        if (requestId) {
+                          toast.success('🎉 Submitted for approval!', {
+                            description: 'Your data will be reviewed before being committed to the database.',
+                          });
+                          onProcessData();
+                        } else {
+                          toast.error('Failed to submit for approval');
+                        }
+                      })();
                     }}
                     disabled={!canProcess || isSubmitting}
                     className="bg-green-600 hover:bg-green-700"
