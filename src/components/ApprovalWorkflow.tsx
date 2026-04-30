@@ -199,8 +199,8 @@ const ApprovalWorkflow = () => {
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() => {
-                        clearAllRequests();
+                      onClick={async () => {
+                        await clearAllRequests();
                         toast.success("All requests cleared");
                       }}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
