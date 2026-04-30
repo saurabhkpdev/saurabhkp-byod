@@ -60,7 +60,34 @@ export function useOnboardingTour() {
           element: '[data-tour="nav-templates"]',
           popover: {
             title: '📄 Templates',
-            description: 'Browse and manage reusable data templates to speed up your workflow.',
+            description: 'Browse and manage reusable data templates. Attach quality rules and share with your groups.',
+            side: 'right',
+            align: 'start',
+          },
+        },
+        {
+          element: '[data-tour="nav-datasets"]',
+          popover: {
+            title: '🗂️ Datasets',
+            description: 'Your saved dataset library. Track versions, share with groups, and see which quality rules are attached.',
+            side: 'right',
+            align: 'start',
+          },
+        },
+        {
+          element: '[data-tour="nav-actions"]',
+          popover: {
+            title: '⚡ Data Flows',
+            description: 'Configure automated triggers — webhooks, Airflow, Snowflake, and email notifications when data changes.',
+            side: 'right',
+            align: 'start',
+          },
+        },
+        {
+          element: '[data-tour="nav-quality-rules"]',
+          popover: {
+            title: '✅ Quality Rules',
+            description: 'Define column and row-level validation rules, then attach them to templates or datasets to run during validation.',
             side: 'right',
             align: 'start',
           },
@@ -70,6 +97,33 @@ export function useOnboardingTour() {
           popover: {
             title: '📖 Documentation',
             description: 'Find quick start guides, feature details, and FAQs all in one place.',
+            side: 'right',
+            align: 'start',
+          },
+        },
+        {
+          element: '[data-tour="nav-approvals"]',
+          popover: {
+            title: '📝 Approvals',
+            description: 'Review and approve data manipulations submitted by other users before they take effect.',
+            side: 'right',
+            align: 'start',
+          },
+        },
+        {
+          element: '[data-tour="nav-access"]',
+          popover: {
+            title: '🔑 Access',
+            description: 'Manage external data source credentials used by Data Studio and Data Flows.',
+            side: 'right',
+            align: 'start',
+          },
+        },
+        {
+          element: '[data-tour="nav-admin"]',
+          popover: {
+            title: '🛡️ Admin',
+            description: 'Admin-only: manage users, roles, groups, audit logs, analytics, and platform settings.',
             side: 'right',
             align: 'start',
           },
