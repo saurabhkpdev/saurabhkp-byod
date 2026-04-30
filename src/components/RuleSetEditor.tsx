@@ -80,16 +80,16 @@ export function RuleSetEditor({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="max-w-3xl h-[90vh] max-h-[820px] flex flex-col overflow-hidden">
+        <DialogHeader className="shrink-0 pr-6">
           <DialogTitle>Quality Rule Set</DialogTitle>
           <DialogDescription>
             Define column-level rules and row-level conditional checks. Reference columns in row rules with <code className="text-xs bg-muted px-1 rounded">{`{column_name}`}</code>.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 flex-1 min-h-0 flex flex-col">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-3 flex-1 min-h-0 flex flex-col overflow-hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 shrink-0">
             <div>
               <Label>Name</Label>
               <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Customer data v1" />
@@ -100,7 +100,7 @@ export function RuleSetEditor({
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center justify-between pt-2 shrink-0">
             <p className="text-sm font-medium">Rules ({rules.length})</p>
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={addColumnRule}>
@@ -113,7 +113,7 @@ export function RuleSetEditor({
           </div>
 
           <ScrollArea className="flex-1 min-h-0 pr-3">
-            <div className="space-y-2">
+            <div className="space-y-2 pb-2">
               {rules.length === 0 && (
                 <Card><CardContent className="py-6 text-center text-sm text-muted-foreground">
                   No rules yet. Add a column or row rule to get started.
@@ -228,7 +228,7 @@ export function RuleSetEditor({
           </ScrollArea>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="shrink-0 pt-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             <X className="w-4 h-4 mr-1" /> Cancel
           </Button>
