@@ -225,6 +225,12 @@ export default function DatasetLibrary() {
                                 {d.shared_group_ids.length}
                               </Badge>
                             )}
+                            {(datasetRuleCounts[d.dataset_name] ?? 0) > 0 && (
+                              <Badge variant="outline" className="text-xs gap-1 border-primary/40 text-primary">
+                                <ListChecks className="w-3 h-3" />
+                                {datasetRuleCounts[d.dataset_name]}
+                              </Badge>
+                            )}
                           </div>
                         </div>
                         <CardTitle className="text-lg mt-2 truncate">{d.dataset_name}</CardTitle>
