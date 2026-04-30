@@ -99,6 +99,7 @@ const AppRoutes = () => {
 
   return (
     <>
+    <UserThemeSync />
     <Routes>
       <Route
         path="/login"
