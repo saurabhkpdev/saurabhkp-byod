@@ -117,6 +117,8 @@ export default function DatasetLibrary() {
     return myDatasets.filter((d) => d.dataset_name.toLowerCase().includes(q));
   }, [myDatasets, searchQuery]);
 
+  const datasetRuleCounts = useDatasetRuleCounts(myDatasets.map((d) => d.dataset_name));
+
   const geoCount = mockDatasets.filter(d => d.hasGeoData).length;
   const generalCount = mockDatasets.length - geoCount;
 
